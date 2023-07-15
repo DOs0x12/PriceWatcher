@@ -1,5 +1,5 @@
 package interfaces
 
 type Processor interface {
-	Process(page string)
+	Process(page string) float32
 }

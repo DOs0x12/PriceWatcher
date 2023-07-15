@@ -1,5 +1,5 @@
 package interfaces
 
 type Sender interface {
-	Send(rate int)
+	Send(rate float32)
 }
