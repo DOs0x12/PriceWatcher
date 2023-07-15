@@ -7,14 +7,15 @@ import (
 
 type testProcessor struct{}
 
-func (p testProcessor) Process(page string) float32 {
+func (p testProcessor) Process(page *string) float32 {
 	return 55.55
 }
 
 type testRequester struct{}
 
 func (r testRequester) RequestPage() entities.Response {
-	return entities.Response{Page: "test55.55"}
+	s := "test55.55"
+	return entities.Response{Page: &s}
 }
 
 type testSender struct{}
