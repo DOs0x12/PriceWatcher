@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"GoldRateGetter/internal/app"
+	"GoldRateGetter/internal/domain"
+	"GoldRateGetter/internal/infrastructure/requester"
+	"GoldRateGetter/internal/infrastructure/sender"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	req := requester.Requester{}
+	pr := domain.Processor{}
+	sen := sender.Sender{}
+
+	app.HandleGoldRate(req, pr, sen)
 }
