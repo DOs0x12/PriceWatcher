@@ -2,7 +2,6 @@ package requester
 
 import (
 	"GoldRateGetter/internal/entities"
-	"io"
 	"net/http"
 )
 
@@ -15,16 +14,8 @@ func (r Requester) RequestPage() entities.Response {
 	resp, err := http.Get(goldRateUrl)
 	if err != nil {
 		//TODO: appropriate error handling and logging
-		return entities.Response{Page: nil}
+		return entities.Response{Body: nil}
 	}
 
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		//TODO: appropriate error handling and logging
-		return entities.Response{Page: nil}
-	}
-
-	sb := string(data)
-
-	return entities.Response{Page: &sb}
+	return entities.Response{Body: resp.Body}
 }

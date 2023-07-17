@@ -1,5 +1,7 @@
 package entities
 
+import "io"
+
 type Response struct {
-	Page *string
+	Body io.ReadCloser
 }
