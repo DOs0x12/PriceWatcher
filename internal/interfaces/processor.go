@@ -1,5 +1,7 @@
 package interfaces
 
+import "io"
+
 type Processor interface {
-	Process(page *string) float32
+	Process(body io.ReadCloser) float32
 }
