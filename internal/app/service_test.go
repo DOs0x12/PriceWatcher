@@ -1,7 +1,7 @@
 package app
 
 // import (
-// 	"GoldRateGetter/internal/entities"
+// 	"GoldPriceGetter/internal/entities"
 // 	"io"
 // 	"strings"
 // 	"testing"
@@ -22,10 +22,10 @@ package app
 
 // type testSender struct{}
 
-// func (s testSender) Send(rate float32) {
+// func (s testSender) Send(price float32) {
 
 // }
 
-// func TestHandleGoldRate(t *testing.T) {
-// 	HandleGoldRate(testRequester{}, testProcessor{}, testSender{})
+// func TestHandleGoldPrice(t *testing.T) {
+// 	HandleGoldPrice(testRequester{}, testProcessor{}, testSender{})
 // }

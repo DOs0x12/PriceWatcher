@@ -1,6 +1,6 @@
 package interfaces
 
-import "GoldRateGetter/internal/entities"
+import "GoldPriceGetter/internal/entities"
 
 type Requester interface {
 	RequestPage() entities.Response

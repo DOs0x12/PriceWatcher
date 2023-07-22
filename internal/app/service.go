@@ -1,12 +1,12 @@
 package app
 
 import (
-	"GoldRateGetter/internal/domain"
-	"GoldRateGetter/internal/interfaces"
+	"GoldPriceGetter/internal/domain"
+	"GoldPriceGetter/internal/interfaces"
 )
 
-func HandleGoldRate(req interfaces.Requester, ext domain.Extractor, sender interfaces.Sender) {
+func HandleGoldPrice(req interfaces.Requester, ext domain.Extractor, sender interfaces.Sender) {
 	response := req.RequestPage()
-	rate := ext.ExtractRate(response.Body)
-	sender.Send(rate)
+	price := ext.ExtractPrice(response.Body)
+	sender.Send(price)
 }

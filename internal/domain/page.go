@@ -7,12 +7,12 @@ import (
 )
 
 type Extractor interface {
-	ExtractRate(body io.ReadCloser) float32
+	ExtractPrice(body io.ReadCloser) float32
 }
 
-type RateExtractor struct{}
+type PriceExtractor struct{}
 
-func (ext RateExtractor) ExtractRate(body io.ReadCloser) float32 {
+func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) float32 {
 	doc, err := html.Parse(body)
 
 	if err != nil {

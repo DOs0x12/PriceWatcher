@@ -1,4 +1,4 @@
-module GoldRateGetter
+module GoldPriceGetter
 
 go 1.20
 

@@ -1,2 +1,2 @@
-# GoldRateChecker
-An app is for getting gold rate from a bank site or resource.
+# GoldPriceGetter
+An app is for getting a gold price from a bank site or resource.

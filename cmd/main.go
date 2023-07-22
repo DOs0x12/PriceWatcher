@@ -1,16 +1,16 @@
 package main
 
 import (
-	"GoldRateGetter/internal/app"
-	"GoldRateGetter/internal/domain"
-	"GoldRateGetter/internal/infrastructure/requester"
-	"GoldRateGetter/internal/infrastructure/sender"
+	"GoldPriceGetter/internal/app"
+	"GoldPriceGetter/internal/domain"
+	"GoldPriceGetter/internal/infrastructure/requester"
+	"GoldPriceGetter/internal/infrastructure/sender"
 )
 
 func main() {
 	req := requester.Requester{}
-	ext := domain.RateExtractor{}
+	ext := domain.PriceExtractor{}
 	sen := sender.Sender{}
 
-	app.HandleGoldRate(req, ext, sen)
+	app.HandleGoldPrice(req, ext, sen)
 }

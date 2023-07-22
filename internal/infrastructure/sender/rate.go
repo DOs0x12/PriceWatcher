@@ -2,6 +2,6 @@ package sender
 
 type Sender struct{}
 
-func (s Sender) Send(rate float32) {
+func (s Sender) Send(price float32) {
 
 }
