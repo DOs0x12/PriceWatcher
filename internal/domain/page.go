@@ -22,10 +22,11 @@ func (ext RateExtractor) ExtractRate(body io.ReadCloser) float32 {
 
 	tag := "td"
 
-	tagValue := doTraverse(doc, tag)
-	tagData := *tagValue
-	t := tagData[0]
+	tagPs := doTraverse(doc, tag)
+	tags := *tagPs
+	t := tags[0]
 	_ = t
+
 	return 5.55
 }
 
@@ -36,7 +37,7 @@ func doTraverse(doc *html.Node, tag string) *[]string {
 
 	traverse = func(n *html.Node, data *[]string, tag string) *html.Node {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			if c.Type == html.TextNode && c.Parent.Data == tag {
+			if isNodeWithPriceForBuying(c, tag) {
 				*data = append(*data, c.Data)
 			}
 
@@ -53,4 +54,8 @@ func doTraverse(doc *html.Node, tag string) *[]string {
 	traverse(doc, &data, tag)
 
 	return &data
+}
+
+func isNodeWithPriceForBuying(n *html.Node, tag string) bool {
+	return n.Type == html.TextNode && n.Parent.Data == tag
 }
