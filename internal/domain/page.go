@@ -6,13 +6,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Processor interface {
-	Process(body io.ReadCloser) float32
+type Extractor interface {
+	ExtractRate(body io.ReadCloser) float32
 }
 
-type PageProcessor struct{}
+type RateExtractor struct{}
 
-func (p PageProcessor) Process(body io.ReadCloser) float32 {
+func (ext RateExtractor) ExtractRate(body io.ReadCloser) float32 {
 	doc, err := html.Parse(body)
 
 	if err != nil {

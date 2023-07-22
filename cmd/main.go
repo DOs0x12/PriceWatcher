@@ -9,8 +9,8 @@ import (
 
 func main() {
 	req := requester.Requester{}
-	pr := domain.PageProcessor{}
+	ext := domain.RateExtractor{}
 	sen := sender.Sender{}
 
-	app.HandleGoldRate(req, pr, sen)
+	app.HandleGoldRate(req, ext, sen)
 }

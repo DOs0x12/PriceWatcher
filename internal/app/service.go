@@ -5,8 +5,8 @@ import (
 	"GoldRateGetter/internal/interfaces"
 )
 
-func HandleGoldRate(req interfaces.Requester, pr domain.Processor, sender interfaces.Sender) {
+func HandleGoldRate(req interfaces.Requester, ext domain.Extractor, sender interfaces.Sender) {
 	response := req.RequestPage()
-	rate := pr.Process(response.Body)
+	rate := ext.ExtractRate(response.Body)
 	sender.Send(rate)
 }
