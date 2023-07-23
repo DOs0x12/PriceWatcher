@@ -27,32 +27,32 @@ func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) float32 {
 	tag := "td"
 	re := regexp.MustCompile(regstring)
 
-	data, isFound := doTraverse(doc, tag, re)
+	data := doTraverse(doc, tag, re)
 
-	if !isFound {
+	if data == "" {
 		return 0.00
 	}
 
 	return getPrice(data)
 }
 
-func doTraverse(doc *html.Node, tag string, re *regexp.Regexp) (data string, isFound bool) {
-	var traverse func(n *html.Node, tag string, re *regexp.Regexp) (data string, isFound bool)
+func doTraverse(doc *html.Node, tag string, re *regexp.Regexp) string {
+	var traverse func(n *html.Node, tag string, re *regexp.Regexp) string
 
-	traverse = func(n *html.Node, tag string, re *regexp.Regexp) (data string, isFound bool) {
+	traverse = func(n *html.Node, tag string, re *regexp.Regexp) string {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			if isNodeWithPriceForBuying(c, tag, re) {
-				return c.Data, true
+				return c.Data
 			}
 
-			data, isFound := traverse(c, tag, re)
+			data := traverse(c, tag, re)
 
-			if isFound {
-				return data, true
+			if data != "" {
+				return data
 			}
 		}
 
-		return "", false
+		return ""
 	}
 
 	return traverse(doc, tag, re)
