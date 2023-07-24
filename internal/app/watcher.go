@@ -20,11 +20,11 @@ func WatchGoldPrice(s Service) {
 	}
 }
 
-func isMessageHour(h int) bool {
+func isMessageHour(hour int) bool {
 	hours := []int{12, 17}
 
-	for i := range hours {
-		if i == h {
+	for _, h := range hours {
+		if h == hour {
 			return true
 		}
 	}
