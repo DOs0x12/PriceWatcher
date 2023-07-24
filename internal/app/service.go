@@ -5,8 +5,32 @@ import (
 	"GoldPriceGetter/internal/interfaces"
 )
 
-func HandleGoldPrice(req interfaces.Requester, ext domain.Extractor, sender interfaces.Sender) {
-	response := req.RequestPage()
-	price := ext.ExtractPrice(response.Body)
-	sender.Send(price)
+type Service interface {
+	HandlePrice()
+}
+
+type GoldPriceService struct {
+	req    interfaces.Requester
+	ext    domain.Extractor
+	sender interfaces.Sender
+}
+
+func (s *GoldPriceService) HandlePrice() {
+	response := s.req.RequestPage()
+	price := s.ext.ExtractPrice(response.Body)
+	s.sender.Send(price)
+}
+
+func NewGoldPriceService(
+	req interfaces.Requester,
+	ext domain.Extractor,
+	sender interfaces.Sender) *GoldPriceService {
+
+	serv := GoldPriceService{
+		req:    req,
+		ext:    ext,
+		sender: sender,
+	}
+
+	return &serv
 }

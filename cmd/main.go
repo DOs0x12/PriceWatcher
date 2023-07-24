@@ -12,5 +12,7 @@ func main() {
 	ext := domain.PriceExtractor{}
 	sen := sender.Sender{}
 
-	app.HandleGoldPrice(req, ext, sen)
+	serv := app.NewGoldPriceService(req, ext, sen)
+
+	app.WatchGoldPrice(serv)
 }
