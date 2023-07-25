@@ -2,6 +2,7 @@ package sender
 
 import (
 	"crypto/tls"
+	"fmt"
 
 	gomail "gopkg.in/mail.v2"
 )
@@ -9,7 +10,7 @@ import (
 const (
 	from     = "guise322@ya.ru"
 	pass     = "nxwamiqmoqdolhds"
-	to       = "dimsonex@ya.ru"
+	to       = "paulina.urgn@yandex.ru"
 	smtpHost = "smtp.yandex.ru"
 	smtpPort = 465
 )
@@ -17,8 +18,8 @@ const (
 type Sender struct{}
 
 func (s Sender) Send(price float32) {
-	msg := "Hello there!"
-	sub := "testSub"
+	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
+	sub := "Че по золоту?"
 	m := gomail.NewMessage()
 	configure(m, sub, msg)
 	d := gomail.NewDialer(smtpHost, smtpPort, from, pass)
