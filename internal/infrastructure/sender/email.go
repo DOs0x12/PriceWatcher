@@ -26,9 +26,7 @@ func (s Sender) Send(price float32) error {
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
-		sendingErr := "an error occurs when sending an email: %w"
-
-		return fmt.Errorf(sendingErr, err)
+		return fmt.Errorf("an error occurs when sending an email: %w", err)
 	}
 
 	return nil

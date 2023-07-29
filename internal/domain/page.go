@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -21,9 +20,7 @@ type PriceExtractor struct{}
 func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) (float32, error) {
 	doc, err := html.Parse(body)
 	if err != nil {
-		priceErr := "cannot parse the body to an HTML document: %w"
-
-		return 0.00, fmt.Errorf(priceErr, err)
+		return 0.00, fmt.Errorf("cannot parse the body to an HTML document: %w", err)
 	}
 
 	tag := "td"
@@ -32,9 +29,7 @@ func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) (float32, error) {
 	data := doTraverse(doc, tag, re)
 
 	if data == "" {
-		traverceErr := fmt.Sprintf("the document does not have a price value with the tag: %v", tag)
-
-		return 0.00, errors.New(traverceErr)
+		return 0.00, fmt.Errorf("the document does not have a price value with the tag: %v", tag)
 	}
 
 	return getPrice(data)
@@ -71,17 +66,13 @@ func getPrice(data string) (float32, error) {
 	dataLen := len(data)
 
 	if (dataLen == 0) || (dataLen <= trailingSymCnt) {
-		lenErr := fmt.Sprintf("the length of the data string is not valid: %v", dataLen)
-
-		return 0.00, errors.New(lenErr)
+		return 0.00, fmt.Errorf("the length of the data string is not valid: %v", dataLen)
 	}
 
 	data = data[trailingSymCnt : dataLen-1]
 	price, err := strconv.ParseFloat(data, 32)
 	if err != nil {
-		parseErr := fmt.Sprintf("cannot parse the string data: %v", data)
-
-		return 0.00, errors.New(parseErr)
+		return 0.00, fmt.Errorf("cannot parse the string data: %v", data)
 	}
 
 	return float32(price), nil

@@ -19,17 +19,13 @@ type GoldPriceService struct {
 func (s *GoldPriceService) HandlePrice() error {
 	response, err := s.req.RequestPage()
 	if err != nil {
-		serviceErr := "cannot get a page with the current price of gold: %w"
-
-		return fmt.Errorf(serviceErr, err)
+		return fmt.Errorf("cannot get a page with the current price of gold: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	s.sender.Send(price)
 	if err != nil {
-		serviceErr := "cannot exttract the gold price from the body: %w"
-
-		return fmt.Errorf(serviceErr, err)
+		return fmt.Errorf("cannot exttract the gold price from the body: %w", err)
 	}
 
 	return nil
