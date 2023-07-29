@@ -5,6 +5,8 @@ import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/infrastructure/requester"
 	"GoldPriceGetter/internal/infrastructure/sender"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -16,7 +18,12 @@ var (
 func main() {
 	setGlobalVals()
 	serv := app.NewGoldPriceService(req, ext, sen)
+
+	logrus.Infoln("Start the application")
+
 	app.WatchGoldPrice(serv)
+
+	logrus.Infoln("The application has been stopped")
 }
 
 func setGlobalVals() {

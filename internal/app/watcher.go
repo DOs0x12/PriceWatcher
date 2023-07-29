@@ -2,6 +2,8 @@ package app
 
 import (
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func WatchGoldPrice(s Service) {
@@ -11,11 +13,10 @@ func WatchGoldPrice(s Service) {
 	for {
 		select {
 		case <-done:
+			logrus.Infoln("Done is called")
 			return
 		case <-t.C:
-			if isMessageHour(time.Now().Hour()) {
-				_ = s.HandlePrice()
-			}
+			handlePrice(s)
 		}
 	}
 }
@@ -30,4 +31,21 @@ func isMessageHour(hour int) bool {
 	}
 
 	return false
+}
+
+func handlePrice(s Service) {
+	logrus.Infoln("Check time for handling a gold price")
+
+	if !isMessageHour(time.Now().Hour()) {
+		return
+	}
+
+	logrus.Infoln("Start handling a gold price")
+
+	err := s.HandlePrice()
+	if err != nil {
+		logrus.Errorf("Handling the gold price ends with the error: %v", err)
+	}
+
+	logrus.Info("The gold price is handled")
 }
