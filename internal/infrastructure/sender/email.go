@@ -17,20 +17,24 @@ const (
 
 type Sender struct{}
 
-func (s Sender) Send(price float32) {
+func (s Sender) Send(price float32) error {
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
 	sub := "Че по золоту?"
 	m := gomail.NewMessage()
-	configure(m, sub, msg)
+	configureMsg(m, sub, msg)
 	d := gomail.NewDialer(smtpHost, smtpPort, from, pass)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+		sendingErr := "an error occurs when sending an email: %w"
+
+		return fmt.Errorf(sendingErr, err)
 	}
+
+	return nil
 }
 
-func configure(m *gomail.Message, sub, msg string) {
+func configureMsg(m *gomail.Message, sub, msg string) {
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", sub)

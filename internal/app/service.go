@@ -3,10 +3,11 @@ package app
 import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/interfaces"
+	"fmt"
 )
 
 type Service interface {
-	HandlePrice()
+	HandlePrice() error
 }
 
 type GoldPriceService struct {
@@ -15,10 +16,23 @@ type GoldPriceService struct {
 	sender interfaces.Sender
 }
 
-func (s *GoldPriceService) HandlePrice() {
-	response := s.req.RequestPage()
-	price := s.ext.ExtractPrice(response.Body)
+func (s *GoldPriceService) HandlePrice() error {
+	response, err := s.req.RequestPage()
+	if err != nil {
+		serviceErr := "cannot get a page with the current price of gold: %w"
+
+		return fmt.Errorf(serviceErr, err)
+	}
+
+	price, err := s.ext.ExtractPrice(response.Body)
 	s.sender.Send(price)
+	if err != nil {
+		serviceErr := "cannot exttract the gold price from the body: %w"
+
+		return fmt.Errorf(serviceErr, err)
+	}
+
+	return nil
 }
 
 func NewGoldPriceService(

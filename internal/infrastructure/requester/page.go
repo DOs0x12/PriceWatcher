@@ -2,6 +2,7 @@ package requester
 
 import (
 	"GoldPriceGetter/internal/entities"
+	"fmt"
 	"net/http"
 )
 
@@ -10,12 +11,13 @@ const goldPriceUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 type Requester struct{}
 
-func (r Requester) RequestPage() entities.Response {
+func (r Requester) RequestPage() (entities.Response, error) {
 	resp, err := http.Get(goldPriceUrl)
 	if err != nil {
-		//TODO: appropriate error handling and logging
-		return entities.Response{Body: nil}
+		requestError := fmt.Sprintf("Cannot get the data from the address: %v", goldPriceUrl)
+
+		return entities.Response{Body: nil}, fmt.Errorf(requestError, err)
 	}
 
-	return entities.Response{Body: resp.Body}
+	return entities.Response{Body: resp.Body}, nil
 }

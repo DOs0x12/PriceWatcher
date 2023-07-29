@@ -14,7 +14,7 @@ func WatchGoldPrice(s Service) {
 			return
 		case <-t.C:
 			if isMessageHour(time.Now().Hour()) {
-				s.HandlePrice()
+				_ = s.HandlePrice()
 			}
 		}
 	}
