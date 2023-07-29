@@ -7,12 +7,20 @@ import (
 	"GoldPriceGetter/internal/infrastructure/sender"
 )
 
+var (
+	req requester.Requester
+	ext domain.PriceExtractor
+	sen sender.Sender
+)
+
 func main() {
-	req := requester.Requester{}
-	ext := domain.PriceExtractor{}
-	sen := sender.Sender{}
-
+	setGlobalVals()
 	serv := app.NewGoldPriceService(req, ext, sen)
-
 	app.WatchGoldPrice(serv)
+}
+
+func setGlobalVals() {
+	req = requester.Requester{}
+	ext = domain.PriceExtractor{}
+	sen = sender.Sender{}
 }
