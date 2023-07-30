@@ -4,43 +4,76 @@ import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/interfaces"
 	"fmt"
-)
+	"time"
 
-type Service interface {
-	HandlePrice() error
-}
+	"github.com/sirupsen/logrus"
+)
 
 type GoldPriceService struct {
 	req    interfaces.Requester
-	ext    domain.Extractor
 	sender interfaces.Sender
+	ext    domain.Extractor
+	val    domain.HourValidator
 }
 
-func (s *GoldPriceService) HandlePrice() error {
+func NewGoldPriceService(
+	req interfaces.Requester,
+	sender interfaces.Sender,
+	ext domain.Extractor,
+	val domain.HourValidator) *GoldPriceService {
+
+	serv := GoldPriceService{
+		req:    req,
+		sender: sender,
+		ext:    ext,
+		val:    val,
+	}
+
+	return &serv
+}
+
+func (s *GoldPriceService) serve() error {
+	logrus.Infoln("Check time for processing a gold price")
+
+	curHour := time.Now().Hour()
+
+	if !s.val.Validate(curHour) {
+		return nil
+	}
+
+	logrus.Infoln("Start processing a gold price")
+
 	response, err := s.req.RequestPage()
 	if err != nil {
 		return fmt.Errorf("cannot get a page with the current price of gold: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
-	s.sender.Send(price)
 	if err != nil {
 		return fmt.Errorf("cannot extract the gold price from the body: %w", err)
 	}
 
+	s.sender.Send(price)
+	if err != nil {
+		return fmt.Errorf("cannot send the gold price: %w", err)
+	}
+
+	logrus.Info("The gold price is processed")
+
 	return nil
 }
 
-func NewGoldPriceService(
-	req interfaces.Requester,
-	ext domain.Extractor,
-	sender interfaces.Sender) *GoldPriceService {
+func (s *GoldPriceService) Watch(done <-chan struct{}) {
+	t := time.NewTicker(1 * time.Hour)
 
-	serv := GoldPriceService{
-		req:    req,
-		ext:    ext,
-		sender: sender,
+	for {
+		select {
+		case <-done:
+			logrus.Infoln("Shut down the application")
+			return
+		case <-t.C:
+			err := s.serve()
+			logrus.Errorf("The error occurs while serving a gold price: %v", err)
+		}
 	}
-
-	return &serv
 }

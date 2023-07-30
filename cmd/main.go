@@ -15,25 +15,26 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	startInterruptionWatch(cancel)
+	watchInterruption(cancel)
 	serv := newService()
 
 	logrus.Infoln("Start the application")
 
-	app.WatchGoldPrice(serv, ctx.Done())
+	serv.Watch(ctx.Done())
 
 	logrus.Infoln("The application is done")
 }
 
 func newService() *app.GoldPriceService {
 	req := requester.Requester{}
-	ext := domain.PriceExtractor{}
 	sen := sender.Sender{}
+	ext := domain.PriceExtractor{}
+	val := domain.MessageHourVal{}
 
-	return app.NewGoldPriceService(req, ext, sen)
+	return app.NewGoldPriceService(req, sen, ext, val)
 }
 
-func startInterruptionWatch(cancel context.CancelFunc) {
+func watchInterruption(cancel context.CancelFunc) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
