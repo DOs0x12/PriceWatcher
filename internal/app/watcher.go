@@ -6,9 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func WatchGoldPrice(s Service) {
+func WatchGoldPrice(s Service, done chan interface{}) {
 	t := time.NewTicker(1 * time.Hour)
-	done := make(chan interface{})
 
 	for {
 		select {

@@ -11,28 +11,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	req requester.Requester
-	ext domain.PriceExtractor
-	sen sender.Sender
-)
-
 func main() {
 	startInterruptionWatch()
-	setGlobalVals()
-	serv := app.NewGoldPriceService(req, ext, sen)
+	done := make(chan interface{})
+	serv := newService()
 
 	logrus.Infoln("Start the application")
 
-	app.WatchGoldPrice(serv)
+	app.WatchGoldPrice(serv, done)
 
 	logrus.Infoln("The application is done")
 }
 
-func setGlobalVals() {
-	req = requester.Requester{}
-	ext = domain.PriceExtractor{}
-	sen = sender.Sender{}
+func newService() *app.GoldPriceService {
+	req := requester.Requester{}
+	ext := domain.PriceExtractor{}
+	sen := sender.Sender{}
+
+	return app.NewGoldPriceService(req, ext, sen)
 }
 
 func startInterruptionWatch() {

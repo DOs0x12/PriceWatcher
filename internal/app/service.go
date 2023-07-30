@@ -25,7 +25,7 @@ func (s *GoldPriceService) HandlePrice() error {
 	price, err := s.ext.ExtractPrice(response.Body)
 	s.sender.Send(price)
 	if err != nil {
-		return fmt.Errorf("cannot exttract the gold price from the body: %w", err)
+		return fmt.Errorf("cannot extract the gold price from the body: %w", err)
 	}
 
 	return nil
