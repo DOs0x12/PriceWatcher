@@ -6,13 +6,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func WatchGoldPrice(s Service, done chan interface{}) {
+func WatchGoldPrice(s Service, done <-chan struct{}) {
 	t := time.NewTicker(1 * time.Hour)
 
 	for {
 		select {
 		case <-done:
-			logrus.Infoln("Done is called")
+			logrus.Infoln("Shut down the application")
 			return
 		case <-t.C:
 			handlePrice(s)

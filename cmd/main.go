@@ -5,6 +5,7 @@ import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/infrastructure/requester"
 	"GoldPriceGetter/internal/infrastructure/sender"
+	"context"
 	"os"
 	"os/signal"
 
@@ -12,13 +13,14 @@ import (
 )
 
 func main() {
-	startInterruptionWatch()
-	done := make(chan interface{})
+	ctx, cancel := context.WithCancel(context.Background())
+
+	startInterruptionWatch(cancel)
 	serv := newService()
 
 	logrus.Infoln("Start the application")
 
-	app.WatchGoldPrice(serv, done)
+	app.WatchGoldPrice(serv, ctx.Done())
 
 	logrus.Infoln("The application is done")
 }
@@ -31,13 +33,12 @@ func newService() *app.GoldPriceService {
 	return app.NewGoldPriceService(req, ext, sen)
 }
 
-func startInterruptionWatch() {
+func startInterruptionWatch(cancel context.CancelFunc) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
-		for range c {
-			logrus.Infof("The application has been stopped")
-			os.Exit(0)
-		}
+		<-c
+		logrus.Infof("The application has been stopped")
+		cancel()
 	}()
 }
