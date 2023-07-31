@@ -3,7 +3,11 @@ package app
 import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/interfaces"
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -63,7 +67,9 @@ func (s *GoldPriceService) serve() error {
 	return nil
 }
 
-func (s *GoldPriceService) Watch(done <-chan struct{}) {
+func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc) {
+	watchForInterruption(cancel)
+
 	t := time.NewTicker(1 * time.Hour)
 
 	for {
@@ -76,4 +82,13 @@ func (s *GoldPriceService) Watch(done <-chan struct{}) {
 			logrus.Errorf("The error occurs while serving a gold price: %v", err)
 		}
 	}
+}
+
+func watchForInterruption(cancel context.CancelFunc) {
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-c
+		cancel()
+	}()
 }
