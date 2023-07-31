@@ -79,7 +79,9 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 			return
 		case <-t.C:
 			err := s.serve()
-			logrus.Errorf("The error occurs while serving a gold price: %v", err)
+			if err != nil {
+				logrus.Errorf("The error occurs while serving a gold price: %v", err)
+			}
 		}
 	}
 }
