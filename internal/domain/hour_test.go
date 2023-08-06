@@ -2,7 +2,7 @@ package domain
 
 import "testing"
 
-func TestValide(t *testing.T) {
+func TestValidate(t *testing.T) {
 	val := MessageHourVal{}
 
 	tHours := [4]int{11, 13, 16, 18}
