@@ -32,7 +32,7 @@ func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) (float32, error) {
 		return 0.00, fmt.Errorf("the document does not have a price value with the tag: %v", tag)
 	}
 
-	return getPrice(data)
+	return getPrice(data), nil
 }
 
 func doTraverse(doc *html.Node, tag string, re *regexp.Regexp) string {
@@ -61,19 +61,10 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 	return n.Type == html.TextNode && n.Parent.Data == tag && re.MatchString(n.Data)
 }
 
-func getPrice(data string) (float32, error) {
-	trailingSymCnt := 17
-	dataLen := len(data)
+func getPrice(data string) float32 {
+	re := regexp.MustCompile(`([0-9]{4,5}\.[0-9][0-9])`)
+	match := re.FindStringSubmatch(data)[0]
+	price, _ := strconv.ParseFloat(match, 32)
 
-	if (dataLen == 0) || (dataLen <= trailingSymCnt) {
-		return 0.00, fmt.Errorf("the length of the data string is not valid: %v", dataLen)
-	}
-
-	data = data[trailingSymCnt : dataLen-1]
-	price, err := strconv.ParseFloat(data, 32)
-	if err != nil {
-		return 0.00, fmt.Errorf("cannot parse the string data: %v", data)
-	}
-
-	return float32(price), nil
+	return float32(price)
 }

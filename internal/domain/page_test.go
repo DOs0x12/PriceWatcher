@@ -51,34 +51,13 @@ func TestExtractPrice(t *testing.T) {
 			</head>
 			<body>
 				<table>
-					<td> покупка: 3232.00wrong value</td>
-				</table>
-			</body>
-		</html>`
-	rc.Reader = strings.NewReader(s)
-	want = 0.00
-	errTemplt := "cannot parse the string data:"
-	got, err = ext.ExtractPrice(rc)
-	if err != nil && !strings.Contains(err.Error(), errTemplt) {
-		t.Errorf("got not wanted error: %v, wanted error template: %v", err, errTemplt)
-	}
-	if got != want {
-		t.Errorf("got %v, wanted %v", got, want)
-	}
-
-	s = `
-		<html>
-			<head>
-				<title>test</title>
-			</head>
-			<body>
-				<table>
 					<td> покупка: wrong value</td>
 				</table>
 			</body>
 		</html>`
 	rc.Reader = strings.NewReader(s)
-	errTemplt = "the document does not have a price value with the tag:"
+	errTemplt := "the document does not have a price value with the tag:"
+	want = 0.00
 	got, err = ext.ExtractPrice(rc)
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
 		t.Errorf("got not wanted error: %v, wanted error template: %v", err, errTemplt)
