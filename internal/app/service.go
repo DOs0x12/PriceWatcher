@@ -36,10 +36,12 @@ func NewGoldPriceService(
 	return &serv
 }
 
+var nowHour = time.Now().Hour
+
 func (s *GoldPriceService) serve() error {
 	logrus.Infoln("Check time for processing a gold price")
 
-	curHour := time.Now().Hour()
+	curHour := nowHour()
 
 	if !s.val.Validate(curHour) {
 		return nil

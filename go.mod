@@ -5,7 +5,6 @@ go 1.20
 require golang.org/x/net v0.12.0
 
 require (
-	github.com/agiledragon/gomonkey v2.0.2+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 )

@@ -3,13 +3,9 @@ package app
 import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/entities"
-	"errors"
 	"io"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/agiledragon/gomonkey"
 )
 
 type testReadCloser struct {
@@ -40,33 +36,21 @@ func (r testRequester) RequestPage() (entities.Response, error) {
 
 type testSender struct{}
 
-func (s testSender) Send(price float32) error { return errors.New("HOHO") }
+func (s testSender) Send(price float32) error { return nil }
 
 func TestServe(t *testing.T) {
-	serv := GoldPriceService{
-		req:    testRequester{},
-		sender: testSender{},
-		ext:    domain.PriceExtractor{},
-		val:    domain.MessageHourVal{}}
-	patches := gomonkey.ApplyFunc(time.Time.Hour, func(time.Time) int {
-		return 12
-	})
-	defer patches.Reset()
-	var want error = nil
+	serv := NewGoldPriceService(
+		testRequester{},
+		testSender{},
+		domain.PriceExtractor{},
+		domain.MessageHourVal{})
+
+	workHour := 12
+	nowHour = func() int { return workHour }
+
 	got := serv.serve()
 
-	if want != got {
-		t.Errorf("got error: %v", got)
+	if got != nil {
+		t.Errorf("got error: %v", got.Error())
 	}
-
 }
-
-// type testProcessor struct{}
-
-// func (p testProcessor) Process(page *string) float32 {
-// 	return 55.55
-// }
-
-// func TestHandleGoldPrice(t *testing.T) {
-// 	HandleGoldPrice(testRequester{}, testProcessor{}, testSender{})
-// }
