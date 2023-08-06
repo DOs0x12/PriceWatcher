@@ -57,7 +57,7 @@ func (s *GoldPriceService) serve() error {
 		return fmt.Errorf("cannot extract the gold price from the body: %w", err)
 	}
 
-	s.sender.Send(price)
+	err = s.sender.Send(price)
 	if err != nil {
 		return fmt.Errorf("cannot send the gold price: %w", err)
 	}
