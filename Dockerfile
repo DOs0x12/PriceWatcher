@@ -11,4 +11,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /gold-price-getter
 
 FROM alpine:latest AS release-stage
 COPY --from=build-stage /gold-price-getter /gold-price-getter
+RUN apk add --no-cache tzdata
+ENV TZ=Europe/Moscow
 CMD ["/gold-price-getter"]
