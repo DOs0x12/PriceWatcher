@@ -5,7 +5,18 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 )
+
+var ext = PriceExtractor{}
+
+func TestExtractPrice(t *testing.T) {
+	logrus.Info("Start to test the func ExtractPrice() with true value")
+	withTrueValue(t)
+	logrus.Info("Start to test the func ExtractPrice() for errors")
+	testErrors(t)
+}
 
 type testReadCloser struct {
 	Reader io.Reader
@@ -20,8 +31,7 @@ func (errReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("Some error!")
 }
 
-func TestExtractPrice(t *testing.T) {
-	ext := PriceExtractor{}
+func withTrueValue(t *testing.T) {
 	s := `
 		<html>
 			<head>
@@ -43,8 +53,10 @@ func TestExtractPrice(t *testing.T) {
 	if got != want && err == nil {
 		t.Errorf("got %v, wanted %v", got, want)
 	}
+}
 
-	s = `
+func testErrors(t *testing.T) {
+	s := `
 		<html>
 			<head>
 				<title>test</title>
@@ -55,10 +67,11 @@ func TestExtractPrice(t *testing.T) {
 				</table>
 			</body>
 		</html>`
-	rc.Reader = strings.NewReader(s)
+	r := strings.NewReader(s)
+	rc := testReadCloser{r}
 	errTemplt := "the document does not have a price value with the tag:"
-	want = 0.00
-	got, err = ext.ExtractPrice(rc)
+	want := float32(0.00)
+	got, err := ext.ExtractPrice(rc)
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
 		t.Errorf("got not wanted error: %v, wanted error template: %v", err, errTemplt)
 	}
