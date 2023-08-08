@@ -78,6 +78,7 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 		select {
 		case <-done:
 			logrus.Infoln("Shut down the application")
+			t.Stop()
 			return
 		case <-t.C:
 			err := s.serve()
