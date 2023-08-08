@@ -11,9 +11,9 @@ import (
 )
 
 func TestServe(t *testing.T) {
-	logrus.Infof("Start to test the func serve() with true value")
+	logrus.Info("Start to test the func serve with true value")
 	withTrueValue(t)
-	logrus.Infof("Start to test the func serve() for checking that the all methods are called")
+	logrus.Info("Start to test the func serve for checking that the all methods are called")
 	withCall(t)
 }
 

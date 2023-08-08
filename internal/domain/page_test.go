@@ -12,9 +12,9 @@ import (
 var ext = PriceExtractor{}
 
 func TestExtractPrice(t *testing.T) {
-	logrus.Info("Start to test the func ExtractPrice() with true value")
+	logrus.Info("Start to test the func ExtractPrice with true value")
 	withTrueValue(t)
-	logrus.Info("Start to test the func ExtractPrice() for errors")
+	logrus.Info("Start to test the func ExtractPrice for errors")
 	testErrors(t)
 }
 
