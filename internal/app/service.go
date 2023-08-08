@@ -72,6 +72,12 @@ func (s *GoldPriceService) serve() error {
 func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc) {
 	watchForInterruption(cancel)
 
+	errMes := "The error occurs while serving a gold price: %v"
+	err := s.serve()
+	if err != nil {
+		logrus.Errorf(errMes, err)
+	}
+
 	t := time.NewTicker(1 * time.Hour)
 
 	for {
@@ -83,7 +89,7 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 		case <-t.C:
 			err := s.serve()
 			if err != nil {
-				logrus.Errorf("The error occurs while serving a gold price: %v", err)
+				logrus.Errorf(errMes, err)
 			}
 		}
 	}
