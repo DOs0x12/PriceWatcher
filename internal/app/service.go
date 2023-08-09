@@ -44,6 +44,8 @@ func (s *GoldPriceService) serve() error {
 	curHour := nowHour()
 
 	if !s.val.Validate(curHour) {
+		logrus.Info("No time for getting a price")
+
 		return nil
 	}
 
