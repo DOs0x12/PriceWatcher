@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,6 +17,15 @@ func TestServe(t *testing.T) {
 	logrus.Info("Start to test the func serve for checking that the all methods are called")
 	withCall(t)
 }
+
+var TestNow func() time.Time
+
+type testClock struct{}
+
+func (testClock) Now() time.Time {
+	return TestNow()
+}
+func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
 type testReadCloser struct {
 	Reader io.Reader
@@ -55,9 +65,12 @@ func withTrueValue(t *testing.T) {
 		domain.MessageHourVal{})
 
 	workHour := 12
-	nowHour = func() int { return workHour }
+	TestNow = func() time.Time {
+		t := time.Now()
+		return time.Date(t.Year(), t.Month(), t.Day(), workHour, t.Minute(), t.Second(), t.Nanosecond(), t.Location())
+	}
 
-	got := serv.serve()
+	got := serv.serve(testClock{})
 
 	if got != nil {
 		t.Errorf("got error: %v", got.Error())
@@ -114,7 +127,13 @@ func withCall(t *testing.T) {
 		extWithCall{},
 		valWithCall{})
 
-	serv.serve()
+	workHour := 12
+	TestNow = func() time.Time {
+		t := time.Now()
+		return time.Date(t.Year(), t.Month(), t.Day(), workHour, t.Minute(), t.Second(), t.Nanosecond(), t.Location())
+	}
+
+	serv.serve(testClock{})
 
 	if !reqCall {
 		t.Errorf("the method for requesting a page is not called in the app layer")

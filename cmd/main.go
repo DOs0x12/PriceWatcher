@@ -6,6 +6,7 @@ import (
 	"GoldPriceGetter/internal/infrastructure/requester"
 	"GoldPriceGetter/internal/infrastructure/sender"
 	"context"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -17,7 +18,7 @@ func main() {
 
 	logrus.Infoln("Start the application")
 
-	serv.Watch(ctx.Done(), cancel)
+	serv.Watch(ctx.Done(), cancel, realClock{})
 
 	logrus.Infoln("The application is done")
 }
@@ -30,3 +31,8 @@ func newService() *app.GoldPriceService {
 
 	return app.NewGoldPriceService(req, sen, ext, val)
 }
+
+type realClock struct{}
+
+func (realClock) Now() time.Time                         { return time.Now() }
+func (realClock) After(d time.Duration) <-chan time.Time { return time.After(d) }

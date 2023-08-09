@@ -36,10 +36,8 @@ func NewGoldPriceService(
 	return &serv
 }
 
-var nowHour = time.Now().Hour
-
-func (s *GoldPriceService) serve() error {
-	curHour := nowHour()
+func (s *GoldPriceService) serve(clock Clock) error {
+	curHour := clock.Now().Hour()
 
 	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
 
@@ -71,11 +69,16 @@ func (s *GoldPriceService) serve() error {
 	return nil
 }
 
-func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc) {
+type Clock interface {
+	Now() time.Time
+	After(d time.Duration) <-chan time.Time
+}
+
+func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock Clock) {
 	watchForInterruption(cancel)
 
 	errMes := "The error occurs while serving a gold price: %v"
-	err := s.serve()
+	err := s.serve(clock)
 	if err != nil {
 		logrus.Errorf(errMes, err)
 	}
@@ -89,7 +92,7 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 			t.Stop()
 			return
 		case <-t.C:
-			err := s.serve()
+			err := s.serve(clock)
 			if err != nil {
 				logrus.Errorf(errMes, err)
 			}
