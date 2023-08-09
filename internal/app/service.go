@@ -39,9 +39,9 @@ func NewGoldPriceService(
 var nowHour = time.Now().Hour
 
 func (s *GoldPriceService) serve() error {
-	logrus.Infoln("Check time for processing a gold price")
-
 	curHour := nowHour()
+
+	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
 
 	if !s.val.Validate(curHour) {
 		logrus.Info("No time for getting a price")
@@ -49,7 +49,7 @@ func (s *GoldPriceService) serve() error {
 		return nil
 	}
 
-	logrus.Infoln("Start processing a gold price")
+	logrus.Info("Start processing a gold price")
 
 	response, err := s.req.RequestPage()
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 	for {
 		select {
 		case <-done:
-			logrus.Infoln("Shut down the application")
+			logrus.Info("Shut down the application")
 			t.Stop()
 			return
 		case <-t.C:
