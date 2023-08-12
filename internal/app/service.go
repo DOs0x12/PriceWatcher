@@ -1,13 +1,13 @@
 package app
 
 import (
-	"GoldPriceGetter/internal/domain"
+	"GoldPriceGetter/internal/app/clock"
+	"GoldPriceGetter/internal/app/interrupt"
+	"GoldPriceGetter/internal/domain/hour"
+	"GoldPriceGetter/internal/domain/page"
 	"GoldPriceGetter/internal/interfaces"
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -16,15 +16,15 @@ import (
 type GoldPriceService struct {
 	req    interfaces.Requester
 	sender interfaces.Sender
-	ext    domain.Extractor
-	val    domain.HourValidator
+	ext    page.Extractor
+	val    hour.HourValidator
 }
 
 func NewGoldPriceService(
 	req interfaces.Requester,
 	sender interfaces.Sender,
-	ext domain.Extractor,
-	val domain.HourValidator) *GoldPriceService {
+	ext page.Extractor,
+	val hour.HourValidator) *GoldPriceService {
 
 	serv := GoldPriceService{
 		req:    req,
@@ -36,7 +36,7 @@ func NewGoldPriceService(
 	return &serv
 }
 
-func (s *GoldPriceService) serve(clock Clock) error {
+func (s *GoldPriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
 	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
@@ -69,13 +69,8 @@ func (s *GoldPriceService) serve(clock Clock) error {
 	return nil
 }
 
-type Clock interface {
-	Now() time.Time
-	After(d time.Duration) <-chan time.Time
-}
-
-func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock Clock) {
-	watchForInterruption(cancel)
+func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
+	interrupt.WatchForInterruption(cancel)
 
 	errMes := "An error occurs while serving a gold price: %v"
 	if err := s.serve(clock); err != nil {
@@ -101,33 +96,4 @@ func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc
 			}
 		}
 	}
-}
-
-func watchForInterruption(cancel context.CancelFunc) {
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-c
-		cancel()
-	}()
-}
-
-func waitHourStart(now time.Time) error {
-	waitTime, err := getWaitTime(now)
-	if err != nil {
-		return err
-	}
-
-	time.Sleep(waitTime)
-
-	return nil
-}
-
-func getWaitTime(now time.Time) (time.Duration, error) {
-	waitMin := 60 - now.Minute()
-	waitSec := 60 - now.Second()
-
-	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
-
-	return time.ParseDuration(durStr)
 }

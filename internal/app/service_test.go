@@ -1,9 +1,9 @@
 package app
 
 import (
-	"GoldPriceGetter/internal/domain"
+	"GoldPriceGetter/internal/domain/hour"
+	"GoldPriceGetter/internal/domain/page"
 	"GoldPriceGetter/internal/entities"
-	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -60,8 +60,8 @@ func serveWithTrueValue(t *testing.T) {
 	serv := NewGoldPriceService(
 		testRequester{},
 		testSender{},
-		domain.PriceExtractor{},
-		domain.MessageHourVal{})
+		page.PriceExtractor{},
+		hour.MessageHourVal{})
 
 	workHour := 12
 	now := time.Now()
@@ -145,31 +145,5 @@ func serveWithCall(t *testing.T) {
 	}
 	if !sendCall {
 		t.Error("The method for sending the price is not called in the app layer")
-	}
-}
-
-func TestGetTuneTime(t *testing.T) {
-	nT := time.Now()
-	testMin := 45
-	testSec := 45
-	testNow :=
-		time.Date(nT.Year(), nT.Month(), nT.Day(), nT.Hour(), testMin, testSec, nT.Nanosecond(), nT.Location())
-
-	waitMin := 60 - testMin
-	waitSec := 60 - testSec
-
-	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
-	want, err := time.ParseDuration(durStr)
-	if err != nil {
-		t.Errorf("An error occurs while parsing duration in the test: %v", err)
-	}
-
-	got, err := getWaitTime(testNow)
-	if err != nil {
-		t.Errorf("The getWaitTime method retuns an error: %v", err)
-	}
-
-	if want != got {
-		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }
