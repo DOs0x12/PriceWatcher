@@ -48,10 +48,10 @@ func withTrueValue(t *testing.T) {
 	var want float32 = 3232.00
 	got, err := ext.ExtractPrice(rc)
 	if err != nil {
-		t.Errorf("got error: %v, wanted %v", err, want)
+		t.Errorf("Got error: %v, wanted %v", err, want)
 	}
 	if got != want && err == nil {
-		t.Errorf("got %v, wanted %v", got, want)
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }
 
@@ -73,19 +73,19 @@ func testErrors(t *testing.T) {
 	want := float32(0.00)
 	got, err := ext.ExtractPrice(rc)
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
-		t.Errorf("got not wanted error: %v, wanted error template: %v", err, errTemplt)
+		t.Errorf("Got not wanted error: %v, wanted error template: %v", err, errTemplt)
 	}
 	if got != want {
-		t.Errorf("got %v, wanted %v", got, want)
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
 	errTemplt = "cannot parse the body to an HTML document:"
 	rc.Reader = errReader{}
 	got, err = ext.ExtractPrice(rc)
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
-		t.Errorf("got not wanted error: %v, wanted error template: %v", err, errTemplt)
+		t.Errorf("Got not wanted error: %v, wanted error template: %v", err, errTemplt)
 	}
 	if got != want {
-		t.Errorf("got %v, wanted %v", got, want)
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }

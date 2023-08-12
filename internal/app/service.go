@@ -77,23 +77,26 @@ type Clock interface {
 func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock Clock) {
 	watchForInterruption(cancel)
 
-	errMes := "The error occurs while serving a gold price: %v"
-	err := s.serve(clock)
-	if err != nil {
+	errMes := "An error occurs while serving a gold price: %v"
+	if err := s.serve(clock); err != nil {
 		logrus.Errorf(errMes, err)
 	}
 
+	err := waitHourStart(clock.Now())
+	if err != nil {
+		logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
+	}
+
 	t := time.NewTicker(1 * time.Hour)
+	defer t.Stop()
 
 	for {
 		select {
 		case <-done:
 			logrus.Info("Shut down the application")
-			t.Stop()
 			return
 		case <-t.C:
-			err := s.serve(clock)
-			if err != nil {
+			if err := s.serve(clock); err != nil {
 				logrus.Errorf(errMes, err)
 			}
 		}
@@ -107,4 +110,24 @@ func watchForInterruption(cancel context.CancelFunc) {
 		<-c
 		cancel()
 	}()
+}
+
+func waitHourStart(now time.Time) error {
+	waitTime, err := getWaitTime(now)
+	if err != nil {
+		return err
+	}
+
+	time.Sleep(waitTime)
+
+	return nil
+}
+
+func getWaitTime(now time.Time) (time.Duration, error) {
+	waitMin := 60 - now.Minute()
+	waitSec := 60 - now.Second()
+
+	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
+
+	return time.ParseDuration(durStr)
 }

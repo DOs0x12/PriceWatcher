@@ -19,13 +19,13 @@ func withTrueValues(t *testing.T) {
 	tHour := 12
 	want := true
 	if got := val.Validate(tHour); got != want {
-		t.Errorf("got %v, wanted %v", got, want)
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
 	tHour = 17
 	want = true
 	if got := val.Validate(tHour); got != want {
-		t.Errorf("got %v, wanted %v", got, want)
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }
 
@@ -34,7 +34,7 @@ func withFalseValues(t *testing.T) {
 	want := false
 	for i := 0; i < len(tHours); i++ {
 		if got := val.Validate(tHours[i]); got != want {
-			t.Errorf("got %v, wanted %v", got, want)
+			t.Errorf("Got %v, wanted %v", got, want)
 		}
 	}
 }

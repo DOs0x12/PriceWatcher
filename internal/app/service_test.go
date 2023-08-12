@@ -3,6 +3,7 @@ package app
 import (
 	"GoldPriceGetter/internal/domain"
 	"GoldPriceGetter/internal/entities"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -13,18 +14,16 @@ import (
 
 func TestServe(t *testing.T) {
 	logrus.Info("Start to test the func serve with true value")
-	withTrueValue(t)
+	serveWithTrueValue(t)
 	logrus.Info("Start to test the func serve for checking that the all methods are called")
-	withCall(t)
+	serveWithCall(t)
 }
 
-var TestNow func() time.Time
+var testNow time.Time
 
 type testClock struct{}
 
-func (testClock) Now() time.Time {
-	return TestNow()
-}
+func (testClock) Now() time.Time                         { return testNow }
 func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
 type testReadCloser struct {
@@ -57,7 +56,7 @@ type testSender struct{}
 
 func (s testSender) Send(price float32) error { return nil }
 
-func withTrueValue(t *testing.T) {
+func serveWithTrueValue(t *testing.T) {
 	serv := NewGoldPriceService(
 		testRequester{},
 		testSender{},
@@ -65,15 +64,15 @@ func withTrueValue(t *testing.T) {
 		domain.MessageHourVal{})
 
 	workHour := 12
-	TestNow = func() time.Time {
-		t := time.Now()
-		return time.Date(t.Year(), t.Month(), t.Day(), workHour, t.Minute(), t.Second(), t.Nanosecond(), t.Location())
-	}
+	now := time.Now()
+	testNow = time.Date(
+		now.Year(), now.Month(), now.Day(), workHour,
+		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
 	got := serv.serve(testClock{})
 
 	if got != nil {
-		t.Errorf("got error: %v", got.Error())
+		t.Errorf("Got an error in the serve method: %v", got.Error())
 	}
 }
 
@@ -120,7 +119,7 @@ func (sendWithCall) Send(price float32) error {
 	return nil
 }
 
-func withCall(t *testing.T) {
+func serveWithCall(t *testing.T) {
 	serv := NewGoldPriceService(
 		reqWithCall{},
 		sendWithCall{},
@@ -128,23 +127,49 @@ func withCall(t *testing.T) {
 		valWithCall{})
 
 	workHour := 12
-	TestNow = func() time.Time {
-		t := time.Now()
-		return time.Date(t.Year(), t.Month(), t.Day(), workHour, t.Minute(), t.Second(), t.Nanosecond(), t.Location())
-	}
+	now := time.Now()
+	testNow = time.Date(
+		now.Year(), now.Month(), now.Day(), workHour,
+		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
 	serv.serve(testClock{})
 
 	if !reqCall {
-		t.Errorf("the method for requesting a page is not called in the app layer")
+		t.Error("The method for requesting a page is not called in the app layer")
 	}
 	if !extCall {
-		t.Errorf("the method for extracting a price is not called in the app layer")
+		t.Error("The method for extracting a price is not called in the app layer")
 	}
 	if !valCall {
-		t.Errorf("the method for validating the price is not called in the app layer")
+		t.Error("The method for validating the price is not called in the app layer")
 	}
 	if !sendCall {
-		t.Errorf("the method for sending the price is not called in the app layer")
+		t.Error("The method for sending the price is not called in the app layer")
+	}
+}
+
+func TestGetTuneTime(t *testing.T) {
+	nT := time.Now()
+	testMin := 45
+	testSec := 45
+	testNow :=
+		time.Date(nT.Year(), nT.Month(), nT.Day(), nT.Hour(), testMin, testSec, nT.Nanosecond(), nT.Location())
+
+	waitMin := 60 - testMin
+	waitSec := 60 - testSec
+
+	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
+	want, err := time.ParseDuration(durStr)
+	if err != nil {
+		t.Errorf("An error occurs while parsing duration in the test: %v", err)
+	}
+
+	got, err := getWaitTime(testNow)
+	if err != nil {
+		t.Errorf("The getWaitTime method retuns an error: %v", err)
+	}
+
+	if want != got {
+		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }
