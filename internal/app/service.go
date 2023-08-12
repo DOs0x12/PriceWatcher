@@ -42,7 +42,7 @@ func (s *GoldPriceService) serve(clock Clock) error {
 	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
 
 	if !s.val.Validate(curHour) {
-		logrus.Info("It is no time for getting a price")
+		logrus.Info("It is not appropriate time for getting a price")
 
 		return nil
 	}
