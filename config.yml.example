@@ -1,0 +1,12 @@
+#Sets the hours when the app sends price reports to the user
+sending_hours: [12, 17]
+
+email:
+    #The email and its password from which a report will be sended
+    from: 'from@mail.com'
+    password: 'password'
+    #The email to which a report will be sended
+    to: 'to@mail.com'
+    #SMTP settings
+    smtp_host: 'smtp.yandex.ru'
+    smtp_port: 465

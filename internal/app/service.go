@@ -5,7 +5,9 @@ import (
 	"GoldPriceGetter/internal/app/interrupt"
 	"GoldPriceGetter/internal/domain/hour"
 	"GoldPriceGetter/internal/domain/page"
-	"GoldPriceGetter/internal/interfaces"
+	"GoldPriceGetter/internal/interfaces/configer"
+	interReq "GoldPriceGetter/internal/interfaces/requester"
+	interSend "GoldPriceGetter/internal/interfaces/sender"
 	"context"
 	"fmt"
 	"time"
@@ -14,23 +16,26 @@ import (
 )
 
 type GoldPriceService struct {
-	req    interfaces.Requester
-	sender interfaces.Sender
+	req    interReq.Requester
+	sender interSend.Sender
 	ext    page.Extractor
 	val    hour.HourValidator
+	conf   configer.Configer
 }
 
 func NewGoldPriceService(
-	req interfaces.Requester,
-	sender interfaces.Sender,
+	req interReq.Requester,
+	sender interSend.Sender,
 	ext page.Extractor,
-	val hour.HourValidator) *GoldPriceService {
+	val hour.HourValidator,
+	conf configer.Configer) *GoldPriceService {
 
 	serv := GoldPriceService{
 		req:    req,
 		sender: sender,
 		ext:    ext,
 		val:    val,
+		conf:   conf,
 	}
 
 	return &serv
@@ -39,9 +44,14 @@ func NewGoldPriceService(
 func (s *GoldPriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
+	conf, err := s.conf.GetConfig()
+	if err != nil {
+		return fmt.Errorf("on getting the config an error occurs: %w", err)
+	}
+
 	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
 
-	if !s.val.Validate(curHour) {
+	if !s.val.Validate(curHour, conf.SendingHours) {
 		logrus.Info("It is not appropriate time for getting a price")
 
 		return nil
@@ -59,7 +69,7 @@ func (s *GoldPriceService) serve(clock clock.Clock) error {
 		return fmt.Errorf("cannot extract the gold price from the body: %w", err)
 	}
 
-	err = s.sender.Send(price)
+	err = s.sender.Send(price, conf.Email)
 	if err != nil {
 		return fmt.Errorf("cannot send the gold price: %w", err)
 	}

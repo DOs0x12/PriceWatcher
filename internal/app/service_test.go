@@ -2,8 +2,9 @@ package app
 
 import (
 	"GoldPriceGetter/internal/domain/hour"
-	"GoldPriceGetter/internal/domain/page"
-	"GoldPriceGetter/internal/entities"
+	pDomain "GoldPriceGetter/internal/domain/page"
+	"GoldPriceGetter/internal/entities/config"
+	pEnt "GoldPriceGetter/internal/entities/page"
 	"io"
 	"strings"
 	"testing"
@@ -35,7 +36,7 @@ func (t testReadCloser) Read(p []byte) (n int, err error) { return t.Reader.Read
 
 type testRequester struct{}
 
-func (r testRequester) RequestPage() (entities.Response, error) {
+func (r testRequester) RequestPage() (pEnt.Response, error) {
 	s := `
 		<html>
 			<head>
@@ -49,19 +50,26 @@ func (r testRequester) RequestPage() (entities.Response, error) {
 		</html>`
 	reader := strings.NewReader(s)
 	rc := testReadCloser{reader}
-	return entities.Response{Body: rc}, nil
+	return pEnt.Response{Body: rc}, nil
 }
 
 type testSender struct{}
 
-func (s testSender) Send(price float32) error { return nil }
+func (s testSender) Send(price float32, config config.Email) error { return nil }
+
+type testConfiger struct{}
+
+func (testConfiger) GetConfig() (config.Config, error) {
+	return config.Config{}, nil
+}
 
 func serveWithTrueValue(t *testing.T) {
 	serv := NewGoldPriceService(
 		testRequester{},
 		testSender{},
-		page.PriceExtractor{},
-		hour.MessageHourVal{})
+		pDomain.PriceExtractor{},
+		hour.MessageHourVal{},
+		testConfiger{})
 
 	workHour := 12
 	now := time.Now()
@@ -81,18 +89,19 @@ var (
 	extCall  bool
 	valCall  bool
 	sendCall bool
+	confCall bool
 )
 
 type reqWithCall struct{}
 
-func (r reqWithCall) RequestPage() (entities.Response, error) {
+func (r reqWithCall) RequestPage() (pEnt.Response, error) {
 	s := "test"
 	reader := strings.NewReader(s)
 	rc := testReadCloser{reader}
 
 	reqCall = true
 
-	return entities.Response{Body: rc}, nil
+	return pEnt.Response{Body: rc}, nil
 }
 
 type extWithCall struct{}
@@ -105,7 +114,7 @@ func (extWithCall) ExtractPrice(body io.ReadCloser) (float32, error) {
 
 type valWithCall struct{}
 
-func (valWithCall) Validate(hour int) bool {
+func (valWithCall) Validate(hour int, sendHours []int) bool {
 	valCall = true
 
 	return true
@@ -113,10 +122,18 @@ func (valWithCall) Validate(hour int) bool {
 
 type sendWithCall struct{}
 
-func (sendWithCall) Send(price float32) error {
+func (sendWithCall) Send(price float32, conf config.Email) error {
 	sendCall = true
 
 	return nil
+}
+
+type confWithCall struct{}
+
+func (confWithCall) GetConfig() (config.Config, error) {
+	confCall = true
+
+	return config.Config{}, nil
 }
 
 func serveWithCall(t *testing.T) {
@@ -124,7 +141,8 @@ func serveWithCall(t *testing.T) {
 		reqWithCall{},
 		sendWithCall{},
 		extWithCall{},
-		valWithCall{})
+		valWithCall{},
+		confWithCall{})
 
 	workHour := 12
 	now := time.Now()

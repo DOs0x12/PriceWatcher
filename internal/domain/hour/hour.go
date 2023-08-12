@@ -1,15 +1,13 @@
 package hour
 
 type HourValidator interface {
-	Validate(hour int) bool
+	Validate(hour int, sendHours []int) bool
 }
 
 type MessageHourVal struct{}
 
-func (MessageHourVal) Validate(hour int) bool {
-	hours := []int{12, 17}
-
-	for _, h := range hours {
+func (MessageHourVal) Validate(hour int, sendHours []int) bool {
+	for _, h := range sendHours {
 		if h == hour {
 			return true
 		}

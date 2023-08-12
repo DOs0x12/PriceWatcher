@@ -1,4 +1,4 @@
-package entities
+package page
 
 import "io"
 

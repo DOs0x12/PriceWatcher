@@ -18,13 +18,13 @@ func TestValidate(t *testing.T) {
 func withTrueValues(t *testing.T) {
 	tHour := 12
 	want := true
-	if got := val.Validate(tHour); got != want {
+	if got := val.Validate(tHour, []int{12, 17}); got != want {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
 	tHour = 17
 	want = true
-	if got := val.Validate(tHour); got != want {
+	if got := val.Validate(tHour, []int{12, 17}); got != want {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 }
@@ -33,7 +33,7 @@ func withFalseValues(t *testing.T) {
 	tHours := [4]int{11, 13, 16, 18}
 	want := false
 	for i := 0; i < len(tHours); i++ {
-		if got := val.Validate(tHours[i]); got != want {
+		if got := val.Validate(tHours[i], []int{12, 17}); got != want {
 			t.Errorf("Got %v, wanted %v", got, want)
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"GoldPriceGetter/internal/app/clock"
 	"GoldPriceGetter/internal/domain/hour"
 	"GoldPriceGetter/internal/domain/page"
+	"GoldPriceGetter/internal/infrastructure/configer"
 	"GoldPriceGetter/internal/infrastructure/requester"
 	"GoldPriceGetter/internal/infrastructure/sender"
 	"context"
@@ -29,6 +30,7 @@ func newService() *app.GoldPriceService {
 	sen := sender.Sender{}
 	ext := page.PriceExtractor{}
 	val := hour.MessageHourVal{}
+	conf := configer.Configer{}
 
-	return app.NewGoldPriceService(req, sen, ext, val)
+	return app.NewGoldPriceService(req, sen, ext, val, conf)
 }
