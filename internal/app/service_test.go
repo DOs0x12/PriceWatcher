@@ -29,7 +29,7 @@ func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) 
 
 type testRequester struct{}
 
-func (r testRequester) RequestPage() (pEnt.Response, error) {
+func (r testRequester) RequestPage(url string) (pEnt.Response, error) {
 	s := `
 		<html>
 			<head>
@@ -87,7 +87,7 @@ var (
 
 type reqWithCall struct{}
 
-func (r reqWithCall) RequestPage() (pEnt.Response, error) {
+func (r reqWithCall) RequestPage(url string) (pEnt.Response, error) {
 	s := "test"
 	reader := strings.NewReader(s)
 

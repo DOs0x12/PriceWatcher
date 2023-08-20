@@ -41,6 +41,8 @@ func NewGoldPriceService(
 	return &serv
 }
 
+const bankUrl = "https://investzoloto.ru/gold-sber-oms/"
+
 func (s *GoldPriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
@@ -59,7 +61,7 @@ func (s *GoldPriceService) serve(clock clock.Clock) error {
 
 	logrus.Info("Start processing a gold price")
 
-	response, err := s.req.RequestPage()
+	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
 		return fmt.Errorf("cannot get a page with the current price of gold: %w", err)
 	}
