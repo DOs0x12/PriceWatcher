@@ -1,6 +1,11 @@
 #Sets the hours when the app sends price reports to the user
 sending_hours: [12, 17]
 
+#Sets the type of a watched price (bank or marketplace)
+price_type: 'marketplace'
+#If the price type is "marketplace" then add the url of the product for price watching
+item_url: 'https://marketplace-url.com'
+
 email:
     #The email and its password from which a report will be sended
     from: 'from@mail.com'
