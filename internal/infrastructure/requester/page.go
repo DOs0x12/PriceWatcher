@@ -1,7 +1,7 @@
 package requester
 
 import (
-	"GoldPriceGetter/internal/entities/page"
+	"PriceWatcher/internal/entities/page"
 	"fmt"
 	"net/http"
 )

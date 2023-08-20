@@ -1,10 +1,10 @@
 package app
 
 import (
-	"GoldPriceGetter/internal/domain/hour"
-	pDomain "GoldPriceGetter/internal/domain/page"
-	"GoldPriceGetter/internal/entities/config"
-	pEnt "GoldPriceGetter/internal/entities/page"
+	"PriceWatcher/internal/domain/hour"
+	pDomain "PriceWatcher/internal/domain/page"
+	"PriceWatcher/internal/entities/config"
+	pEnt "PriceWatcher/internal/entities/page"
 	"io"
 	"strings"
 	"testing"

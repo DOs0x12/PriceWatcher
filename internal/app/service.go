@@ -1,13 +1,13 @@
 package app
 
 import (
-	"GoldPriceGetter/internal/app/clock"
-	"GoldPriceGetter/internal/app/interrupt"
-	"GoldPriceGetter/internal/domain/hour"
-	"GoldPriceGetter/internal/domain/page"
-	"GoldPriceGetter/internal/interfaces/configer"
-	interReq "GoldPriceGetter/internal/interfaces/requester"
-	interSend "GoldPriceGetter/internal/interfaces/sender"
+	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/app/interrupt"
+	"PriceWatcher/internal/domain/hour"
+	"PriceWatcher/internal/domain/page"
+	"PriceWatcher/internal/interfaces/configer"
+	interReq "PriceWatcher/internal/interfaces/requester"
+	interSend "PriceWatcher/internal/interfaces/sender"
 	"context"
 	"fmt"
 	"time"

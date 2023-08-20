@@ -1,7 +1,7 @@
 package sender
 
 import (
-	"GoldPriceGetter/internal/entities/config"
+	"PriceWatcher/internal/entities/config"
 	"crypto/tls"
 	"fmt"
 

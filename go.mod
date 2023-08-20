@@ -1,4 +1,4 @@
-module GoldPriceGetter
+module PriceWatcher
 
 go 1.20
 

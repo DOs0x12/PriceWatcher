@@ -1,7 +1,7 @@
 package configer
 
 import (
-	"GoldPriceGetter/internal/entities/config"
+	"PriceWatcher/internal/entities/config"
 	"os"
 
 	"gopkg.in/yaml.v3"

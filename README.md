@@ -1,2 +1,2 @@
-# GoldPriceGetter
-An app is for getting a gold price from a bank site or resource.
+# PriceWatcher
+An app is for watching a price from a site or resource.

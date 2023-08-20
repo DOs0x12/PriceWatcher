@@ -1,13 +1,13 @@
 package main
 
 import (
-	"GoldPriceGetter/internal/app"
-	"GoldPriceGetter/internal/app/clock"
-	"GoldPriceGetter/internal/domain/hour"
-	"GoldPriceGetter/internal/domain/page"
-	"GoldPriceGetter/internal/infrastructure/configer"
-	"GoldPriceGetter/internal/infrastructure/requester"
-	"GoldPriceGetter/internal/infrastructure/sender"
+	"PriceWatcher/internal/app"
+	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/domain/hour"
+	"PriceWatcher/internal/domain/page"
+	"PriceWatcher/internal/infrastructure/configer"
+	"PriceWatcher/internal/infrastructure/requester"
+	"PriceWatcher/internal/infrastructure/sender"
 	"context"
 
 	"github.com/sirupsen/logrus"
