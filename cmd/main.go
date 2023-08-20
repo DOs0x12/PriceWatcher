@@ -6,7 +6,7 @@ import (
 	"PriceWatcher/internal/domain/hour"
 	"PriceWatcher/internal/domain/page"
 	"PriceWatcher/internal/infrastructure/configer"
-	"PriceWatcher/internal/infrastructure/requester"
+	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
 
@@ -26,7 +26,7 @@ func main() {
 }
 
 func newService() *app.GoldPriceService {
-	req := requester.Requester{}
+	req := bank.Requester{}
 	sen := sender.Sender{}
 	ext := page.PriceExtractor{}
 	val := hour.MessageHourVal{}
