@@ -57,7 +57,7 @@ func (testConfiger) GetConfig() (config.Config, error) {
 }
 
 func serveWithTrueValue(t *testing.T) {
-	serv := NewGoldPriceService(
+	serv := NewPriceService(
 		testRequester{},
 		testSender{},
 		pDomain.PriceExtractor{},
@@ -129,7 +129,7 @@ func (confWithCall) GetConfig() (config.Config, error) {
 }
 
 func serveWithCall(t *testing.T) {
-	serv := NewGoldPriceService(
+	serv := NewPriceService(
 		reqWithCall{},
 		sendWithCall{},
 		extWithCall{},

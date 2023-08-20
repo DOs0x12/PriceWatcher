@@ -15,7 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GoldPriceService struct {
+type PriceService struct {
 	req    interReq.Requester
 	sender interSend.Sender
 	ext    page.Extractor
@@ -23,14 +23,14 @@ type GoldPriceService struct {
 	conf   configer.Configer
 }
 
-func NewGoldPriceService(
+func NewPriceService(
 	req interReq.Requester,
 	sender interSend.Sender,
 	ext page.Extractor,
 	val hour.HourValidator,
-	conf configer.Configer) *GoldPriceService {
+	conf configer.Configer) *PriceService {
 
-	serv := GoldPriceService{
+	serv := PriceService{
 		req:    req,
 		sender: sender,
 		ext:    ext,
@@ -43,7 +43,7 @@ func NewGoldPriceService(
 
 const bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
-func (s *GoldPriceService) serve(clock clock.Clock) error {
+func (s *PriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
 	conf, err := s.conf.GetConfig()
@@ -81,7 +81,7 @@ func (s *GoldPriceService) serve(clock clock.Clock) error {
 	return nil
 }
 
-func (s *GoldPriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
+func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
 	interrupt.WatchForInterruption(cancel)
 
 	errMes := "An error occurs while serving a gold price: %v"

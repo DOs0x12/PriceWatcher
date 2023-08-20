@@ -25,12 +25,12 @@ func main() {
 	logrus.Infoln("The application is done")
 }
 
-func newService() *app.GoldPriceService {
+func newService() *app.PriceService {
 	req := bank.Requester{}
 	sen := sender.Sender{}
 	ext := page.PriceExtractor{}
 	val := hour.MessageHourVal{}
 	conf := configer.Configer{}
 
-	return app.NewGoldPriceService(req, sen, ext, val, conf)
+	return app.NewPriceService(req, sen, ext, val, conf)
 }
