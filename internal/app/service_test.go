@@ -27,13 +27,6 @@ type testClock struct{}
 func (testClock) Now() time.Time                         { return testNow }
 func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
-type testReadCloser struct {
-	Reader io.Reader
-}
-
-func (testReadCloser) Close() error                       { return nil }
-func (t testReadCloser) Read(p []byte) (n int, err error) { return t.Reader.Read(p) }
-
 type testRequester struct{}
 
 func (r testRequester) RequestPage() (pEnt.Response, error) {
@@ -49,8 +42,8 @@ func (r testRequester) RequestPage() (pEnt.Response, error) {
 			</body>
 		</html>`
 	reader := strings.NewReader(s)
-	rc := testReadCloser{reader}
-	return pEnt.Response{Body: rc}, nil
+
+	return pEnt.Response{Body: reader}, nil
 }
 
 type testSender struct{}
@@ -97,16 +90,15 @@ type reqWithCall struct{}
 func (r reqWithCall) RequestPage() (pEnt.Response, error) {
 	s := "test"
 	reader := strings.NewReader(s)
-	rc := testReadCloser{reader}
 
 	reqCall = true
 
-	return pEnt.Response{Body: rc}, nil
+	return pEnt.Response{Body: reader}, nil
 }
 
 type extWithCall struct{}
 
-func (extWithCall) ExtractPrice(body io.ReadCloser) (float32, error) {
+func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
 	extCall = true
 
 	return 0.00, nil

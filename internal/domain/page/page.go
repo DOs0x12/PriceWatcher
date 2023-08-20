@@ -12,12 +12,12 @@ import (
 const regstring = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
 
 type Extractor interface {
-	ExtractPrice(body io.ReadCloser) (float32, error)
+	ExtractPrice(body io.Reader) (float32, error)
 }
 
 type PriceExtractor struct{}
 
-func (ext PriceExtractor) ExtractPrice(body io.ReadCloser) (float32, error) {
+func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	doc, err := html.Parse(body)
 	if err != nil {
 		return 0.00, fmt.Errorf("cannot parse the body to an HTML document: %w", err)
