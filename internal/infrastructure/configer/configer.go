@@ -37,7 +37,7 @@ func (Configer) GetConfig() (config.Config, error) {
 	}
 
 	dto := ConfigDto{Email: EmailDto{}}
-	err = yaml.Unmarshal(confFile, dto)
+	err = yaml.Unmarshal(confFile, &dto)
 	if err != nil {
 		return config.Config{}, err
 	}
@@ -48,6 +48,8 @@ func (Configer) GetConfig() (config.Config, error) {
 func cast(confDto ConfigDto) config.Config {
 	return config.Config{
 		SendingHours: confDto.SendingHours,
+		PriceType:    confDto.PriceType,
+		ItemUrl:      confDto.ItemUrl,
 		Email: config.Email{
 			From:     confDto.Email.From,
 			Pass:     confDto.Email.Pass,
