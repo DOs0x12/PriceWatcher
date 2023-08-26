@@ -70,7 +70,7 @@ func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 		tag = "td"
 		return pageReg, priceReg, tag
 	case "marketplace":
-		pageReg = `([0-9])*(&nbsp;)*([0-9])*(&nbsp;)[₽];`
+		pageReg = "([0-9])*(\u00a0)*([0-9])*(\u00a0)[₽]"
 		priceReg = `([0-9]{4,5}\.[0-9][0-9])`
 		tag = "ins"
 		return pageReg, priceReg, tag
