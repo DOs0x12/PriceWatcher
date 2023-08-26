@@ -54,22 +54,24 @@ func createRequester(priceType string) (interReq.Requester, error) {
 }
 
 func createPriceExtractor(priceType string) price.Extractor {
-	pageReg, priceReg := getRegexp(priceType)
+	pageReg, priceReg, tag := getSearchData(priceType)
 
-	return price.New(pageReg, priceReg)
+	return price.New(pageReg, priceReg, tag)
 }
 
-func getRegexp(priceType string) (pageReg, priceReg string) {
+func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 	switch priceType {
 	case "bank":
 		pageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
 		priceReg = `([0-9]{4,5}\.[0-9][0-9])`
-		return pageReg, priceReg
+		tag = "td"
+		return pageReg, priceReg, tag
 	case "marketplace":
 		pageReg = `([0-9])*(&nbsp;)*([0-9])*(&nbsp;)[₽];`
 		priceReg = `([0-9]{4,5}\.[0-9][0-9])`
-		return pageReg, priceReg
+		tag = "ins"
+		return pageReg, priceReg, tag
 	default:
-		return "", ""
+		return "", "", ""
 	}
 }

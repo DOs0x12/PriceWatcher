@@ -16,9 +16,10 @@ type Extractor interface {
 type PriceExtractor struct {
 	pageReg  string
 	priceReg string
+	tag      string
 }
 
-func New(pageReg, priceReg string) PriceExtractor {
+func New(pageReg, priceReg, tag string) PriceExtractor {
 	return PriceExtractor{pageReg: pageReg, priceReg: priceReg}
 }
 
@@ -28,13 +29,12 @@ func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 		return 0.00, fmt.Errorf("cannot parse the body to an HTML document: %w", err)
 	}
 
-	tag := "td"
 	re := regexp.MustCompile(ext.pageReg)
 
-	data := doTraverse(doc, tag, re)
+	data := doTraverse(doc, ext.tag, re)
 
 	if data == "" {
-		return 0.00, fmt.Errorf("the document does not have a price value with the tag: %v", tag)
+		return 0.00, fmt.Errorf("the document does not have a price value with the tag: %v", ext.tag)
 	}
 
 	return ext.getPrice(data), nil
