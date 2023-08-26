@@ -1,4 +1,4 @@
-package hour
+package message
 
 type HourValidator interface {
 	Validate(hour int, sendHours []int) bool

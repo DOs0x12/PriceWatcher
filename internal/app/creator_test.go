@@ -1,7 +1,7 @@
 package app
 
 import (
-	"PriceWatcher/internal/domain/hour"
+	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/bank"
 	"PriceWatcher/internal/entities/config"
 	"reflect"
@@ -28,7 +28,7 @@ func TestNewPriceService(t *testing.T) {
 	serv, err := NewPriceService(
 		crtTSender{},
 		bank.PriceExtractor{},
-		hour.MessageHourVal{},
+		message.MessageHourVal{},
 		bankConfiger{})
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
@@ -49,7 +49,7 @@ func TestNewPriceService(t *testing.T) {
 	serv, err = NewPriceService(
 		crtTSender{},
 		bank.PriceExtractor{},
-		hour.MessageHourVal{},
+		message.MessageHourVal{},
 		marketplaceConfiger{})
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
