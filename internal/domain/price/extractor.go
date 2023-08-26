@@ -20,7 +20,7 @@ type PriceExtractor struct {
 }
 
 func New(pageReg, priceReg, tag string) PriceExtractor {
-	return PriceExtractor{pageReg: pageReg, priceReg: priceReg}
+	return PriceExtractor{pageReg: pageReg, priceReg: priceReg, tag: tag}
 }
 
 func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
