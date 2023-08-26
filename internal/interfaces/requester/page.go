@@ -5,5 +5,5 @@ import (
 )
 
 type Requester interface {
-	RequestPage(url string) (page.Response, error)
+	RequestPage() (page.Response, error)
 }

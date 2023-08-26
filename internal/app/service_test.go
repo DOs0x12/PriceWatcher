@@ -29,7 +29,7 @@ func (servTClock) After(d time.Duration) <-chan time.Time { return time.After(d)
 
 type servTRequester struct{}
 
-func (r servTRequester) RequestPage(url string) (pEnt.Response, error) {
+func (r servTRequester) RequestPage() (pEnt.Response, error) {
 	s := `
 		<html>
 			<head>
@@ -87,7 +87,7 @@ var (
 
 type reqWithCall struct{}
 
-func (r reqWithCall) RequestPage(url string) (pEnt.Response, error) {
+func (r reqWithCall) RequestPage() (pEnt.Response, error) {
 	s := "test"
 	reader := strings.NewReader(s)
 

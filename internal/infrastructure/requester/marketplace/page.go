@@ -10,10 +10,12 @@ import (
 
 const headlessCom = `google-chrome --headless=new --dump-dom --no-sandbox --window-size=1920x1080--user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36' --lang=ru-RU --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --timeout=5000 --use-gl --disable-gpu`
 
-type MarketplaceRequester struct{}
+type MarketplaceRequester struct {
+	Url string
+}
 
-func (r MarketplaceRequester) RequestPage(url string) (page.Response, error) {
-	cmd := exec.Command("sh", "-c", headlessCom+" '"+url+"'")
+func (r MarketplaceRequester) RequestPage() (page.Response, error) {
+	cmd := exec.Command("sh", "-c", headlessCom+" '"+r.Url+"'")
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb

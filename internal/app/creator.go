@@ -3,6 +3,7 @@ package app
 import (
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price"
+	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
 	"PriceWatcher/internal/interfaces/configer"
@@ -22,12 +23,12 @@ func NewPriceService(
 		return nil, err
 	}
 
-	priceType := strings.ToLower(config.PriceType)
-
-	req, err := createRequester(priceType)
+	req, err := createRequester(config)
 	if err != nil {
 		return nil, err
 	}
+
+	priceType := strings.ToLower(config.PriceType)
 
 	ext := createPriceExtractor(priceType)
 
@@ -42,14 +43,16 @@ func NewPriceService(
 	return &crt, err
 }
 
-func createRequester(priceType string) (interReq.Requester, error) {
+func createRequester(conf config.Config) (interReq.Requester, error) {
+	priceType := strings.ToLower(conf.PriceType)
+
 	switch priceType {
 	case "bank":
-		return bank.BankRequester{}, nil
+		return bank.BankRequester{Url: "https://investzoloto.ru/gold-sber-oms/"}, nil
 	case "marketplace":
-		return marketplace.MarketplaceRequester{}, nil
+		return marketplace.MarketplaceRequester{Url: conf.ItemUrl}, nil
 	default:
-		return nil, fmt.Errorf("have the unknown price type: %v", priceType)
+		return nil, fmt.Errorf("have the unknown price type: %v", conf.PriceType)
 	}
 }
 

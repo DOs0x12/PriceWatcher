@@ -23,8 +23,6 @@ type PriceService struct {
 	conf   configer.Configer
 }
 
-const bankUrl = "https://investzoloto.ru/gold-sber-oms/"
-
 func (s *PriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
@@ -43,7 +41,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 
 	logrus.Info("Start processing a price")
 
-	response, err := s.req.RequestPage(bankUrl)
+	response, err := s.req.RequestPage()
 	if err != nil {
 		return fmt.Errorf("cannot get a page with the current price: %w", err)
 	}
