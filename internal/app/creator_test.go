@@ -2,7 +2,6 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price"
 	"PriceWatcher/internal/entities/config"
 	"reflect"
 	"testing"
@@ -27,7 +26,6 @@ func (marketplaceConfiger) GetConfig() (config.Config, error) {
 func TestNewPriceService(t *testing.T) {
 	serv, err := NewPriceService(
 		crtTSender{},
-		price.PriceExtractor{},
 		message.MessageHourVal{},
 		bankConfiger{})
 	if err != nil {
@@ -40,15 +38,8 @@ func TestNewPriceService(t *testing.T) {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
-	want = "BankExtractor"
-	got = reflect.TypeOf(serv.ext).Name()
-	if got != want {
-		t.Errorf("Got %v, wanted %v", got, want)
-	}
-
 	serv, err = NewPriceService(
 		crtTSender{},
-		price.PriceExtractor{},
 		message.MessageHourVal{},
 		marketplaceConfiger{})
 	if err != nil {
@@ -57,12 +48,6 @@ func TestNewPriceService(t *testing.T) {
 
 	want = "MarketplaceRequester"
 	got = reflect.TypeOf(serv.req).Name()
-	if got != want {
-		t.Errorf("Got %v, wanted %v", got, want)
-	}
-
-	want = "MarketplaceExtractor"
-	got = reflect.TypeOf(serv.ext).Name()
 	if got != want {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}

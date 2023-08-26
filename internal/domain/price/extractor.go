@@ -9,14 +9,18 @@ import (
 	"golang.org/x/net/html"
 )
 
-const pageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
-const priceReg = `([0-9]{4,5}\.[0-9][0-9])`
-
 type Extractor interface {
 	ExtractPrice(body io.Reader) (float32, error)
 }
 
-type PriceExtractor struct{}
+type PriceExtractor struct {
+	pageReg  string
+	priceReg string
+}
+
+func New(pageReg, priceReg string) PriceExtractor {
+	return PriceExtractor{pageReg: pageReg, priceReg: priceReg}
+}
 
 func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	doc, err := html.Parse(body)
@@ -25,7 +29,7 @@ func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	}
 
 	tag := "td"
-	re := regexp.MustCompile(pageReg)
+	re := regexp.MustCompile(ext.pageReg)
 
 	data := doTraverse(doc, tag, re)
 
@@ -33,7 +37,7 @@ func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 		return 0.00, fmt.Errorf("the document does not have a price value with the tag: %v", tag)
 	}
 
-	return getPrice(data), nil
+	return ext.getPrice(data), nil
 }
 
 func doTraverse(doc *html.Node, tag string, re *regexp.Regexp) string {
@@ -62,8 +66,8 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 	return n.Type == html.TextNode && n.Parent.Data == tag && re.MatchString(n.Data)
 }
 
-func getPrice(data string) float32 {
-	re := regexp.MustCompile(priceReg)
+func (ext PriceExtractor) getPrice(data string) float32 {
+	re := regexp.MustCompile(ext.priceReg)
 	match := re.FindStringSubmatch(data)[0]
 	price, _ := strconv.ParseFloat(match, 32)
 

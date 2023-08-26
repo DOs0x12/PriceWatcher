@@ -14,7 +14,6 @@ import (
 
 func NewPriceService(
 	sender interSend.Sender,
-	ext price.Extractor,
 	val message.HourValidator,
 	conf configer.Configer) (*PriceService, error) {
 
@@ -23,10 +22,14 @@ func NewPriceService(
 		return nil, err
 	}
 
-	req, err := createRequester(strings.ToLower(config.PriceType))
+	priceType := strings.ToLower(config.PriceType)
+
+	req, err := createRequester(priceType)
 	if err != nil {
 		return nil, err
 	}
+
+	ext := createPriceExtractor(priceType)
 
 	crt := PriceService{
 		req:    req,
@@ -47,5 +50,26 @@ func createRequester(priceType string) (interReq.Requester, error) {
 		return marketplace.MarketplaceRequester{}, nil
 	default:
 		return nil, fmt.Errorf("have the unknown price type: %v", priceType)
+	}
+}
+
+func createPriceExtractor(priceType string) price.Extractor {
+	pageReg, priceReg := getRegexp(priceType)
+
+	return price.New(pageReg, priceReg)
+}
+
+func getRegexp(priceType string) (pageReg, priceReg string) {
+	switch priceType {
+	case "bank":
+		pageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
+		priceReg = `([0-9]{4,5}\.[0-9][0-9])`
+		return pageReg, priceReg
+	case "marketplace":
+		pageReg = `([0-9])*(&nbsp;)*([0-9])*(&nbsp;)[₽];`
+		priceReg = `([0-9]{4,5}\.[0-9][0-9])`
+		return pageReg, priceReg
+	default:
+		return "", ""
 	}
 }

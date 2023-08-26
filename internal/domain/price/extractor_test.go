@@ -9,6 +9,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//TO DO: implement tests for extracting the price from a bank and marketplace page
+
+// wantPageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
+// 	wantPriceReg = `([0-9]{4,5}\.[0-9][0-9])`
+// 	gotPageReg = serv.ext.
+// 	gotPriceReg
+// 	if got != want {
+// 		t.Errorf("Got %v, wanted %v", got, want)
+// 	}
+
 var ext = PriceExtractor{}
 
 func TestExtractPrice(t *testing.T) {
