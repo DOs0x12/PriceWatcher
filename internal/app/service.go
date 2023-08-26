@@ -33,7 +33,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 		return fmt.Errorf("on getting the config an error occurs: %w", err)
 	}
 
-	logrus.Infof("Check time for processing a gold price. The time value: %v", curHour)
+	logrus.Infof("Check time for processing a price. The time value: %v", curHour)
 
 	if !s.val.Validate(curHour, conf.SendingHours) {
 		logrus.Info("It is not appropriate time for getting a price")
@@ -41,24 +41,24 @@ func (s *PriceService) serve(clock clock.Clock) error {
 		return nil
 	}
 
-	logrus.Info("Start processing a gold price")
+	logrus.Info("Start processing a price")
 
 	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
-		return fmt.Errorf("cannot get a page with the current price of gold: %w", err)
+		return fmt.Errorf("cannot get a page with the current price: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return fmt.Errorf("cannot extract the gold price from the body: %w", err)
+		return fmt.Errorf("cannot extract the price from the body: %w", err)
 	}
 
 	err = s.sender.Send(price, conf.Email)
 	if err != nil {
-		return fmt.Errorf("cannot send the gold price: %w", err)
+		return fmt.Errorf("cannot send the price: %w", err)
 	}
 
-	logrus.Info("The gold price is processed")
+	logrus.Info("The price is processed")
 
 	return nil
 }
@@ -66,7 +66,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
 	interrupt.WatchForInterruption(cancel)
 
-	errMes := "An error occurs while serving a gold price: %v"
+	errMes := "An error occurs while serving a price: %v"
 	if err := s.serve(clock); err != nil {
 		logrus.Errorf(errMes, err)
 	}
