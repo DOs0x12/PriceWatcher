@@ -4,7 +4,7 @@ import (
 	"PriceWatcher/internal/app"
 	"PriceWatcher/internal/app/clock"
 	"PriceWatcher/internal/domain/hour"
-	"PriceWatcher/internal/domain/page"
+	"PriceWatcher/internal/domain/price/bank"
 	"PriceWatcher/internal/infrastructure/configer"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
@@ -29,7 +29,7 @@ func main() {
 
 func newService() (*app.PriceService, error) {
 	sen := sender.Sender{}
-	ext := page.PriceExtractor{}
+	ext := bank.PriceExtractor{}
 	val := hour.MessageHourVal{}
 	conf := configer.Configer{}
 

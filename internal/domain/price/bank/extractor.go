@@ -1,4 +1,4 @@
-package page
+package bank
 
 import (
 	"fmt"
@@ -9,7 +9,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-const regstring = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
+const pageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
+const priceReg = `([0-9]{4,5}\.[0-9][0-9])`
 
 type Extractor interface {
 	ExtractPrice(body io.Reader) (float32, error)
@@ -24,7 +25,7 @@ func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	}
 
 	tag := "td"
-	re := regexp.MustCompile(regstring)
+	re := regexp.MustCompile(pageReg)
 
 	data := doTraverse(doc, tag, re)
 
@@ -62,7 +63,7 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 }
 
 func getPrice(data string) float32 {
-	re := regexp.MustCompile(`([0-9]{4,5}\.[0-9][0-9])`)
+	re := regexp.MustCompile(priceReg)
 	match := re.FindStringSubmatch(data)[0]
 	price, _ := strconv.ParseFloat(match, 32)
 

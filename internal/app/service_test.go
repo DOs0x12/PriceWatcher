@@ -2,7 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/hour"
-	pDomain "PriceWatcher/internal/domain/page"
+	"PriceWatcher/internal/domain/price/bank"
 	"PriceWatcher/internal/entities/config"
 	pEnt "PriceWatcher/internal/entities/page"
 	"io"
@@ -60,7 +60,7 @@ func serveWithTrueValue(t *testing.T) {
 	serv := PriceService{
 		servTRequester{},
 		servTSender{},
-		pDomain.PriceExtractor{},
+		bank.PriceExtractor{},
 		hour.MessageHourVal{},
 		servTConfiger{}}
 
