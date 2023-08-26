@@ -13,7 +13,7 @@ const headlessCom = `google-chrome --headless=new --dump-dom --no-sandbox --wind
 type MarketplaceRequester struct{}
 
 func (r MarketplaceRequester) RequestPage(url string) (page.Response, error) {
-	cmd := exec.Command("sh", "-c", headlessCom+"'"+url+"'")
+	cmd := exec.Command("sh", "-c", headlessCom+" '"+url+"'")
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
