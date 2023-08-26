@@ -23,24 +23,6 @@ type PriceService struct {
 	conf   configer.Configer
 }
 
-func NewPriceService(
-	req interReq.Requester,
-	sender interSend.Sender,
-	ext page.Extractor,
-	val hour.HourValidator,
-	conf configer.Configer) *PriceService {
-
-	serv := PriceService{
-		req:    req,
-		sender: sender,
-		ext:    ext,
-		val:    val,
-		conf:   conf,
-	}
-
-	return &serv
-}
-
 const bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 func (s *PriceService) serve(clock clock.Clock) error {

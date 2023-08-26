@@ -22,14 +22,14 @@ func TestServe(t *testing.T) {
 
 var testNow time.Time
 
-type testClock struct{}
+type servTClock struct{}
 
-func (testClock) Now() time.Time                         { return testNow }
-func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
+func (servTClock) Now() time.Time                         { return testNow }
+func (servTClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
-type testRequester struct{}
+type servTRequester struct{}
 
-func (r testRequester) RequestPage(url string) (pEnt.Response, error) {
+func (r servTRequester) RequestPage(url string) (pEnt.Response, error) {
 	s := `
 		<html>
 			<head>
@@ -46,23 +46,23 @@ func (r testRequester) RequestPage(url string) (pEnt.Response, error) {
 	return pEnt.Response{Body: reader}, nil
 }
 
-type testSender struct{}
+type servTSender struct{}
 
-func (s testSender) Send(price float32, config config.Email) error { return nil }
+func (s servTSender) Send(price float32, config config.Email) error { return nil }
 
-type testConfiger struct{}
+type servTConfiger struct{}
 
-func (testConfiger) GetConfig() (config.Config, error) {
+func (servTConfiger) GetConfig() (config.Config, error) {
 	return config.Config{}, nil
 }
 
 func serveWithTrueValue(t *testing.T) {
-	serv := NewPriceService(
-		testRequester{},
-		testSender{},
+	serv := PriceService{
+		servTRequester{},
+		servTSender{},
 		pDomain.PriceExtractor{},
 		hour.MessageHourVal{},
-		testConfiger{})
+		servTConfiger{}}
 
 	workHour := 12
 	now := time.Now()
@@ -70,7 +70,7 @@ func serveWithTrueValue(t *testing.T) {
 		now.Year(), now.Month(), now.Day(), workHour,
 		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
-	got := serv.serve(testClock{})
+	got := serv.serve(servTClock{})
 
 	if got != nil {
 		t.Errorf("Got an error in the serve method: %v", got.Error())
@@ -129,12 +129,12 @@ func (confWithCall) GetConfig() (config.Config, error) {
 }
 
 func serveWithCall(t *testing.T) {
-	serv := NewPriceService(
+	serv := PriceService{
 		reqWithCall{},
 		sendWithCall{},
 		extWithCall{},
 		valWithCall{},
-		confWithCall{})
+		confWithCall{}}
 
 	workHour := 12
 	now := time.Now()
@@ -142,7 +142,7 @@ func serveWithCall(t *testing.T) {
 		now.Year(), now.Month(), now.Day(), workHour,
 		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
-	serv.serve(testClock{})
+	serv.serve(servTClock{})
 
 	if !reqCall {
 		t.Error("The method for requesting a page is not called in the app layer")

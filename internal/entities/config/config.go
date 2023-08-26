@@ -2,6 +2,8 @@ package config
 
 type Config struct {
 	SendingHours []int
+	PriceType    string
+	ItemUrl      string
 	Email        Email
 }
 

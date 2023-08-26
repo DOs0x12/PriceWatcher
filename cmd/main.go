@@ -6,7 +6,6 @@ import (
 	"PriceWatcher/internal/domain/hour"
 	"PriceWatcher/internal/domain/page"
 	"PriceWatcher/internal/infrastructure/configer"
-	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
 
@@ -16,7 +15,10 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	serv := newService()
+	serv, err := newService()
+	if err != nil {
+		logrus.Errorf("Got the error: %v", err)
+	}
 
 	logrus.Infoln("Start the application")
 
@@ -25,12 +27,11 @@ func main() {
 	logrus.Infoln("The application is done")
 }
 
-func newService() *app.PriceService {
-	req := bank.Requester{}
+func newService() (*app.PriceService, error) {
 	sen := sender.Sender{}
 	ext := page.PriceExtractor{}
 	val := hour.MessageHourVal{}
 	conf := configer.Configer{}
 
-	return app.NewPriceService(req, sen, ext, val, conf)
+	return app.NewPriceService(sen, ext, val, conf)
 }

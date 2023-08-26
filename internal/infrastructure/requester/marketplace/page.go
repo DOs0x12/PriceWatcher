@@ -10,11 +10,9 @@ import (
 
 const headlessCom = `google-chrome --headless=new --dump-dom --no-sandbox --window-size=1920x1080--user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36' --lang=ru-RU --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --timeout=5000 --use-gl --disable-gpu`
 
-var url string = "https://www.wildberries.ru/catalog/14399645/detail.aspx"
+type MarketplaceRequester struct{}
 
-type Requester struct{}
-
-func (r Requester) RequestPage() (page.Response, error) {
+func (r MarketplaceRequester) RequestPage(url string) (page.Response, error) {
 	cmd := exec.Command("sh", "-c", headlessCom+"'"+url+"'")
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb

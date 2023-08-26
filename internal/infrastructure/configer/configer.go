@@ -14,6 +14,8 @@ const (
 
 type ConfigDto struct {
 	SendingHours []int    `yaml:"sending_hours"`
+	PriceType    string   `yaml:"price_type"`
+	ItemUrl      string   `yaml:"item_url"`
 	Email        EmailDto `yaml:"email"`
 }
 

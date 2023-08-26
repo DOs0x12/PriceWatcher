@@ -24,7 +24,7 @@ func TestGetWaitTime(t *testing.T) {
 
 	got, err := getWaitTime(testNow)
 	if err != nil {
-		t.Errorf("The getWaitTime method retuns an error: %v", err)
+		t.Errorf("The method retuns an error: %v", err)
 	}
 
 	if want != got {
