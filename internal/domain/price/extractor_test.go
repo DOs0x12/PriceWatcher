@@ -1,4 +1,4 @@
-package bank
+package price
 
 import (
 	"errors"

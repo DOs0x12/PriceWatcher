@@ -2,7 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price/bank"
+	"PriceWatcher/internal/domain/price"
 	"PriceWatcher/internal/entities/config"
 	"reflect"
 	"testing"
@@ -27,7 +27,7 @@ func (marketplaceConfiger) GetConfig() (config.Config, error) {
 func TestNewPriceService(t *testing.T) {
 	serv, err := NewPriceService(
 		crtTSender{},
-		bank.PriceExtractor{},
+		price.PriceExtractor{},
 		message.MessageHourVal{},
 		bankConfiger{})
 	if err != nil {
@@ -48,7 +48,7 @@ func TestNewPriceService(t *testing.T) {
 
 	serv, err = NewPriceService(
 		crtTSender{},
-		bank.PriceExtractor{},
+		price.PriceExtractor{},
 		message.MessageHourVal{},
 		marketplaceConfiger{})
 	if err != nil {

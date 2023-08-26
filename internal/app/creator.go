@@ -2,7 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/message"
-	bankPrice "PriceWatcher/internal/domain/price/bank"
+	"PriceWatcher/internal/domain/price"
 	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
 	"PriceWatcher/internal/interfaces/configer"
@@ -14,7 +14,7 @@ import (
 
 func NewPriceService(
 	sender interSend.Sender,
-	ext bankPrice.Extractor,
+	ext price.Extractor,
 	val message.HourValidator,
 	conf configer.Configer) (*PriceService, error) {
 
