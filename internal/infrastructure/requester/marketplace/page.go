@@ -20,7 +20,7 @@ func (r MarketplaceRequester) RequestPage(url string) (page.Response, error) {
 	if err := cmd.Run(); err != nil {
 		return page.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)
 	}
-	if errb.Len() > 0 {
+	if outb.Len() == 0 {
 		return page.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", errb.String())
 	}
 	reader := strings.NewReader(outb.String())
