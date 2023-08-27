@@ -5,6 +5,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -14,14 +15,15 @@ type Extractor interface {
 }
 
 type PriceExtractor struct {
-	pageReg  string
-	priceReg string
-	tag      string
+	pageReg string
+	tag     string
 }
 
 func New(pageReg, priceReg, tag string) PriceExtractor {
-	return PriceExtractor{pageReg: pageReg, priceReg: priceReg, tag: tag}
+	return PriceExtractor{pageReg: pageReg, tag: tag}
 }
+
+var priceReg = `([0-9]+\.*[0-9]*[0-9]*)`
 
 func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	doc, err := html.Parse(body)
@@ -67,8 +69,9 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 }
 
 func (ext PriceExtractor) getPrice(data string) float32 {
-	re := regexp.MustCompile(ext.priceReg)
-	match := re.FindStringSubmatch(data)[0]
+	cleanedData := strings.ReplaceAll(data, "\u00a0", "")
+	re := regexp.MustCompile(priceReg)
+	match := re.FindStringSubmatch(cleanedData)[0]
 	price, _ := strconv.ParseFloat(match, 32)
 
 	return float32(price)
