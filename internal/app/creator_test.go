@@ -9,7 +9,7 @@ import (
 
 type crtTSender struct{}
 
-func (s crtTSender) Send(price float32, config config.Email) error { return nil }
+func (s crtTSender) Send(message, subject string, conf config.Email) error { return nil }
 
 type bankConfiger struct{}
 

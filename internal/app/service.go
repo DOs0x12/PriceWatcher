@@ -56,10 +56,17 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	}
 
 	if s.analyser != nil {
-		changed, _, _ := s.analyser.AnalysePrice(price)
+		changed, up, amount := s.analyser.AnalysePrice(price)
 
-		if changed {
-			//TO DO: send a report
+		if changed && !up {
+			sub := "Цена на товар WB"
+			msg := fmt.Sprintf("Цена на %v уменьшилась на %.2fр. Текущая цена: %.2fр", conf.ItemUrl, amount, price)
+
+			err := s.sender.Send(msg, sub, conf.Email)
+			if err != nil {
+				return fmt.Errorf("cannot send the item price: %w", err)
+			}
+
 			logrus.Info("The item price has been changed. A report is sended")
 
 			return nil
@@ -70,7 +77,10 @@ func (s *PriceService) serve(clock clock.Clock) error {
 		return nil
 	}
 
-	err = s.sender.Send(price, conf.Email)
+	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
+	sub := "Че по золоту?"
+
+	err = s.sender.Send(msg, sub, conf.Email)
 	if err != nil {
 		return fmt.Errorf("cannot send the price: %w", err)
 	}

@@ -48,7 +48,7 @@ func (r servTRequester) RequestPage() (pEnt.Response, error) {
 
 type servTSender struct{}
 
-func (s servTSender) Send(price float32, config config.Email) error { return nil }
+func (s servTSender) Send(message, subject string, conf config.Email) error { return nil }
 
 type servTConfiger struct{}
 
@@ -122,7 +122,7 @@ func (valWithCall) Validate(hour int, sendHours []int) bool {
 
 type sendWithCall struct{}
 
-func (sendWithCall) Send(price float32, conf config.Email) error {
+func (sendWithCall) Send(message, subject string, conf config.Email) error {
 	sendCall = true
 
 	return nil

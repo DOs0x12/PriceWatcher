@@ -10,9 +10,9 @@ import (
 
 type Sender struct{}
 
-func (s Sender) Send(price float32, conf config.Email) error {
-	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
-	sub := "Че по золоту?"
+func (s Sender) Send(message, subject string, conf config.Email) error {
+	msg := message
+	sub := subject
 	m := gomail.NewMessage()
 	configureMsg(m, sub, msg, conf)
 	d := gomail.NewDialer(conf.SmtpHost, conf.SmtpPort, conf.From, conf.Pass)
