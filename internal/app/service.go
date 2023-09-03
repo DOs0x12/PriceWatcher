@@ -4,6 +4,7 @@ import (
 	"PriceWatcher/internal/app/clock"
 	"PriceWatcher/internal/app/interrupt"
 	"PriceWatcher/internal/domain/message"
+	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/interfaces/configer"
 	interReq "PriceWatcher/internal/interfaces/requester"
@@ -16,11 +17,12 @@ import (
 )
 
 type PriceService struct {
-	req    interReq.Requester
-	sender interSend.Sender
-	ext    extractor.Extractor
-	val    message.HourValidator
-	conf   configer.Configer
+	req      interReq.Requester
+	sender   interSend.Sender
+	ext      extractor.Extractor
+	val      message.HourValidator
+	analyser analyser.Analyser
+	conf     configer.Configer
 }
 
 func (s *PriceService) serve(clock clock.Clock) error {
@@ -49,6 +51,21 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
 		return fmt.Errorf("cannot extract the price from the body: %w", err)
+	}
+
+	if s.analyser != nil {
+		changed, _, _ := s.analyser.IsPriceChanged(price)
+
+		if changed {
+			//TO DO: send a report
+			logrus.Info("The item price has been changed. A report is sended")
+
+			return nil
+		}
+
+		logrus.Info("The item price has been not changed")
+
+		return nil
 	}
 
 	err = s.sender.Send(price, conf.Email)

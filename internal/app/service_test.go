@@ -56,12 +56,19 @@ func (servTConfiger) GetConfig() (config.Config, error) {
 	return config.Config{}, nil
 }
 
+type servTAnalyser struct{}
+
+func (servTAnalyser) IsPriceChanged(price float32) (changed, up bool, amount float32) {
+	return false, false, 0.0
+}
+
 func serveWithTrueValue(t *testing.T) {
 	serv := PriceService{
 		servTRequester{},
 		servTSender{},
 		extractor.PriceExtractor{},
 		message.MessageHourVal{},
+		servTAnalyser{},
 		servTConfiger{}}
 
 	workHour := 12
@@ -78,11 +85,12 @@ func serveWithTrueValue(t *testing.T) {
 }
 
 var (
-	reqCall  bool
-	extCall  bool
-	valCall  bool
-	sendCall bool
-	confCall bool
+	reqCall      bool
+	extCall      bool
+	valCall      bool
+	sendCall     bool
+	confCall     bool
+	analyserCall bool
 )
 
 type reqWithCall struct{}
@@ -128,12 +136,21 @@ func (confWithCall) GetConfig() (config.Config, error) {
 	return config.Config{}, nil
 }
 
+type analyserWithCall struct{}
+
+func (analyserWithCall) IsPriceChanged(price float32) (changed, up bool, amount float32) {
+	analyserCall = true
+
+	return false, false, 0.0
+}
+
 func serveWithCall(t *testing.T) {
 	serv := PriceService{
 		reqWithCall{},
 		sendWithCall{},
 		extWithCall{},
 		valWithCall{},
+		analyserWithCall{},
 		confWithCall{}}
 
 	workHour := 12
@@ -152,6 +169,9 @@ func serveWithCall(t *testing.T) {
 	}
 	if !valCall {
 		t.Error("The method for validating the price is not called in the app layer")
+	}
+	if !analyserCall {
+		t.Error("The method for analysing the price is not called in the app layer")
 	}
 	if !sendCall {
 		t.Error("The method for sending the price is not called in the app layer")
