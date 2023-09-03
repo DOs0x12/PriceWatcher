@@ -54,7 +54,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	}
 
 	if s.analyser != nil {
-		changed, _, _ := s.analyser.IsPriceChanged(price)
+		changed, _, _ := s.analyser.AnalysePrice(price)
 
 		if changed {
 			//TO DO: send a report

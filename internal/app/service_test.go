@@ -58,7 +58,7 @@ func (servTConfiger) GetConfig() (config.Config, error) {
 
 type servTAnalyser struct{}
 
-func (servTAnalyser) IsPriceChanged(price float32) (changed, up bool, amount float32) {
+func (servTAnalyser) AnalysePrice(price float32) (changed, up bool, amount float32) {
 	return false, false, 0.0
 }
 
@@ -138,7 +138,7 @@ func (confWithCall) GetConfig() (config.Config, error) {
 
 type analyserWithCall struct{}
 
-func (analyserWithCall) IsPriceChanged(price float32) (changed, up bool, amount float32) {
+func (analyserWithCall) AnalysePrice(price float32) (changed, up bool, amount float32) {
 	analyserCall = true
 
 	return false, false, 0.0
