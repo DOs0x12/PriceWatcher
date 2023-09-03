@@ -9,8 +9,15 @@ COPY internal ./internal
 WORKDIR /app/cmd
 RUN CGO_ENABLED=0 GOOS=linux go build -o /price-watcher
 
-FROM alpine:latest AS release-stage
+FROM ubuntu:latest AS release-stage
 COPY --from=build-stage /price-watcher /price-watcher
-RUN apk add --no-cache tzdata
-ENV TZ=Europe/Moscow
+ENV TZ=Europe/Moscow \
+    DEBIAN_FRONTEND=noninteractive
+RUN apt-get -y update
+RUN apt install wget -y
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt install -y ./google-chrome-stable_current_amd64.deb
+RUN rm google-chrome-stable_current_amd64.deb
+#RUN apk add --no-cache tzdata
+#ENV TZ=Europe/Moscow
 CMD ["/price-watcher"]
