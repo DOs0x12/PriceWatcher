@@ -37,7 +37,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 
 	logrus.Infof("Check time for processing a price. The time value: %v", curHour)
 
-	if !s.val.Validate(curHour, conf.SendingHours) {
+	if s.analyser == nil && !s.val.Validate(curHour, conf.SendingHours) {
 		logrus.Info("It is not appropriate time for getting a price")
 
 		return nil
