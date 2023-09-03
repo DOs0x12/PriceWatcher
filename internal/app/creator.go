@@ -2,6 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/message"
+	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/infrastructure/requester/bank"
@@ -31,13 +32,18 @@ func NewPriceService(
 	priceType := strings.ToLower(config.PriceType)
 
 	ext := createPriceExtractor(priceType)
+	analyser, err := createAnalyser(config.PriceType)
+	if err != nil {
+		return nil, err
+	}
 
 	crt := PriceService{
-		req:    req,
-		sender: sender,
-		ext:    ext,
-		val:    val,
-		conf:   conf,
+		req:      req,
+		sender:   sender,
+		ext:      ext,
+		val:      val,
+		analyser: analyser,
+		conf:     conf,
 	}
 
 	return &crt, err
@@ -74,5 +80,18 @@ func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 		return pageReg, priceReg, tag
 	default:
 		return "", "", ""
+	}
+}
+
+func createAnalyser(priceType string) (analyser.Analyser, error) {
+	pType := strings.ToLower(priceType)
+
+	switch pType {
+	case "bank":
+		return nil, nil
+	case "marketplace":
+		return analyser.MarketplaceAnalyser{}, nil
+	default:
+		return nil, fmt.Errorf("have the unknown price type: %v", pType)
 	}
 }
