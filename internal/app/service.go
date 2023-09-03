@@ -4,7 +4,7 @@ import (
 	"PriceWatcher/internal/app/clock"
 	"PriceWatcher/internal/app/interrupt"
 	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price"
+	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/interfaces/configer"
 	interReq "PriceWatcher/internal/interfaces/requester"
 	interSend "PriceWatcher/internal/interfaces/sender"
@@ -18,7 +18,7 @@ import (
 type PriceService struct {
 	req    interReq.Requester
 	sender interSend.Sender
-	ext    price.Extractor
+	ext    extractor.Extractor
 	val    message.HourValidator
 	conf   configer.Configer
 }

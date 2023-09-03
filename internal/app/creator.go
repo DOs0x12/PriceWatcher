@@ -2,7 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price"
+	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
@@ -56,10 +56,10 @@ func createRequester(conf config.Config) (interReq.Requester, error) {
 	}
 }
 
-func createPriceExtractor(priceType string) price.Extractor {
+func createPriceExtractor(priceType string) extractor.Extractor {
 	pageReg, priceReg, tag := getSearchData(priceType)
 
-	return price.New(pageReg, priceReg, tag)
+	return extractor.New(pageReg, priceReg, tag)
 }
 
 func getSearchData(priceType string) (pageReg, priceReg, tag string) {
