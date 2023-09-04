@@ -30,8 +30,8 @@ type EmailDto struct {
 type Configer struct{}
 
 func (Configer) GetConfig() (config.Config, error) {
-	confFile, err := os.ReadFile(debugPath)
-	//confFile, err := os.ReadFile(path)
+	//confFile, err := os.ReadFile(debugPath)
+	confFile, err := os.ReadFile(path)
 	if err != nil {
 		return config.Config{}, err
 	}

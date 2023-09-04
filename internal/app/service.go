@@ -98,15 +98,20 @@ func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, cl
 		logrus.Errorf(errMes, err)
 	}
 
-	err := waitHourStart(clock.Now())
-	if err != nil {
-		logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
-	}
-
 	config, err := s.conf.GetConfig()
 	if err != nil {
 		logrus.Errorf("An error occurs while get the config data: %v", err)
+
 		return
+	}
+
+	if strings.ToLower(config.PriceType) == "bank" {
+		err := waitHourStart(clock.Now())
+		if err != nil {
+			logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
+
+			return
+		}
 	}
 
 	var dur time.Duration
