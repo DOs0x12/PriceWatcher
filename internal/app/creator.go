@@ -34,12 +34,16 @@ func NewPriceService(
 	priceType := strings.ToLower(config.PriceType)
 
 	ext := createPriceExtractor(priceType)
-	analyser, err := createAnalyser(config.PriceType)
+	wr := createWriteReader(priceType)
+	initialPrice, err := wr.Read()
 	if err != nil {
 		return nil, err
 	}
 
-	wr := createWriteReader(priceType)
+	analyser, err := createAnalyser(config.PriceType, initialPrice)
+	if err != nil {
+		return nil, err
+	}
 
 	crt := PriceService{
 		req:      req,
@@ -88,14 +92,14 @@ func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 	}
 }
 
-func createAnalyser(priceType string) (analyser.Analyser, error) {
+func createAnalyser(priceType string, initialPrice float32) (analyser.Analyser, error) {
 	pType := strings.ToLower(priceType)
 
 	switch pType {
 	case "bank":
 		return nil, nil
 	case "marketplace":
-		return analyser.MarketplaceAnalyser{}, nil
+		return analyser.MarketplaceAnalyser{CurrentMinPrice: initialPrice}, nil
 	default:
 		return nil, fmt.Errorf("have the unknown price type: %v", pType)
 	}
