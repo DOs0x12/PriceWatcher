@@ -14,7 +14,7 @@ var fileName = "last_price.txt"
 
 type WriteReader struct{}
 
-func Write(price float32) error {
+func (WriteReader) Write(price float32) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return fmt.Errorf("cannot create a file: %v", err)
@@ -33,7 +33,7 @@ func Write(price float32) error {
 	return nil
 }
 
-func Read() (float32, error) {
+func (WriteReader) Read() (float32, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
