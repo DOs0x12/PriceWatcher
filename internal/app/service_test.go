@@ -62,6 +62,16 @@ func (servTAnalyser) AnalysePrice(price float32) (changed, up bool, amount float
 	return false, false, 0.0
 }
 
+type servTWriteReader struct{}
+
+func (servTWriteReader) Write(price float32) error {
+	return nil
+}
+
+func (servTWriteReader) Read() (float32, error) {
+	return 0.0, nil
+}
+
 func serveWithTrueValue(t *testing.T) {
 	serv := PriceService{
 		servTRequester{},
@@ -69,6 +79,7 @@ func serveWithTrueValue(t *testing.T) {
 		extractor.PriceExtractor{},
 		message.MessageHourVal{},
 		servTAnalyser{},
+		servTWriteReader{},
 		servTConfiger{}}
 
 	workHour := 12
@@ -91,6 +102,7 @@ var (
 	sendCall     bool
 	confCall     bool
 	analyserCall bool
+	wrCall       bool
 )
 
 type reqWithCall struct{}
@@ -144,6 +156,20 @@ func (analyserWithCall) AnalysePrice(price float32) (changed, up bool, amount fl
 	return false, false, 0.0
 }
 
+type writeReaderWithCall struct{}
+
+func (writeReaderWithCall) Write(price float32) error {
+	wrCall = true
+
+	return nil
+}
+
+func (writeReaderWithCall) Read() (float32, error) {
+	wrCall = true
+
+	return 0.0, nil
+}
+
 func serveWithCall(t *testing.T) {
 	serv := PriceService{
 		reqWithCall{},
@@ -151,6 +177,7 @@ func serveWithCall(t *testing.T) {
 		extWithCall{},
 		valWithCall{},
 		analyserWithCall{},
+		writeReaderWithCall{},
 		confWithCall{}}
 
 	workHour := 12
