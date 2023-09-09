@@ -39,12 +39,15 @@ func NewPriceService(
 		return nil, err
 	}
 
+	wr := createWriteReader(priceType)
+
 	crt := PriceService{
 		req:      req,
 		sender:   sender,
 		ext:      ext,
 		val:      val,
 		analyser: analyser,
+		wr:       wr,
 		conf:     conf,
 	}
 
@@ -98,15 +101,15 @@ func createAnalyser(priceType string) (analyser.Analyser, error) {
 	}
 }
 
-func createWriteReader(priceType string) (file.WriteReader, error) {
+func createWriteReader(priceType string) file.WriteReader {
 	pType := strings.ToLower(priceType)
 
 	switch pType {
 	case "bank":
-		return nil, nil
+		return nil
 	case "marketplace":
-		return infraFile.WriteReader{}, nil
+		return infraFile.WriteReader{}
 	default:
-		return nil, fmt.Errorf("have the unknown price type: %v", pType)
+		return nil
 	}
 }
