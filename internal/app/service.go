@@ -7,6 +7,7 @@ import (
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/interfaces/configer"
+	"PriceWatcher/internal/interfaces/file"
 	interReq "PriceWatcher/internal/interfaces/requester"
 	interSend "PriceWatcher/internal/interfaces/sender"
 	"context"
@@ -24,6 +25,7 @@ type PriceService struct {
 	ext      extractor.Extractor
 	val      message.HourValidator
 	analyser analyser.Analyser
+	wr       file.WriteReader
 	conf     configer.Configer
 }
 

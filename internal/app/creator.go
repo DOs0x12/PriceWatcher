@@ -5,9 +5,11 @@ import (
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
+	infraFile "PriceWatcher/internal/infrastructure/file"
 	"PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
 	"PriceWatcher/internal/interfaces/configer"
+	"PriceWatcher/internal/interfaces/file"
 	interReq "PriceWatcher/internal/interfaces/requester"
 	interSend "PriceWatcher/internal/interfaces/sender"
 	"fmt"
@@ -91,6 +93,19 @@ func createAnalyser(priceType string) (analyser.Analyser, error) {
 		return nil, nil
 	case "marketplace":
 		return analyser.MarketplaceAnalyser{}, nil
+	default:
+		return nil, fmt.Errorf("have the unknown price type: %v", pType)
+	}
+}
+
+func createWriteReader(priceType string) (file.WriteReader, error) {
+	pType := strings.ToLower(priceType)
+
+	switch pType {
+	case "bank":
+		return nil, nil
+	case "marketplace":
+		return infraFile.WriteReader{}, nil
 	default:
 		return nil, fmt.Errorf("have the unknown price type: %v", pType)
 	}
