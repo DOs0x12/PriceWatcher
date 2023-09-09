@@ -58,6 +58,17 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	}
 
 	if s.analyser != nil {
+		curPrice, err := s.wr.Read()
+		if err != nil {
+			return err
+		}
+
+		if curPrice == 0.0 {
+			if err := s.wr.Write(price); err != nil {
+				return err
+			}
+		}
+
 		changed, up, amount := s.analyser.AnalysePrice(price)
 
 		if changed && !up {
@@ -67,6 +78,10 @@ func (s *PriceService) serve(clock clock.Clock) error {
 			err := s.sender.Send(msg, sub, conf.Email)
 			if err != nil {
 				return fmt.Errorf("cannot send the item price: %w", err)
+			}
+
+			if err := s.wr.Write(price); err != nil {
+				return err
 			}
 
 			logrus.Info("The item price has been changed. A report is sended")
