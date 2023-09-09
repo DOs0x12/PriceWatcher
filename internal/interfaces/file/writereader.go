@@ -1,6 +1,6 @@
 package file
 
 type WriteReader interface {
-	Write(data float32)
-	Read() float32
+	Write(price float32) error
+	Read() (float32, error)
 }
