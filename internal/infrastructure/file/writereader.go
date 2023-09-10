@@ -1,20 +1,20 @@
 package file
 
 import (
-	"encoding/binary"
+	"bufio"
 	"errors"
 	"fmt"
-	"io"
-	"math"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var fileName = "last_price.txt"
+var itemPrices = make(map[string]float64)
 
 type WriteReader struct{}
 
-func (WriteReader) Write(price float32) error {
+func (WriteReader) Write(prices map[string]float64) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return fmt.Errorf("cannot create a file: %v", err)
@@ -26,21 +26,26 @@ func (WriteReader) Write(price float32) error {
 		}
 	}()
 
-	if _, err := file.WriteString(strconv.FormatFloat(float64(price), 'f', 2, 32)); err != nil {
-		return fmt.Errorf("cannot write a price to the file %v: %v", fileName, err)
+	for k, v := range prices {
+		val := strconv.FormatFloat(float64(v), 'f', 2, 32)
+		data := fmt.Sprintf("%v %v\n", k, val)
+
+		if _, err := file.WriteString(data); err != nil {
+			return fmt.Errorf("cannot write a price to the file %v: %v", fileName, err)
+		}
 	}
 
 	return nil
 }
 
-func (WriteReader) Read() (float32, error) {
+func (WriteReader) Read() error {
 	file, err := os.Open(fileName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return 0.0, nil
+			return nil
 		}
 
-		return 0.0, err
+		return err
 	}
 
 	defer func() {
@@ -49,19 +54,34 @@ func (WriteReader) Read() (float32, error) {
 		}
 	}()
 
-	buf := make([]byte, 1024)
-	for {
-		n, err := file.Read(buf)
-		if err != nil && err != io.EOF {
-			return 0.0, fmt.Errorf("cannot read a price from the file %v: %v", fileName, err)
-		}
-		if n == 0 {
-			break
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		err = addItemPrice(itemPrices, scanner.Text())
+		if err != nil {
+			return err
 		}
 	}
 
-	bits := binary.LittleEndian.Uint32(buf)
-	pr := math.Float32frombits(bits)
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("cannot read a price from the file %v: %v", fileName, err)
+	}
 
-	return pr, nil
+	return nil
+}
+
+func addItemPrice(prices map[string]float64, dataLine string) error {
+	dataTokenCount := 2
+	data := strings.Split(dataLine, " ")
+	if len(data) < dataTokenCount {
+		return fmt.Errorf("data \"%v\" in the file %v is in not appropriate format", data, fileName)
+	}
+
+	price, err := strconv.ParseFloat(data[1], 32)
+	if err != nil {
+		return err
+	}
+
+	prices[data[0]] = price
+
+	return nil
 }
