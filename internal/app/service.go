@@ -106,12 +106,16 @@ func (s *PriceService) serve(clock clock.Clock) error {
 				continue
 			}
 
-			err = s.wr.Write(curPrices)
-			if err != nil {
-				return err
+			if curPrices[k] == 0.0 {
+				curPrices[k] = float64(price)
 			}
 
 			logrus.Info("The item price has been not changed")
+		}
+
+		err = s.wr.Write(curPrices)
+		if err != nil {
+			return err
 		}
 
 		return nil
