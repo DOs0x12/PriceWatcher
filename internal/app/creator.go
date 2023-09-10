@@ -35,12 +35,8 @@ func NewPriceService(
 
 	ext := createPriceExtractor(priceType)
 	wr := createWriteReader(priceType)
-	initialPrice, err := wr.Read()
-	if err != nil {
-		return nil, err
-	}
 
-	analyser, err := createAnalyser(config.PriceType, initialPrice)
+	analyser, err := createAnalyser(config.PriceType)
 	if err != nil {
 		return nil, err
 	}
@@ -63,9 +59,9 @@ func createRequester(conf config.Config) (interReq.Requester, error) {
 
 	switch priceType {
 	case "bank":
-		return bank.BankRequester{Url: "https://investzoloto.ru/gold-sber-oms/"}, nil
+		return bank.BankRequester{}, nil
 	case "marketplace":
-		return marketplace.MarketplaceRequester{Url: conf.ItemUrl}, nil
+		return marketplace.MarketplaceRequester{}, nil
 	default:
 		return nil, fmt.Errorf("have the unknown price type: %v", conf.PriceType)
 	}
