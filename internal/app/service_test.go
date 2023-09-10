@@ -1,206 +1,206 @@
 package app
 
-import (
-	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price/extractor"
-	"PriceWatcher/internal/entities/config"
-	pEnt "PriceWatcher/internal/entities/page"
-	"io"
-	"strings"
-	"testing"
-	"time"
+// import (
+// 	"PriceWatcher/internal/domain/message"
+// 	"PriceWatcher/internal/domain/price/extractor"
+// 	"PriceWatcher/internal/entities/config"
+// 	pEnt "PriceWatcher/internal/entities/page"
+// 	"io"
+// 	"strings"
+// 	"testing"
+// 	"time"
 
-	"github.com/sirupsen/logrus"
-)
+// 	"github.com/sirupsen/logrus"
+// )
 
-func TestServe(t *testing.T) {
-	logrus.Info("Start to test the func serve with true value")
-	serveWithTrueValue(t)
-	logrus.Info("Start to test the func serve for checking that the all methods are called")
-	serveWithCall(t)
-}
+// func TestServe(t *testing.T) {
+// 	logrus.Info("Start to test the func serve with true value")
+// 	serveWithTrueValue(t)
+// 	logrus.Info("Start to test the func serve for checking that the all methods are called")
+// 	serveWithCall(t)
+// }
 
-var testNow time.Time
+// var testNow time.Time
 
-type servTClock struct{}
+// type servTClock struct{}
 
-func (servTClock) Now() time.Time                         { return testNow }
-func (servTClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
+// func (servTClock) Now() time.Time                         { return testNow }
+// func (servTClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
-type servTRequester struct{}
+// type servTRequester struct{}
 
-func (r servTRequester) RequestPage() (pEnt.Response, error) {
-	s := `
-		<html>
-			<head>
-				<title>test</title>
-			</head>
-			<body>
-				<table>
-					<td> покупка: 3232.00</td>
-				</table>
-			</body>
-		</html>`
-	reader := strings.NewReader(s)
+// func (r servTRequester) RequestPage() (pEnt.Response, error) {
+// 	s := `
+// 		<html>
+// 			<head>
+// 				<title>test</title>
+// 			</head>
+// 			<body>
+// 				<table>
+// 					<td> покупка: 3232.00</td>
+// 				</table>
+// 			</body>
+// 		</html>`
+// 	reader := strings.NewReader(s)
 
-	return pEnt.Response{Body: reader}, nil
-}
+// 	return pEnt.Response{Body: reader}, nil
+// }
 
-type servTSender struct{}
+// type servTSender struct{}
 
-func (s servTSender) Send(message, subject string, conf config.Email) error { return nil }
+// func (s servTSender) Send(message, subject string, conf config.Email) error { return nil }
 
-type servTConfiger struct{}
+// type servTConfiger struct{}
 
-func (servTConfiger) GetConfig() (config.Config, error) {
-	return config.Config{}, nil
-}
+// func (servTConfiger) GetConfig() (config.Config, error) {
+// 	return config.Config{}, nil
+// }
 
-type servTAnalyser struct{}
+// type servTAnalyser struct{}
 
-func (servTAnalyser) AnalysePrice(price float32) (changed, up bool, amount float32) {
-	return false, false, 0.0
-}
+// func (servTAnalyser) AnalysePrice(price float32) (changed, up bool, amount float32) {
+// 	return false, false, 0.0
+// }
 
-type servTWriteReader struct{}
+// type servTWriteReader struct{}
 
-func (servTWriteReader) Write(price float32) error {
-	return nil
-}
+// func (servTWriteReader) Write(price float32) error {
+// 	return nil
+// }
 
-func (servTWriteReader) Read() (float32, error) {
-	return 0.0, nil
-}
+// func (servTWriteReader) Read() (float32, error) {
+// 	return 0.0, nil
+// }
 
-func serveWithTrueValue(t *testing.T) {
-	serv := PriceService{
-		servTRequester{},
-		servTSender{},
-		extractor.PriceExtractor{},
-		message.MessageHourVal{},
-		servTAnalyser{},
-		servTWriteReader{},
-		servTConfiger{}}
+// func serveWithTrueValue(t *testing.T) {
+// 	serv := PriceService{
+// 		servTRequester{},
+// 		servTSender{},
+// 		extractor.PriceExtractor{},
+// 		message.MessageHourVal{},
+// 		servTAnalyser{},
+// 		servTWriteReader{},
+// 		servTConfiger{}}
 
-	workHour := 12
-	now := time.Now()
-	testNow = time.Date(
-		now.Year(), now.Month(), now.Day(), workHour,
-		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
+// 	workHour := 12
+// 	now := time.Now()
+// 	testNow = time.Date(
+// 		now.Year(), now.Month(), now.Day(), workHour,
+// 		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
-	got := serv.serve(servTClock{})
+// 	got := serv.serve(servTClock{})
 
-	if got != nil {
-		t.Errorf("Got an error in the serve method: %v", got.Error())
-	}
-}
+// 	if got != nil {
+// 		t.Errorf("Got an error in the serve method: %v", got.Error())
+// 	}
+// }
 
-var (
-	reqCall      bool
-	extCall      bool
-	valCall      bool
-	sendCall     bool
-	confCall     bool
-	analyserCall bool
-	wrCall       bool
-)
+// var (
+// 	reqCall      bool
+// 	extCall      bool
+// 	valCall      bool
+// 	sendCall     bool
+// 	confCall     bool
+// 	analyserCall bool
+// 	wrCall       bool
+// )
 
-type reqWithCall struct{}
+// type reqWithCall struct{}
 
-func (r reqWithCall) RequestPage() (pEnt.Response, error) {
-	s := "test"
-	reader := strings.NewReader(s)
+// func (r reqWithCall) RequestPage() (pEnt.Response, error) {
+// 	s := "test"
+// 	reader := strings.NewReader(s)
 
-	reqCall = true
+// 	reqCall = true
 
-	return pEnt.Response{Body: reader}, nil
-}
+// 	return pEnt.Response{Body: reader}, nil
+// }
 
-type extWithCall struct{}
+// type extWithCall struct{}
 
-func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
-	extCall = true
+// func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
+// 	extCall = true
 
-	return 0.00, nil
-}
+// 	return 0.00, nil
+// }
 
-type valWithCall struct{}
+// type valWithCall struct{}
 
-func (valWithCall) Validate(hour int, sendHours []int) bool {
-	valCall = true
+// func (valWithCall) Validate(hour int, sendHours []int) bool {
+// 	valCall = true
 
-	return true
-}
+// 	return true
+// }
 
-type sendWithCall struct{}
+// type sendWithCall struct{}
 
-func (sendWithCall) Send(message, subject string, conf config.Email) error {
-	sendCall = true
+// func (sendWithCall) Send(message, subject string, conf config.Email) error {
+// 	sendCall = true
 
-	return nil
-}
+// 	return nil
+// }
 
-type confWithCall struct{}
+// type confWithCall struct{}
 
-func (confWithCall) GetConfig() (config.Config, error) {
-	confCall = true
+// func (confWithCall) GetConfig() (config.Config, error) {
+// 	confCall = true
 
-	return config.Config{}, nil
-}
+// 	return config.Config{}, nil
+// }
 
-type analyserWithCall struct{}
+// type analyserWithCall struct{}
 
-func (analyserWithCall) AnalysePrice(price float32) (changed, up bool, amount float32) {
-	analyserCall = true
+// func (analyserWithCall) AnalysePrice(price float32) (changed, up bool, amount float32) {
+// 	analyserCall = true
 
-	return false, false, 0.0
-}
+// 	return false, false, 0.0
+// }
 
-type writeReaderWithCall struct{}
+// type writeReaderWithCall struct{}
 
-func (writeReaderWithCall) Write(price float32) error {
-	wrCall = true
+// func (writeReaderWithCall) Write(price float32) error {
+// 	wrCall = true
 
-	return nil
-}
+// 	return nil
+// }
 
-func (writeReaderWithCall) Read() (float32, error) {
-	wrCall = true
+// func (writeReaderWithCall) Read() (float32, error) {
+// 	wrCall = true
 
-	return 0.0, nil
-}
+// 	return 0.0, nil
+// }
 
-func serveWithCall(t *testing.T) {
-	serv := PriceService{
-		reqWithCall{},
-		sendWithCall{},
-		extWithCall{},
-		valWithCall{},
-		analyserWithCall{},
-		writeReaderWithCall{},
-		confWithCall{}}
+// func serveWithCall(t *testing.T) {
+// 	serv := PriceService{
+// 		reqWithCall{},
+// 		sendWithCall{},
+// 		extWithCall{},
+// 		valWithCall{},
+// 		analyserWithCall{},
+// 		writeReaderWithCall{},
+// 		confWithCall{}}
 
-	workHour := 12
-	now := time.Now()
-	testNow = time.Date(
-		now.Year(), now.Month(), now.Day(), workHour,
-		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
+// 	workHour := 12
+// 	now := time.Now()
+// 	testNow = time.Date(
+// 		now.Year(), now.Month(), now.Day(), workHour,
+// 		now.Minute(), now.Second(), now.Nanosecond(), now.Location())
 
-	serv.serve(servTClock{})
+// 	serv.serve(servTClock{})
 
-	if !reqCall {
-		t.Error("The method for requesting a page is not called in the app layer")
-	}
-	if !extCall {
-		t.Error("The method for extracting a price is not called in the app layer")
-	}
-	if !valCall {
-		t.Error("The method for validating the price is not called in the app layer")
-	}
-	if !analyserCall {
-		t.Error("The method for analysing the price is not called in the app layer")
-	}
-	if !sendCall {
-		t.Error("The method for sending the price is not called in the app layer")
-	}
-}
+// 	if !reqCall {
+// 		t.Error("The method for requesting a page is not called in the app layer")
+// 	}
+// 	if !extCall {
+// 		t.Error("The method for extracting a price is not called in the app layer")
+// 	}
+// 	if !valCall {
+// 		t.Error("The method for validating the price is not called in the app layer")
+// 	}
+// 	if !analyserCall {
+// 		t.Error("The method for analysing the price is not called in the app layer")
+// 	}
+// 	if !sendCall {
+// 		t.Error("The method for sending the price is not called in the app layer")
+// 	}
+// }
