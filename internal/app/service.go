@@ -29,6 +29,8 @@ type PriceService struct {
 	conf     configer.Configer
 }
 
+var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
+
 func (s *PriceService) serve(clock clock.Clock) error {
 	curHour := clock.Now().Hour()
 
@@ -46,6 +48,15 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	}
 
 	logrus.Info("Start processing a price")
+
+	var url = []string{bankUrl}
+
+	if s.analyser != nil {
+		url = make([]string, 0)
+		for k, _ := range conf.Items {
+			url = append(url, k)
+		}
+	}
 
 	response, err := s.req.RequestPage()
 	if err != nil {

@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-type BankRequester struct {
-	Url string
-}
+type BankRequester struct{}
 
-func (r BankRequester) RequestPage() (page.Response, error) {
-	resp, err := http.Get(r.Url)
+func (r BankRequester) RequestPage(url string) (page.Response, error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return page.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)
 	}

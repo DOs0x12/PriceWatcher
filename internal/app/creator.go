@@ -92,14 +92,14 @@ func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 	}
 }
 
-func createAnalyser(priceType string, initialPrice float32) (analyser.Analyser, error) {
+func createAnalyser(priceType string) (analyser.Analyser, error) {
 	pType := strings.ToLower(priceType)
 
 	switch pType {
 	case "bank":
 		return nil, nil
 	case "marketplace":
-		return analyser.MarketplaceAnalyser{CurrentMinPrice: initialPrice}, nil
+		return analyser.MarketplaceAnalyser{}, nil
 	default:
 		return nil, fmt.Errorf("have the unknown price type: %v", pType)
 	}
