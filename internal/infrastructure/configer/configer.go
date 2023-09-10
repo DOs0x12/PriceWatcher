@@ -13,10 +13,10 @@ const (
 )
 
 type ConfigDto struct {
-	SendingHours []int              `yaml:"sending_hours"`
-	PriceType    string             `yaml:"price_type"`
-	Items        map[string]float64 `yaml:"items"`
-	Email        EmailDto           `yaml:"email"`
+	SendingHours []int             `yaml:"sending_hours"`
+	PriceType    string            `yaml:"price_type"`
+	Items        map[string]string `yaml:"items"`
+	Email        EmailDto          `yaml:"email"`
 }
 
 type EmailDto struct {
