@@ -10,7 +10,6 @@ import (
 )
 
 var fileName = "last_price.txt"
-var itemPrices = make(map[string]float64)
 
 type WriteReader struct{}
 
@@ -38,14 +37,14 @@ func (WriteReader) Write(prices map[string]float64) error {
 	return nil
 }
 
-func (WriteReader) Read() error {
+func (WriteReader) Read() (map[string]float64, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil
+			return nil, nil
 		}
 
-		return err
+		return nil, err
 	}
 
 	defer func() {
@@ -54,19 +53,20 @@ func (WriteReader) Read() error {
 		}
 	}()
 
+	itemPrices := make(map[string]float64)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		err = addItemPrice(itemPrices, scanner.Text())
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("cannot read a price from the file %v: %v", fileName, err)
+		return nil, fmt.Errorf("cannot read a price from the file %v: %v", fileName, err)
 	}
 
-	return nil
+	return itemPrices, nil
 }
 
 func addItemPrice(prices map[string]float64, dataLine string) error {
