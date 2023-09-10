@@ -3,7 +3,7 @@ package config
 type Config struct {
 	SendingHours []int
 	PriceType    string
-	ItemUrl      string
+	Items        map[string]float64
 	Email        Email
 }
 

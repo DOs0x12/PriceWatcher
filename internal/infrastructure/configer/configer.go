@@ -13,10 +13,10 @@ const (
 )
 
 type ConfigDto struct {
-	SendingHours []int    `yaml:"sending_hours"`
-	PriceType    string   `yaml:"price_type"`
-	ItemUrl      string   `yaml:"item_url"`
-	Email        EmailDto `yaml:"email"`
+	SendingHours []int              `yaml:"sending_hours"`
+	PriceType    string             `yaml:"price_type"`
+	Items        map[string]float64 `yaml:"items"`
+	Email        EmailDto           `yaml:"email"`
 }
 
 type EmailDto struct {
@@ -49,7 +49,7 @@ func cast(confDto ConfigDto) config.Config {
 	return config.Config{
 		SendingHours: confDto.SendingHours,
 		PriceType:    confDto.PriceType,
-		ItemUrl:      confDto.ItemUrl,
+		Items:        confDto.Items,
 		Email: config.Email{
 			From:     confDto.Email.From,
 			Pass:     confDto.Email.Pass,
