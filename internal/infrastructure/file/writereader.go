@@ -38,10 +38,11 @@ func (WriteReader) Write(prices map[string]float64) error {
 }
 
 func (WriteReader) Read() (map[string]float64, error) {
+	itemPrices := make(map[string]float64)
 	file, err := os.Open(fileName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, nil
+			return itemPrices, nil
 		}
 
 		return nil, err
@@ -53,7 +54,6 @@ func (WriteReader) Read() (map[string]float64, error) {
 		}
 	}()
 
-	itemPrices := make(map[string]float64)
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		err = addItemPrice(itemPrices, scanner.Text())
