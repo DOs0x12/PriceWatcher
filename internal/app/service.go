@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 type PriceService struct {
@@ -49,16 +50,74 @@ func (s *PriceService) serve(clock clock.Clock) error {
 
 	logrus.Info("Start processing a price")
 
-	var url = []string{bankUrl}
+	itemPrices := conf.Items
 
 	if s.analyser != nil {
-		url = make([]string, 0)
-		for k, _ := range conf.Items {
-			url = append(url, k)
+		curPrices, err := s.wr.Read()
+		if err != nil {
+			return err
 		}
+
+		crossedKeys := make([]string, len(curPrices))
+
+		for k := range curPrices {
+			if _, ok := itemPrices[k]; ok {
+				crossedKeys = append(crossedKeys, k)
+
+				continue
+			}
+
+			delete(curPrices, k)
+		}
+
+		for k := range itemPrices {
+			if !slices.Contains(crossedKeys, k) {
+				curPrices[k] = 0.0
+			}
+		}
+
+		for k, v := range itemPrices {
+
+			response, err := s.req.RequestPage(v)
+			if err != nil {
+				return fmt.Errorf("cannot get a page with the current price: %w", err)
+			}
+
+			price, err := s.ext.ExtractPrice(response.Body)
+			if err != nil {
+				return fmt.Errorf("cannot extract the price from the body: %w", err)
+			}
+
+			changed, up, amount := s.analyser.AnalysePrice(price, float32(curPrices[k]))
+
+			if changed && !up {
+				sub := "Цена на товар WB"
+				msg := fmt.Sprintf("Цена на %v уменьшилась на %.2fр. Текущая цена: %.2fр", itemPrices[k], amount, price)
+
+				err := s.sender.Send(msg, sub, conf.Email)
+				if err != nil {
+					return fmt.Errorf("cannot send the item price: %w", err)
+				}
+
+				curPrices[k] = float64(price)
+
+				logrus.Info("The item price has been changed. A report is sended")
+
+				continue
+			}
+
+			err = s.wr.Write(curPrices)
+			if err != nil {
+				return err
+			}
+
+			logrus.Info("The item price has been not changed")
+		}
+
+		return nil
 	}
 
-	response, err := s.req.RequestPage()
+	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
 		return fmt.Errorf("cannot get a page with the current price: %w", err)
 	}
@@ -66,43 +125,6 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
 		return fmt.Errorf("cannot extract the price from the body: %w", err)
-	}
-
-	if s.analyser != nil {
-		curPrice, err := s.wr.Read()
-		if err != nil {
-			return err
-		}
-
-		if curPrice == 0.0 {
-			if err := s.wr.Write(price); err != nil {
-				return err
-			}
-		}
-
-		changed, up, amount := s.analyser.AnalysePrice(price)
-
-		if changed && !up {
-			sub := "Цена на товар WB"
-			msg := fmt.Sprintf("Цена на %v уменьшилась на %.2fр. Текущая цена: %.2fр", conf.ItemUrl, amount, price)
-
-			err := s.sender.Send(msg, sub, conf.Email)
-			if err != nil {
-				return fmt.Errorf("cannot send the item price: %w", err)
-			}
-
-			if err := s.wr.Write(price); err != nil {
-				return err
-			}
-
-			logrus.Info("The item price has been changed. A report is sended")
-
-			return nil
-		}
-
-		logrus.Info("The item price has been not changed")
-
-		return nil
 	}
 
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
