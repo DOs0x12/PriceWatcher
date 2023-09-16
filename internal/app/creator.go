@@ -81,13 +81,14 @@ func getSearchData(priceType, marketplaceType string) (pageReg, priceReg, tag st
 		tag = "td"
 		return pageReg, priceReg, tag
 	case "marketplace":
-		pageReg = "([0-9])*(\u00a0)*([0-9])*(\u00a0)[₽]"
-
 		if marketplaceType == "wb" {
+			pageReg = "([0-9])*(\u00a0)*([0-9])*(\u00a0)[₽]"
 			tag = "ins"
 
 			return pageReg, priceReg, tag
 		}
+
+		pageReg = "([0-9])*(\u2009)*([0-9])*(\u2009)[₽]"
 		tag = "span"
 
 		return pageReg, priceReg, tag
