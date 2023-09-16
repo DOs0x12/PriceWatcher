@@ -32,8 +32,9 @@ func NewPriceService(
 	}
 
 	priceType := strings.ToLower(config.PriceType)
+	marketplaceType := strings.ToLower(config.Marketplace)
 
-	ext := createPriceExtractor(priceType)
+	ext := createPriceExtractor(priceType, marketplaceType)
 	wr := createWriteReader(priceType)
 
 	analyser, err := createAnalyser(config.PriceType)
@@ -67,13 +68,13 @@ func createRequester(conf config.Config) (interReq.Requester, error) {
 	}
 }
 
-func createPriceExtractor(priceType string) extractor.Extractor {
-	pageReg, priceReg, tag := getSearchData(priceType)
+func createPriceExtractor(priceType, marketplaceType string) extractor.Extractor {
+	pageReg, priceReg, tag := getSearchData(priceType, marketplaceType)
 
 	return extractor.New(pageReg, priceReg, tag)
 }
 
-func getSearchData(priceType string) (pageReg, priceReg, tag string) {
+func getSearchData(priceType, marketplaceType string) (pageReg, priceReg, tag string) {
 	switch priceType {
 	case "bank":
 		pageReg = `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`
@@ -81,7 +82,14 @@ func getSearchData(priceType string) (pageReg, priceReg, tag string) {
 		return pageReg, priceReg, tag
 	case "marketplace":
 		pageReg = "([0-9])*(\u00a0)*([0-9])*(\u00a0)[₽]"
-		tag = "ins"
+
+		if marketplaceType == "wb" {
+			tag = "ins"
+
+			return pageReg, priceReg, tag
+		}
+		tag = "span"
+
 		return pageReg, priceReg, tag
 	default:
 		return "", "", ""
