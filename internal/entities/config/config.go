@@ -3,6 +3,7 @@ package config
 type Config struct {
 	SendingHours []int
 	PriceType    string
+	Marketplace  string
 	Items        map[string]string
 	Email        Email
 }
