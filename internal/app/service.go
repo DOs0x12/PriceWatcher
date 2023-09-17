@@ -111,6 +111,11 @@ func (s *PriceService) serve(clock clock.Clock) error {
 			}
 
 			logrus.Info("The item price has been not changed")
+
+			if len(itemPrices) > 1 {
+				dur := time.Duration(60+rand.Intn(120)) * time.Second
+				time.Sleep(dur)
+			}
 		}
 
 		err = s.wr.Write(curPrices)
