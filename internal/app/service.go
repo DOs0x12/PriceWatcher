@@ -92,7 +92,12 @@ func (s *PriceService) serve(clock clock.Clock) error {
 
 			if changed && !up {
 				sub := "Цена на товар WB"
-				msg := fmt.Sprintf("Цена на %v уменьшилась на %.2fр. Текущая цена: %.2fр", itemPrices[k], amount, price)
+
+				if strings.ToLower(conf.Marketplace) == "ozon" {
+					sub = "Цена на товар Ozon"
+				}
+
+				msg := fmt.Sprintf("Цена на %v %v уменьшилась на %.2fр. Текущая цена: %.2fр", k, itemPrices[k], amount, price)
 
 				err := s.sender.Send(msg, sub, conf.Email)
 				if err != nil {
