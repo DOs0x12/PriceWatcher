@@ -32,6 +32,10 @@ func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, cl
 
 			return
 		}
+
+		if err := s.serve(clock); err != nil {
+			logrus.Errorf(errMes, err)
+		}
 	}
 
 	var dur time.Duration
