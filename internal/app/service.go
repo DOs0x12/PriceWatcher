@@ -2,7 +2,6 @@ package app
 
 import (
 	"PriceWatcher/internal/app/clock"
-	"PriceWatcher/internal/app/interrupt"
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
@@ -155,7 +154,7 @@ func (s *PriceService) serve(clock clock.Clock) error {
 }
 
 func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
-	interrupt.WatchForInterruption(cancel)
+	WatchForInterruption(cancel)
 
 	errMes := "An error occurs while serving a price: %v"
 	if err := s.serve(clock); err != nil {
