@@ -1,7 +1,9 @@
 package price
 
-import "PriceWatcher/internal/interfaces/configer"
+import (
+	"PriceWatcher/internal/entities/config"
+)
 
 type PriceService interface {
-	ServePrice(conf configer.Configer) (string, error)
+	ServePrice(conf config.Config) (string, error)
 }
