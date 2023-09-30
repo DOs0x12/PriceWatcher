@@ -31,12 +31,6 @@ type PriceService struct {
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 func (s *PriceService) serve(clock clock.Clock) error {
-	curHour := clock.Now().Hour()
-
-	conf, err := s.conf.GetConfig()
-	if err != nil {
-		return fmt.Errorf("on getting the config an error occurs: %w", err)
-	}
 
 	logrus.Info("Start processing a price")
 
