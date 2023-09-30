@@ -28,11 +28,12 @@ type PriceService struct {
 	conf     configer.Configer
 }
 
-var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
-
 func (s *PriceService) serve(clock clock.Clock) error {
+	conf, err := s.conf.GetConfig()
 
-	logrus.Info("Start processing a price")
+	if err != nil {
+		return fmt.Errorf("on getting the config an error occurs: %w", err)
+	}
 
 	itemPrices := conf.Items
 
@@ -114,19 +115,6 @@ func (s *PriceService) serve(clock clock.Clock) error {
 
 		return nil
 	}
-
-	response, err := s.req.RequestPage(bankUrl)
-	if err != nil {
-		return fmt.Errorf("cannot get a page with the current price: %w", err)
-	}
-
-	price, err := s.ext.ExtractPrice(response.Body)
-	if err != nil {
-		return fmt.Errorf("cannot extract the price from the body: %w", err)
-	}
-
-	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
-	sub := "Че по золоту?"
 
 	err = s.sender.Send(msg, sub, conf.Email)
 	if err != nil {
