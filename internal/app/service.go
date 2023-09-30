@@ -38,14 +38,6 @@ func (s *PriceService) serve(clock clock.Clock) error {
 		return fmt.Errorf("on getting the config an error occurs: %w", err)
 	}
 
-	logrus.Infof("Check time for processing a price. The time value: %v", curHour)
-
-	if s.analyser == nil && !s.val.Validate(curHour, conf.SendingHours) {
-		logrus.Info("It is not appropriate time for getting a price")
-
-		return nil
-	}
-
 	logrus.Info("Start processing a price")
 
 	itemPrices := conf.Items
