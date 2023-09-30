@@ -1,12 +1,15 @@
 package app
 
 import (
+	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/app/price"
+	"PriceWatcher/internal/app/price/bank"
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	infraFile "PriceWatcher/internal/infrastructure/file"
-	"PriceWatcher/internal/infrastructure/requester/bank"
+	bankReq "PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
 	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/file"
@@ -42,14 +45,22 @@ func NewPriceService(
 		return nil, err
 	}
 
+	bankType := "bank"
+	var priceService price.PriceService
+
+	if strings.ToLower(config.PriceType) == bankType {
+		priceService = bank.NewService(req, ext, val, clock.RealClock{})
+	}
+
 	crt := PriceService{
-		req:      req,
-		sender:   sender,
-		ext:      ext,
-		val:      val,
-		analyser: analyser,
-		wr:       wr,
-		conf:     conf,
+		req:          req,
+		sender:       sender,
+		ext:          ext,
+		val:          val,
+		analyser:     analyser,
+		wr:           wr,
+		conf:         conf,
+		priceService: priceService,
 	}
 
 	return &crt, err
@@ -60,7 +71,7 @@ func createRequester(conf config.Config) (interReq.Requester, error) {
 
 	switch priceType {
 	case "bank":
-		return bank.BankRequester{}, nil
+		return bankReq.BankRequester{}, nil
 	case "marketplace":
 		return marketplace.MarketplaceRequester{}, nil
 	default:

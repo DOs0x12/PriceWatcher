@@ -2,6 +2,7 @@ package app
 
 import (
 	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/app/price"
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
@@ -19,13 +20,14 @@ import (
 )
 
 type PriceService struct {
-	req      interReq.Requester
-	sender   interSend.Sender
-	ext      extractor.Extractor
-	val      message.HourValidator
-	analyser analyser.Analyser
-	wr       file.WriteReader
-	conf     configer.Configer
+	req          interReq.Requester
+	sender       interSend.Sender
+	ext          extractor.Extractor
+	val          message.HourValidator
+	analyser     analyser.Analyser
+	wr           file.WriteReader
+	conf         configer.Configer
+	priceService price.PriceService
 }
 
 func (s *PriceService) serve(clock clock.Clock) error {
@@ -114,6 +116,11 @@ func (s *PriceService) serve(clock clock.Clock) error {
 		}
 
 		return nil
+	}
+
+	msg, sub, err := s.priceService.ServePrice(conf)
+	if err != nil {
+		return err
 	}
 
 	err = s.sender.Send(msg, sub, conf.Email)
