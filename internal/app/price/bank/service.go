@@ -24,7 +24,7 @@ type Service struct {
 
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
-func (s Service) ServePrice(conf config.Config) (string, error) {
+func (s Service) ServePrice(conf config.Config) (message, subject string, err error) {
 	curHour := s.cl.Now().Hour()
 
 	logrus.Infof("Check time for processing a price. The time value: %v", curHour)

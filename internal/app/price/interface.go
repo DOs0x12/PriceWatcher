@@ -5,5 +5,5 @@ import (
 )
 
 type PriceService interface {
-	ServePrice(conf config.Config) (string, error)
+	ServePrice(conf config.Config) (message, subject string, err error)
 }
