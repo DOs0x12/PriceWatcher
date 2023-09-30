@@ -1,5 +1,7 @@
 package price
 
+import "PriceWatcher/internal/interfaces/configer"
+
 type PriceService interface {
-	ServePrice() string
+	ServePrice(conf configer.Configer) string
 }
