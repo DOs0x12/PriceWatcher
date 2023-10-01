@@ -19,7 +19,7 @@ type PriceExtractor struct {
 	tag     string
 }
 
-func New(pageReg, priceReg, tag string) PriceExtractor {
+func New(pageReg, tag string) PriceExtractor {
 	return PriceExtractor{pageReg: pageReg, tag: tag}
 }
 
