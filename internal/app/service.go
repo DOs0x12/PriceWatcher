@@ -3,12 +3,7 @@ package app
 import (
 	"PriceWatcher/internal/app/clock"
 	"PriceWatcher/internal/app/price"
-	"PriceWatcher/internal/domain/message"
-	"PriceWatcher/internal/domain/price/analyser"
-	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/interfaces/configer"
-	"PriceWatcher/internal/interfaces/file"
-	interReq "PriceWatcher/internal/interfaces/requester"
 	interSend "PriceWatcher/internal/interfaces/sender"
 	"fmt"
 
@@ -16,12 +11,7 @@ import (
 )
 
 type PriceService struct {
-	req          interReq.Requester
 	sender       interSend.Sender
-	ext          extractor.Extractor
-	val          message.HourValidator
-	analyser     analyser.Analyser
-	wr           file.WriteReader
 	conf         configer.Configer
 	priceService price.PriceService
 }
