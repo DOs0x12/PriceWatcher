@@ -1,6 +1,7 @@
 package marketplace
 
 import (
+	"PriceWatcher/internal/app/price"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -21,6 +22,20 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
+}
+
+func NewService(
+	wr file.WriteReader,
+	req requester.Requester,
+	ext extractor.Extractor,
+	analyser analyser.Analyser) price.PriceService {
+
+	return Service{
+		wr:       wr,
+		req:      req,
+		ext:      ext,
+		analyser: analyser,
+	}
 }
 
 func (s Service) ServePrice(conf config.Config) (message, subject string, err error) {
