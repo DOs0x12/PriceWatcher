@@ -19,7 +19,6 @@ import (
 
 func NewPriceService(
 	sender interSend.Sender,
-	val message.HourValidator,
 	conf configer.Configer) (*PriceService, error) {
 
 	config, err := conf.GetConfig()
