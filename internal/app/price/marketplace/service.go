@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
@@ -49,6 +50,10 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 		}
 	}
 
+	priceType := capitalize(conf.PriceType)
+	sub := fmt.Sprintf("Цена на товар %v", priceType)
+	messages := make([]string, 0)
+
 	for k, v := range itemPrices {
 
 		response, err := s.req.RequestPage(v)
@@ -64,18 +69,8 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 		changed, up, amount := s.analyser.AnalysePrice(price, float32(curPrices[k]))
 
 		if changed && !up {
-			sub := "Цена на товар WB"
-
-			if strings.ToLower(conf.Marketplace) == "ozon" {
-				sub = "Цена на товар Ozon"
-			}
-
-			msg := fmt.Sprintf("Цена на %v %v уменьшилась на %.2fр. Текущая цена: %.2fр", k, itemPrices[k], amount, price)
-
-			err := s.sender.Send(msg, sub, conf.Email)
-			if err != nil {
-				return fmt.Errorf("cannot send the item price: %w", err)
-			}
+			msg := fmt.Sprintf("Цена на %v %v уменьшилась на %.2fр. Текущая цена: %.2fр\n", k, itemPrices[k], amount, price)
+			messages = append(messages, msg)
 
 			curPrices[k] = float64(price)
 
@@ -98,10 +93,14 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 
 	err = s.wr.Write(curPrices)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
-	return nil
+	return strings.Join(messages, "\n"), sub, nil
+}
 
-	return "", "", nil
+func capitalize(str string) string {
+	runes := []rune(str)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
