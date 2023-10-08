@@ -23,7 +23,7 @@ func NewService(req requester.Requester, ext extractor.Extractor, val message.Ho
 		req: req,
 		ext: ext,
 		val: val,
-		cl:  clock.RealClock{},
+		cl:  cl,
 	}
 }
 
