@@ -1,0 +1,102 @@
+package marketplace
+
+import (
+	"PriceWatcher/internal/entities/config"
+	"PriceWatcher/internal/entities/page"
+	"io"
+	"testing"
+)
+
+type wrWithCall struct{}
+
+func (wrWithCall) Write(prices map[string]float64) error {
+	rwWriteCall = true
+
+	return nil
+}
+
+func (wrWithCall) Read() (map[string]float64, error) {
+	rwReadCall = true
+
+	return map[string]float64{"test": 0.0}, nil
+}
+
+type reqWithCall struct{}
+
+func (reqWithCall) RequestPage(url string) (page.Response, error) {
+	reqCall = true
+
+	return page.Response{}, nil
+}
+
+type extWithCall struct{}
+
+func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
+	extCall = true
+
+	return 0.0, nil
+}
+
+type analyserWithUpChangedAndCall struct{}
+
+func (analyserWithUpChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+	analyzerCall = true
+
+	return true, true, 1.0
+}
+
+type analyserWithDownChangedAndCall struct{}
+
+func (analyserWithDownChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+	analyzerCall = true
+
+	return true, false, 1.0
+}
+
+type analyserWithNotChangedAndCall struct{}
+
+func (analyserWithNotChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+	analyzerCall = true
+
+	return false, false, 0.0
+}
+
+var (
+	rwWriteCall  bool
+	rwReadCall   bool
+	reqCall      bool
+	extCall      bool
+	analyzerCall bool
+)
+
+func testUpChangedServePriceCalls(t *testing.T) {
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedAndCall{})
+
+	itemName := "test"
+	itemValue := "1.0"
+	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+
+	serv.ServePrice(config)
+
+	if !rwWriteCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !rwReadCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !reqCall {
+		t.Error("The method for requesting a page is not called")
+	}
+	if !extCall {
+		t.Error("The method for extracting a price is not called")
+	}
+	if !analyzerCall {
+		t.Error("The method for analyzing the price is not called")
+	}
+}
+
+func TestServePrice(t *testing.T) {
+	testUpChangedServePriceCalls(t)
+	//testServePriceE2E(t)
+	//testServePriceError(t)
+}
