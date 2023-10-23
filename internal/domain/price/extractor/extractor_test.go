@@ -19,7 +19,7 @@ import (
 // 		t.Errorf("Got %v, wanted %v", got, want)
 // 	}
 
-var ext = PriceExtractor{}
+var ext = PriceExtractor{tag: "td", pageReg: `(^ покупка: [0-9]{4,5}\.[0-9][0-9])`}
 
 func TestExtractPrice(t *testing.T) {
 	logrus.Info("Start to test the func ExtractPrice with true value")
