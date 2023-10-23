@@ -37,25 +37,25 @@ func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
 	return 0.0, nil
 }
 
-type analyserWithUpChangedAndCall struct{}
+type analyserWithUpChangedCall struct{}
 
-func (analyserWithUpChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+func (analyserWithUpChangedCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
 	analyzerCall = true
 
 	return true, true, 1.0
 }
 
-type analyserWithDownChangedAndCall struct{}
+type analyserWithDownChangedCall struct{}
 
-func (analyserWithDownChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+func (analyserWithDownChangedCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
 	analyzerCall = true
 
 	return true, false, 1.0
 }
 
-type analyserWithNotChangedAndCall struct{}
+type analyserWithNotChangedCall struct{}
 
-func (analyserWithNotChangedAndCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
+func (analyserWithNotChangedCall) AnalysePrice(price, initialPrice float32) (changed, up bool, amount float32) {
 	analyzerCall = true
 
 	return false, false, 0.0
@@ -70,7 +70,7 @@ var (
 )
 
 func testUpChangedServePriceCalls(t *testing.T) {
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedAndCall{})
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{})
 
 	itemName := "test"
 	itemValue := "1.0"
