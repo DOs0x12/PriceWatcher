@@ -70,6 +70,58 @@ var (
 )
 
 func testUpChangedServePriceCalls(t *testing.T) {
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{})
+
+	itemName := "test"
+	itemValue := "1.0"
+	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+
+	serv.ServePrice(config)
+
+	if !rwWriteCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !rwReadCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !reqCall {
+		t.Error("The method for requesting a page is not called")
+	}
+	if !extCall {
+		t.Error("The method for extracting a price is not called")
+	}
+	if !analyzerCall {
+		t.Error("The method for analyzing the price is not called")
+	}
+}
+
+func testNotChangedServePriceCalls(t *testing.T) {
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{})
+
+	itemName := "test"
+	itemValue := "1.0"
+	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+
+	serv.ServePrice(config)
+
+	if !rwWriteCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !rwReadCall {
+		t.Error("The method for writing the current prices is not called")
+	}
+	if !reqCall {
+		t.Error("The method for requesting a page is not called")
+	}
+	if !extCall {
+		t.Error("The method for extracting a price is not called")
+	}
+	if !analyzerCall {
+		t.Error("The method for analyzing the price is not called")
+	}
+}
+
+func testDownChangedServePriceCalls(t *testing.T) {
 	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{})
 
 	itemName := "test"
@@ -97,6 +149,8 @@ func testUpChangedServePriceCalls(t *testing.T) {
 
 func TestServePrice(t *testing.T) {
 	testUpChangedServePriceCalls(t)
+	testNotChangedServePriceCalls(t)
+	testDownChangedServePriceCalls(t)
 	//testServePriceE2E(t)
 	//testServePriceError(t)
 }
