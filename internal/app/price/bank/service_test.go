@@ -37,31 +37,64 @@ func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
 	return 0.0, nil
 }
 
-type valWithCall struct{}
+type valWithCallAndTrue struct{}
 
-func (valWithCall) Validate(hour int, sendHours []int) bool {
+func (valWithCallAndTrue) Validate(hour int, sendHours []int) bool {
 	valCall = true
 
 	return true
 }
 
-func testServePriceCalls(t *testing.T) {
-	serv := NewService(reqWithCall{}, extWithCall{}, valWithCall{}, testClock{})
+type valWithCallAndFalse struct{}
+
+func (valWithCallAndFalse) Validate(hour int, sendHours []int) bool {
+	valCall = true
+
+	return false
+}
+
+func testCallsWithTimeToCheck(t *testing.T) {
+	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndTrue{}, testClock{})
 
 	config := config.Config{}
 	serv.ServePrice(config)
 
 	if !reqCall {
-		t.Error("The method for requesting a page is not called in the app layer")
+		t.Error("The method for requesting a page is not called")
 	}
 	if !extCall {
-		t.Error("The method for extracting a price is not called in the app layer")
+		t.Error("The method for extracting a price is not called")
 	}
 	if !valCall {
-		t.Error("The method for validating the price is not called in the app layer")
+		t.Error("The method for validating the price is not called")
 	}
 }
 
+func testCallsWithNoTimeToCheck(t *testing.T) {
+	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndFalse{}, testClock{})
+
+	config := config.Config{}
+	serv.ServePrice(config)
+
+	if reqCall {
+		t.Error("The method for requesting a page is called")
+	}
+	if extCall {
+		t.Error("The method for extracting a price is called")
+	}
+	if !valCall {
+		t.Error("The method for validating the price is not called")
+	}
+}
+
+func setCallsToDefault() {
+	reqCall = false
+	extCall = false
+	valCall = false
+}
+
 func TestServePrice(t *testing.T) {
-	testServePriceCalls(t)
+	testCallsWithTimeToCheck(t)
+	setCallsToDefault()
+	testCallsWithNoTimeToCheck(t)
 }
