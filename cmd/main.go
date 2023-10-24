@@ -2,7 +2,7 @@ package main
 
 import (
 	"PriceWatcher/internal/app"
-	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/infrastructure/configer"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := newContext()
 
 	serv, err := newService()
 	if err != nil {
@@ -20,14 +20,18 @@ func main() {
 
 	logrus.Infoln("Start the application")
 
-	serv.Watch(ctx.Done(), cancel, clock.RealClock{})
+	serv.Watch(ctx.Done(), cancel, time.RealClock{})
 
 	logrus.Infoln("The application is done")
 }
 
-func newService() (*app.PriceService, error) {
+func newService() (app.PriceWatcherService, error) {
 	sen := sender.Sender{}
 	conf := configer.Configer{}
 
-	return app.NewPriceService(sen, conf)
+	return app.NewWatcherService(sen, conf)
+}
+
+func newContext() (ctx context.Context, cancel context.CancelFunc) {
+	return context.WithCancel(context.Background())
 }

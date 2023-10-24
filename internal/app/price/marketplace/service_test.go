@@ -151,6 +151,4 @@ func TestServePrice(t *testing.T) {
 	testUpChangedServePriceCalls(t)
 	testNotChangedServePriceCalls(t)
 	testDownChangedServePriceCalls(t)
-	//testServePriceE2E(t)
-	//testServePriceError(t)
 }

@@ -1,7 +1,6 @@
 package marketplace
 
 import (
-	"PriceWatcher/internal/app/price"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -28,7 +27,7 @@ func NewService(
 	wr file.WriteReader,
 	req requester.Requester,
 	ext extractor.Extractor,
-	analyser analyser.Analyser) price.PriceService {
+	analyser analyser.Analyser) Service {
 
 	return Service{
 		wr:       wr,

@@ -1,22 +1,20 @@
 package app
 
 import (
-	"PriceWatcher/internal/app/clock"
 	"PriceWatcher/internal/app/price"
+	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/interfaces/configer"
 	interSend "PriceWatcher/internal/interfaces/sender"
 	"fmt"
-
-	"github.com/sirupsen/logrus"
 )
 
-type PriceService struct {
+type PriceWatcherService struct {
 	sender       interSend.Sender
 	conf         configer.Configer
 	priceService price.PriceService
 }
 
-func (s *PriceService) serve(clock clock.Clock) error {
+func (s PriceWatcherService) serve(clock time.Clock) error {
 	conf, err := s.conf.GetConfig()
 	if err != nil {
 		return fmt.Errorf("on getting the config an error occurs: %w", err)
@@ -31,8 +29,6 @@ func (s *PriceService) serve(clock clock.Clock) error {
 	if err != nil {
 		return fmt.Errorf("cannot send the price: %w", err)
 	}
-
-	logrus.Info("The price is processed")
 
 	return nil
 }
