@@ -1,7 +1,7 @@
 package app
 
 import (
-	"PriceWatcher/internal/app/clock"
+	lTime "PriceWatcher/internal/app/time"
 	"context"
 	"math/rand"
 	"strings"
@@ -10,13 +10,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock clock.Clock) {
+func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock lTime.Clock) {
 	WatchForInterruption(cancel)
 
 	errMes := "An error occurs while serving a price: %v"
 	if err := s.serve(clock); err != nil {
 		logrus.Errorf(errMes, err)
 	}
+
+	logrus.Info("The price is processed")
 
 	config, err := s.conf.GetConfig()
 	if err != nil {
@@ -36,6 +38,8 @@ func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, cl
 		if err := s.serve(clock); err != nil {
 			logrus.Errorf(errMes, err)
 		}
+
+		logrus.Info("The price is processed")
 	}
 
 	var dur time.Duration
@@ -58,6 +62,8 @@ func (s *PriceService) Watch(done <-chan struct{}, cancel context.CancelFunc, cl
 			if err := s.serve(clock); err != nil {
 				logrus.Errorf(errMes, err)
 			}
+
+			logrus.Info("The price is processed")
 
 			if strings.ToLower(config.PriceType) == "marketplace" {
 				dur = time.Duration(20+rand.Intn(10)) * time.Minute

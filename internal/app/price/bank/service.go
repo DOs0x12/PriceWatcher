@@ -1,7 +1,7 @@
 package bank
 
 import (
-	"PriceWatcher/internal/app/clock"
+	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -15,10 +15,10 @@ type Service struct {
 	req requester.Requester
 	ext extractor.Extractor
 	val message.HourValidator
-	cl  clock.Clock
+	cl  time.Clock
 }
 
-func NewService(req requester.Requester, ext extractor.Extractor, val message.HourValidator, cl clock.Clock) Service {
+func NewService(req requester.Requester, ext extractor.Extractor, val message.HourValidator, cl time.Clock) Service {
 	return Service{
 		req: req,
 		ext: ext,
