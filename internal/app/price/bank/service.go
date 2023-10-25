@@ -1,12 +1,13 @@
 package bank
 
 import (
-	"PriceWatcher/internal/app/time"
+	custTime "PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/requester"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -15,10 +16,10 @@ type Service struct {
 	req requester.Requester
 	ext extractor.Extractor
 	val message.HourValidator
-	cl  time.Clock
+	cl  custTime.Clock
 }
 
-func NewService(req requester.Requester, ext extractor.Extractor, val message.HourValidator, cl time.Clock) Service {
+func NewService(req requester.Requester, ext extractor.Extractor, val message.HourValidator, cl custTime.Clock) Service {
 	return Service{
 		req: req,
 		ext: ext,
@@ -56,4 +57,8 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 	sub := "Че по золоту?"
 
 	return msg, sub, nil
+}
+
+func (Service) GetWaitTime() time.Duration {
+	return getWaitTime()
 }

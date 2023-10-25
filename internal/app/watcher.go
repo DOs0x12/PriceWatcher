@@ -1,16 +1,15 @@
 package app
 
 import (
-	lTime "PriceWatcher/internal/app/time"
+	custTime "PriceWatcher/internal/app/time"
 	"context"
-	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock lTime.Clock) {
+func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock custTime.Clock) {
 	WatchForInterruption(cancel)
 
 	serveWithLogs(s)
@@ -22,8 +21,10 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 		return
 	}
 
+	//TODO: rewrite waiting for the all services; if the previous processing occured less than 10 mins ago then no need
+	//for the second processing
 	if strings.ToLower(config.PriceType) == "bank" {
-		err := waitHourStart(clock.Now())
+		err := custTime.WaitHourStart(clock.Now())
 		if err != nil {
 			logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
 
@@ -33,13 +34,7 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 		serveWithLogs(s)
 	}
 
-	var dur time.Duration
-
-	if strings.ToLower(config.PriceType) == "marketplace" {
-		dur = time.Duration(20 * time.Minute)
-	} else {
-		dur = time.Duration(1 * time.Hour)
-	}
+	dur := s.priceService.GetWaitTime()
 
 	t := time.NewTicker(dur)
 	defer t.Stop()
@@ -51,11 +46,8 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 			return
 		case <-t.C:
 			serveWithLogs(s)
-
-			if strings.ToLower(config.PriceType) == "marketplace" {
-				dur = time.Duration(20+rand.Intn(10)) * time.Minute
-				t.Reset(dur)
-			}
+			dur = s.priceService.GetWaitTime()
+			t.Reset(dur)
 		}
 	}
 }

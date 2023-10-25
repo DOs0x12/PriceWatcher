@@ -1,11 +1,11 @@
-package app
+package time
 
 import (
 	"fmt"
 	"time"
 )
 
-func waitHourStart(now time.Time) error {
+func WaitHourStart(now time.Time) error {
 	waitTime, err := getWaitTime(now)
 	if err != nil {
 		return err
