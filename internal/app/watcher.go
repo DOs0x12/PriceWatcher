@@ -13,12 +13,7 @@ import (
 func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFunc, clock lTime.Clock) {
 	WatchForInterruption(cancel)
 
-	errMes := "An error occurs while serving a price: %v"
-	if err := s.serve(clock); err != nil {
-		logrus.Errorf(errMes, err)
-	}
-
-	logrus.Info("The price is processed")
+	serveWithLogs(s)
 
 	config, err := s.conf.GetConfig()
 	if err != nil {
@@ -35,11 +30,7 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 			return
 		}
 
-		if err := s.serve(clock); err != nil {
-			logrus.Errorf(errMes, err)
-		}
-
-		logrus.Info("The price is processed")
+		serveWithLogs(s)
 	}
 
 	var dur time.Duration
@@ -56,14 +47,10 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 	for {
 		select {
 		case <-done:
-			logrus.Info("Shut down the application")
+			logrus.Info("Shutting down the application")
 			return
 		case <-t.C:
-			if err := s.serve(clock); err != nil {
-				logrus.Errorf(errMes, err)
-			}
-
-			logrus.Info("The price is processed")
+			serveWithLogs(s)
 
 			if strings.ToLower(config.PriceType) == "marketplace" {
 				dur = time.Duration(20+rand.Intn(10)) * time.Minute
@@ -71,4 +58,12 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 			}
 		}
 	}
+}
+
+func serveWithLogs(serv PriceWatcherService) {
+	if err := serv.serve(); err != nil {
+		logrus.Errorf("An error occurs while serving a price: %v", err)
+	}
+
+	logrus.Info("The price is processed")
 }

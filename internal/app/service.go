@@ -2,7 +2,6 @@ package app
 
 import (
 	"PriceWatcher/internal/app/price"
-	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/interfaces/configer"
 	interSend "PriceWatcher/internal/interfaces/sender"
 	"fmt"
@@ -14,7 +13,7 @@ type PriceWatcherService struct {
 	priceService price.PriceService
 }
 
-func (s PriceWatcherService) serve(clock time.Clock) error {
+func (s PriceWatcherService) serve() error {
 	conf, err := s.conf.GetConfig()
 	if err != nil {
 		return fmt.Errorf("on getting the config an error occurs: %w", err)
