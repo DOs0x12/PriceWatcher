@@ -1,4 +1,4 @@
-package app
+package service
 
 import (
 	"PriceWatcher/internal/app/price"
@@ -20,9 +20,9 @@ func NewWatcherService(sender interSend.Sender, conf configer.Configer) (PriceWa
 	}
 
 	service := PriceWatcherService{
+		priceService: priceService,
 		sender:       sender,
 		conf:         conf,
-		priceService: priceService,
 	}
 
 	return service, nil

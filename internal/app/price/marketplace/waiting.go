@@ -1,12 +1,12 @@
 package marketplace
 
 import (
-	"PriceWatcher/internal/app/price/shared"
+	custTime "PriceWatcher/internal/app/price/time"
 	"time"
 )
 
 func getWaitTime() time.Duration {
 	base := 20
 	variation := 10
-	return shared.GetWaitTimeInMinutes(base, variation)
+	return custTime.GetWaitTimeInMinutes(base, variation)
 }

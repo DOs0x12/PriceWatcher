@@ -1,11 +1,11 @@
 package marketplace
 
 import (
-	"PriceWatcher/internal/app/price/shared"
+	custTime "PriceWatcher/internal/app/price/time"
 	"time"
 )
 
 func waitNextStart(now time.Time) (time.Duration, error) {
 	period := 30
-	return shared.WaitNextStart(now, period)
+	return custTime.WaitNextStart(now, period)
 }
