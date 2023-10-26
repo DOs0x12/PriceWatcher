@@ -1,9 +1,9 @@
 package app
 
 import (
+	"PriceWatcher/internal/app/price"
 	custTime "PriceWatcher/internal/app/time"
 	"context"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -14,23 +14,14 @@ func (s PriceWatcherService) Watch(done <-chan struct{}, cancel context.CancelFu
 
 	serveWithLogs(s)
 
-	config, err := s.conf.GetConfig()
+	delay, err := s.priceService.WaitNextStart(clock.Now())
 	if err != nil {
-		logrus.Errorf("An error occurs while get the config data: %v", err)
+		logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
 
 		return
 	}
 
-	//TODO: rewrite waiting for the all services; if the previous processing occured less than 10 mins ago then no need
-	//for the second processing
-	if strings.ToLower(config.PriceType) == "bank" {
-		err := custTime.WaitHourStart(clock.Now())
-		if err != nil {
-			logrus.Errorf("An error occurs while waiting when the next hour begins: %v", err)
-
-			return
-		}
-
+	if price.IsAppropriateDelay(delay) {
 		serveWithLogs(s)
 	}
 

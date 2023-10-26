@@ -1,4 +1,4 @@
-package time
+package shared
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func TestGetWaitTime(t *testing.T) {
 		t.Errorf("An error occurs while parsing duration in the test: %v", err)
 	}
 
-	got, err := getWaitTime(testNow)
+	got, err := getWaitTime(testNow, waitMin)
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
 	}

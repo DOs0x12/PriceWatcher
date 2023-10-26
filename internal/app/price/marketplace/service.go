@@ -122,3 +122,7 @@ func capitalize(str string) string {
 func (Service) GetWaitTime() time.Duration {
 	return getWaitTime()
 }
+
+func (Service) WaitNextStart(now time.Time) (time.Duration, error) {
+	return waitNextStart(now)
+}

@@ -62,3 +62,7 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 func (Service) GetWaitTime() time.Duration {
 	return getWaitTime()
 }
+
+func (Service) WaitNextStart(now time.Time) (time.Duration, error) {
+	return waitNextStart(now)
+}
