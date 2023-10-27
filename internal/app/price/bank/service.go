@@ -13,29 +13,35 @@ import (
 )
 
 type Service struct {
-	req requester.Requester
-	ext extractor.Extractor
-	val message.HourValidator
-	cl  custTime.Clock
+	req  requester.Requester
+	ext  extractor.Extractor
+	val  message.HourValidator
+	cl   custTime.Clock
+	conf config.Config
 }
 
-func NewService(req requester.Requester, ext extractor.Extractor, val message.HourValidator, cl custTime.Clock) Service {
+func NewService(req requester.Requester,
+	ext extractor.Extractor,
+	val message.HourValidator,
+	cl custTime.Clock,
+	conf config.Config) Service {
 	return Service{
-		req: req,
-		ext: ext,
-		val: val,
-		cl:  cl,
+		req:  req,
+		ext:  ext,
+		val:  val,
+		cl:   cl,
+		conf: conf,
 	}
 }
 
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
-func (s Service) ServePrice(conf config.Config) (message, subject string, err error) {
+func (s Service) ServePrice() (message, subject string, err error) {
 	curHour := s.cl.Now().Hour()
 
 	logrus.Infof("Check time for processing a price. The time value: %v", curHour)
 
-	if !s.val.Validate(curHour, conf.SendingHours) {
+	if !s.val.Validate(curHour, s.conf.SendingHours) {
 		logrus.Info("It is not appropriate time for getting a price")
 
 		return "", "", nil
@@ -59,8 +65,8 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 	return msg, sub, nil
 }
 
-func (Service) GetWaitTime() time.Duration {
-	return getWaitTime()
+func (s Service) GetWaitTime() time.Duration {
+	return getWaitTime(s.cl.Now(), s.conf.SendingHours)
 }
 
 func (Service) WaitNextStart(now time.Time) (time.Duration, error) {

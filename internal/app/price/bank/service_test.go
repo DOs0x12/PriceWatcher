@@ -54,10 +54,8 @@ func (valWithCallAndFalse) Validate(hour int, sendHours []int) bool {
 }
 
 func testCallsWithTimeToCheck(t *testing.T) {
-	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndTrue{}, testClock{})
-
-	config := config.Config{}
-	serv.ServePrice(config)
+	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndTrue{}, testClock{}, config.Config{})
+	serv.ServePrice()
 
 	if !reqCall {
 		t.Error("The method for requesting a page is not called")
@@ -71,10 +69,8 @@ func testCallsWithTimeToCheck(t *testing.T) {
 }
 
 func testCallsWithNoTimeToCheck(t *testing.T) {
-	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndFalse{}, testClock{})
-
-	config := config.Config{}
-	serv.ServePrice(config)
+	serv := NewService(reqWithCall{}, extWithCall{}, valWithCallAndFalse{}, testClock{}, config.Config{})
+	serv.ServePrice()
 
 	if reqCall {
 		t.Error("The method for requesting a page is called")

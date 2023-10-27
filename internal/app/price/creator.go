@@ -7,6 +7,7 @@ import (
 	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
+	"PriceWatcher/internal/entities/config"
 	infraFile "PriceWatcher/internal/infrastructure/file"
 	bankReq "PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
@@ -14,39 +15,39 @@ import (
 	"strings"
 )
 
-func NewPriceService(priceType, marketplaceType string) (PriceService, error) {
+func NewPriceService(conf config.Config) (PriceService, error) {
 	bankPriceType := "bank"
 	marketplacePriceType := "marketplace"
 
-	priceTypeInLowers := strings.ToLower(priceType)
+	priceTypeInLowers := strings.ToLower(conf.PriceType)
 
 	if priceTypeInLowers == bankPriceType {
-		return createBankPriceService(), nil
+		return createBankPriceService(conf), nil
 	}
 
 	if priceTypeInLowers == marketplacePriceType {
-		marketplaceTypeInLowers := strings.ToLower(marketplaceType)
-		return createMarketplacePriceService(marketplaceTypeInLowers), nil
+		return createMarketplacePriceService(conf), nil
 	}
 
-	return nil, fmt.Errorf("a price service is not created from the price type %v", priceType)
+	return nil, fmt.Errorf("a price service is not created from the price type %v", conf.Marketplace)
 }
 
-func createBankPriceService() PriceService {
+func createBankPriceService(conf config.Config) PriceService {
 	req := bankReq.BankRequester{}
 	ext := createBankExtractor()
 	val := message.MessageHourVal{}
 
-	return bank.NewService(req, ext, val, time.RealClock{})
+	return bank.NewService(req, ext, val, time.RealClock{}, conf)
 }
 
-func createMarketplacePriceService(marketplaceType string) PriceService {
+func createMarketplacePriceService(conf config.Config) PriceService {
 	wr := infraFile.WriteReader{}
 	req := marketplace.MarketplaceRequester{}
-	ext := createMarketplaceExtractor(marketplaceType)
+	marketplaceTypeInLowers := strings.ToLower(conf.Marketplace)
+	ext := createMarketplaceExtractor(marketplaceTypeInLowers)
 	analyser := analyser.MarketplaceAnalyser{}
 
-	return mpService.NewService(wr, req, ext, analyser)
+	return mpService.NewService(wr, req, ext, analyser, conf)
 }
 
 func createMarketplaceExtractor(marketplaceType string) extractor.Extractor {

@@ -10,15 +10,16 @@ import (
 )
 
 func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTime.Clock) {
-	serveWithLogs(serv)
-	sendReportWithLogs(serv)
+	//TODO: delete the below code - the calls will be only in the for statement
+	//serveWithLogs(serv)
+	//sendReportWithLogs(serv)
 
-	delay := waitNextStartWithLogs(serv, clock.Now())
+	_ = waitNextStartWithLogs(serv, clock.Now())
 
-	if serv.CanCall(delay) {
-		serveWithLogs(serv)
-		sendReportWithLogs(serv)
-	}
+	//if serv.CanCall(delay) {
+	//	serveWithLogs(serv)
+	//	sendReportWithLogs(serv)
+	//}
 
 	dur := serv.GetWaitTime()
 
@@ -55,6 +56,7 @@ func sendReportWithLogs(serv service.PriceWatcherService) {
 	}
 }
 
+// TODO: rename the method to wait when send a report; the method should do not return duration
 func waitNextStartWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
 	delay, err := serv.WaitNextStart(now)
 	if err != nil {

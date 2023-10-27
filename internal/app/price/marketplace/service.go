@@ -21,25 +21,28 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
+	conf     config.Config
 }
 
 func NewService(
 	wr file.WriteReader,
 	req requester.Requester,
 	ext extractor.Extractor,
-	analyser analyser.Analyser) Service {
+	analyser analyser.Analyser,
+	conf config.Config) Service {
 
 	return Service{
 		wr:       wr,
 		req:      req,
 		ext:      ext,
 		analyser: analyser,
+		conf:     conf,
 	}
 }
 
-func (s Service) ServePrice(conf config.Config) (message, subject string, err error) {
+func (s Service) ServePrice() (message, subject string, err error) {
 
-	itemPrices := conf.Items
+	itemPrices := s.conf.Items
 
 	curPrices, err := s.wr.Read()
 	if err != nil {
@@ -64,7 +67,7 @@ func (s Service) ServePrice(conf config.Config) (message, subject string, err er
 		}
 	}
 
-	priceType := capitalize(conf.PriceType)
+	priceType := capitalize(s.conf.PriceType)
 	sub := fmt.Sprintf("Цена на товар %v", priceType)
 	messages := make([]string, 0)
 

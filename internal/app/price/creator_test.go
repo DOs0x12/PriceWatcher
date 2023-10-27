@@ -3,6 +3,7 @@ package price
 import (
 	"PriceWatcher/internal/app/price/bank"
 	"PriceWatcher/internal/app/price/marketplace"
+	"PriceWatcher/internal/entities/config"
 	"reflect"
 	"strings"
 	"testing"
@@ -17,9 +18,9 @@ func TestNewPriceService(t *testing.T) {
 
 func createBankService(t *testing.T) {
 	priceType := "bank"
-	marketplaceType := ""
+	config := config.Config{PriceType: priceType}
 
-	serv, err := NewPriceService(priceType, marketplaceType)
+	serv, err := NewPriceService(config)
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
 	}
@@ -39,8 +40,9 @@ func createBankService(t *testing.T) {
 
 func createMarketplaceService(marketplaceType string) (PriceService, error) {
 	priceType := "marketplace"
+	config := config.Config{PriceType: priceType}
 
-	return NewPriceService(priceType, marketplaceType)
+	return NewPriceService(config)
 }
 
 func createWBService(t *testing.T) {
@@ -80,12 +82,12 @@ func checkMarketplaceService(serv PriceService, t *testing.T) {
 }
 
 func getCreationError(t *testing.T) {
-	errTemplt := "a price service is not created from the price type"
-
 	priceType := "test"
 	marketplaceType := "test"
+	config := config.Config{PriceType: priceType, Marketplace: marketplaceType}
 
-	_, err := NewPriceService(priceType, marketplaceType)
+	_, err := NewPriceService(config)
+	errTemplt := "a price service is not created from the price type"
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
 		t.Errorf("Got not wanted error: %v, wanted error template: %v", err, errTemplt)
 	}

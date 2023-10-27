@@ -6,7 +6,6 @@ import (
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/configer"
 	interSend "PriceWatcher/internal/interfaces/sender"
-	"fmt"
 	"time"
 )
 
@@ -23,12 +22,8 @@ var (
 )
 
 func (s PriceWatcherService) Serve() error {
-	conf, err := s.conf.GetConfig()
-	if err != nil {
-		return fmt.Errorf("on getting the config an error occurs: %w", err)
-	}
-
-	msg, sub, err = s.priceService.ServePrice(conf)
+	var err error
+	msg, sub, err = s.priceService.ServePrice()
 	if err != nil {
 		return err
 	}

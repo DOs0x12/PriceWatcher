@@ -14,7 +14,7 @@ func NewWatcherService(sender interSend.Sender, conf configer.Configer) (PriceWa
 		return PriceWatcherService{}, fmt.Errorf("can not get the config data: %v", err)
 	}
 
-	priceService, err := price.NewPriceService(config.PriceType, config.Marketplace)
+	priceService, err := price.NewPriceService(config)
 	if err != nil {
 		return PriceWatcherService{}, err
 	}

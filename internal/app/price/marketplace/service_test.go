@@ -70,13 +70,12 @@ var (
 )
 
 func testUpChangedServePriceCalls(t *testing.T) {
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{})
-
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{}, config)
 
-	serv.ServePrice(config)
+	serv.ServePrice()
 
 	if !rwWriteCall {
 		t.Error("The method for writing the current prices is not called")
@@ -96,13 +95,12 @@ func testUpChangedServePriceCalls(t *testing.T) {
 }
 
 func testNotChangedServePriceCalls(t *testing.T) {
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{})
-
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{}, config)
 
-	serv.ServePrice(config)
+	serv.ServePrice()
 
 	if !rwWriteCall {
 		t.Error("The method for writing the current prices is not called")
@@ -122,13 +120,12 @@ func testNotChangedServePriceCalls(t *testing.T) {
 }
 
 func testDownChangedServePriceCalls(t *testing.T) {
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{})
-
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{}, config)
 
-	serv.ServePrice(config)
+	serv.ServePrice()
 
 	if !rwWriteCall {
 		t.Error("The method for writing the current prices is not called")
