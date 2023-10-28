@@ -5,7 +5,15 @@ import (
 	"PriceWatcher/internal/entities/page"
 	"io"
 	"testing"
+	"time"
 )
+
+var testNow time.Time
+
+type testClock struct{}
+
+func (testClock) Now() time.Time                         { return testNow }
+func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
 type wrWithCall struct{}
 
@@ -73,7 +81,7 @@ func testUpChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{}, config)
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{}, testClock{}, config)
 
 	serv.ServePrice()
 
@@ -98,7 +106,7 @@ func testNotChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{}, config)
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{}, testClock{}, config)
 
 	serv.ServePrice()
 
@@ -123,7 +131,7 @@ func testDownChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
 	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
-	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{}, config)
+	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{}, testClock{}, config)
 
 	serv.ServePrice()
 

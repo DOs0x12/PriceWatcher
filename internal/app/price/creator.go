@@ -47,7 +47,7 @@ func createMarketplacePriceService(conf config.Config) PriceService {
 	ext := createMarketplaceExtractor(marketplaceTypeInLowers)
 	analyser := analyser.MarketplaceAnalyser{}
 
-	return mpService.NewService(wr, req, ext, analyser, conf)
+	return mpService.NewService(wr, req, ext, analyser, time.RealClock{}, conf)
 }
 
 func createMarketplaceExtractor(marketplaceType string) extractor.Extractor {

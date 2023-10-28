@@ -1,6 +1,7 @@
 package marketplace
 
 import (
+	custTime "PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -21,6 +22,7 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
+	cl       custTime.Clock
 	conf     config.Config
 }
 
@@ -29,6 +31,7 @@ func NewService(
 	req requester.Requester,
 	ext extractor.Extractor,
 	analyser analyser.Analyser,
+	cl custTime.Clock,
 	conf config.Config) Service {
 
 	return Service{
@@ -36,6 +39,7 @@ func NewService(
 		req:      req,
 		ext:      ext,
 		analyser: analyser,
+		cl:       cl,
 		conf:     conf,
 	}
 }
@@ -122,8 +126,8 @@ func capitalize(str string) string {
 	return string(runes)
 }
 
-func (Service) GetWaitTime() time.Duration {
-	return getWaitTime()
+func (s Service) GetWaitTime() time.Duration {
+	return getWaitTime(s.cl.Now())
 }
 
 func (Service) WaitNextStart(now time.Time) (time.Duration, error) {
