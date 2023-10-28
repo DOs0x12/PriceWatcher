@@ -14,5 +14,10 @@ func GetWaitDurWithRandomComp(now time.Time, callTime time.Time, variation int) 
 
 	randComp := rand.Intn(variation)
 	randDur := time.Duration(randComp)
+
+	if waitDur < randDur {
+		return waitDur
+	}
+
 	return waitDur - randDur
 }
