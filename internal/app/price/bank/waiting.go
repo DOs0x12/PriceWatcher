@@ -9,7 +9,7 @@ func getWaitTime(now time.Time, callHours []int) time.Duration {
 	curHour := now.Hour()
 	nextHour := -1
 	for hour := range callHours {
-		if curHour < hour {
+		if curHour <= hour {
 			nextHour = hour
 		}
 	}
