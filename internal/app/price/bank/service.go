@@ -2,7 +2,6 @@ package bank
 
 import (
 	custTime "PriceWatcher/internal/app/time"
-	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/requester"
@@ -15,20 +14,17 @@ import (
 type Service struct {
 	req  requester.Requester
 	ext  extractor.Extractor
-	val  message.HourValidator
 	cl   custTime.Clock
 	conf config.Config
 }
 
 func NewService(req requester.Requester,
 	ext extractor.Extractor,
-	val message.HourValidator,
 	cl custTime.Clock,
 	conf config.Config) Service {
 	return Service{
 		req:  req,
 		ext:  ext,
-		val:  val,
 		cl:   cl,
 		conf: conf,
 	}
@@ -37,16 +33,6 @@ func NewService(req requester.Requester,
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 func (s Service) ServePrice() (message, subject string, err error) {
-	curHour := s.cl.Now().Hour()
-
-	logrus.Infof("Check time for processing a price. The time value: %v", curHour)
-
-	if !s.val.Validate(curHour, s.conf.SendingHours) {
-		logrus.Info("It is not appropriate time for getting a price")
-
-		return "", "", nil
-	}
-
 	logrus.Info("Start processing a price")
 
 	response, err := s.req.RequestPage(bankUrl)

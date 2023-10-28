@@ -4,7 +4,6 @@ import (
 	"PriceWatcher/internal/app/price/bank"
 	mpService "PriceWatcher/internal/app/price/marketplace"
 	"PriceWatcher/internal/app/time"
-	"PriceWatcher/internal/domain/message"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -35,9 +34,8 @@ func NewPriceService(conf config.Config) (PriceService, error) {
 func createBankPriceService(conf config.Config) PriceService {
 	req := bankReq.BankRequester{}
 	ext := createBankExtractor()
-	val := message.MessageHourVal{}
 
-	return bank.NewService(req, ext, val, time.RealClock{}, conf)
+	return bank.NewService(req, ext, time.RealClock{}, conf)
 }
 
 func createMarketplacePriceService(conf config.Config) PriceService {
