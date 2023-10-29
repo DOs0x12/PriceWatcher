@@ -10,19 +10,7 @@ import (
 )
 
 func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTime.Clock) {
-	//TODO: delete the below code - the calls will be only in the for statement
-	//serveWithLogs(serv)
-	//sendReportWithLogs(serv)
-
-	_ = waitNextStartWithLogs(serv, clock.Now())
-
-	//if serv.CanCall(delay) {
-	//	serveWithLogs(serv)
-	//	sendReportWithLogs(serv)
-	//}
-
 	dur := serv.GetWaitTime()
-
 	t := time.NewTicker(dur)
 	defer t.Stop()
 
@@ -33,7 +21,7 @@ func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTim
 			return
 		case <-t.C:
 			serveWithLogs(serv)
-			_ = waitNextStartWithLogs(serv, clock.Now())
+			waitToSendRepWithLogs(serv, clock.Now())
 			sendReportWithLogs(serv)
 			dur = serv.GetWaitTime()
 			t.Reset(dur)
@@ -56,13 +44,10 @@ func sendReportWithLogs(serv service.PriceWatcherService) {
 	}
 }
 
-// TODO: rename the method to wait when send a report; the method should do not return duration
-func waitNextStartWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
-	delay, err := serv.WaitNextStart(now)
+func waitToSendRepWithLogs(serv service.PriceWatcherService, now time.Time) {
+	_, err := serv.WaitNextStart(now)
 	if err != nil {
-		msg := fmt.Sprintf("An error occurs while waiting when the next hour begins: %v", err)
+		msg := fmt.Sprintf("An error occurs while waiting when to send a report: %v", err)
 		panic(msg)
 	}
-
-	return delay
 }
