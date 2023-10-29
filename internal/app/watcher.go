@@ -10,20 +10,20 @@ import (
 )
 
 func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTime.Clock) {
-	dur := serv.GetWaitTime()
+	dur := getWaitTimeWithLogs(serv)
 	t := time.NewTicker(dur)
 	defer t.Stop()
 
 	for {
 		select {
 		case <-done:
-			logrus.Info("Shutting down the application")
+			logrus.Infoln("Shutting down the application")
 			return
 		case <-t.C:
 			serveWithLogs(serv)
 			waitToSendRepWithLogs(serv, clock.Now())
 			sendReportWithLogs(serv)
-			dur = serv.GetWaitTime()
+			dur = getWaitTimeWithLogs(serv)
 			t.Reset(dur)
 		}
 	}
@@ -50,4 +50,11 @@ func waitToSendRepWithLogs(serv service.PriceWatcherService, now time.Time) {
 		msg := fmt.Sprintf("An error occurs while waiting when to send a report: %v", err)
 		panic(msg)
 	}
+}
+
+func getWaitTimeWithLogs(serv service.PriceWatcherService) time.Duration {
+	dur := serv.GetWaitTime()
+	logrus.Infof("Waiting %v", dur)
+
+	return dur
 }
