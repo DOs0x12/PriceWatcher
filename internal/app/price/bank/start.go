@@ -6,6 +6,6 @@ import (
 )
 
 func waitNextStart(now time.Time) (time.Duration, error) {
-	period := 60
-	return custTime.WaitNextStart(now, period)
+	targetMin := 60
+	return custTime.WaitNextStart(now, targetMin)
 }

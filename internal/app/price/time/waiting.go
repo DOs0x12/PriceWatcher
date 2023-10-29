@@ -9,7 +9,8 @@ func GetWaitDurWithRandomComp(now time.Time, callTime time.Time, variation int) 
 	waitDur := callTime.Sub(now)
 
 	if waitDur < 0 {
-		return time.Duration(0)
+		var zeroDur time.Duration
+		return zeroDur
 	}
 
 	randComp := rand.Intn(variation)

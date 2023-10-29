@@ -5,10 +5,12 @@ import (
 	"time"
 )
 
-func WaitNextStart(now time.Time, periodInMin int) (time.Duration, error) {
-	waitTime, err := getWaitTime(now, periodInMin)
+func WaitNextStart(now time.Time, targetMin int) (time.Duration, error) {
+	waitTime, err := getWaitTime(now, targetMin)
 	if err != nil {
-		return time.Duration(0), err
+		var zeroDur time.Duration
+
+		return zeroDur, err
 	}
 
 	time.Sleep(waitTime)
@@ -16,9 +18,24 @@ func WaitNextStart(now time.Time, periodInMin int) (time.Duration, error) {
 	return waitTime, nil
 }
 
-func getWaitTime(now time.Time, periodInMin int) (time.Duration, error) {
-	waitMin := periodInMin - now.Minute()
-	waitSec := periodInMin - now.Second()
+func getWaitTime(now time.Time, targetMin int) (time.Duration, error) {
+	minInHour := 60
+	secInMin := 60
+	curMin := now.Minute()
+	waitMin := targetMin - curMin
+	waitSec := secInMin - now.Second()
+
+	if targetMin < curMin {
+		waitMin += minInHour
+	}
+
+	if waitSec < secInMin {
+		waitMin--
+	}
+
+	if waitSec == secInMin {
+		waitSec = 0
+	}
 
 	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
 
