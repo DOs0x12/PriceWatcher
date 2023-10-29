@@ -22,34 +22,34 @@ func TestGetWaitTime(t *testing.T) {
 		wantMin:    49,
 		wantSec:    29,
 	}
-	testWaitTime(t, par)
+	testWhenToSendRep(t, par)
 
 	par.testMin = 46
 	par.testSecond = 0
 	par.wantMin = 59
 	par.wantSec = 0
-	testWaitTime(t, par)
+	testWhenToSendRep(t, par)
 
 	par.testMin = 45
 	par.testSecond = 0
 	par.wantMin = 0
 	par.wantSec = 0
-	testWaitTime(t, par)
+	testWhenToSendRep(t, par)
 
 	par.testMin = 44
 	par.testSecond = 0
 	par.wantMin = 1
 	par.wantSec = 0
-	testWaitTime(t, par)
+	testWhenToSendRep(t, par)
 
 	par.testMin = 44
 	par.testSecond = 5
 	par.wantMin = 0
 	par.wantSec = 55
-	testWaitTime(t, par)
+	testWhenToSendRep(t, par)
 }
 
-func testWaitTime(t *testing.T, par testTimeParam) {
+func testWhenToSendRep(t *testing.T, par testTimeParam) {
 	nT := time.Now()
 
 	testNow :=
@@ -62,7 +62,7 @@ func testWaitTime(t *testing.T, par testTimeParam) {
 		t.Errorf("An error occurs while parsing duration in the test: %v", err)
 	}
 
-	got, err := getWaitTime(testNow, par.periodMin)
+	got, err := WhenToSendRep(testNow, par.periodMin)
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
 	}

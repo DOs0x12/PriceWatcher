@@ -7,5 +7,5 @@ import (
 type PriceService interface {
 	ServePrice() (message, subject string, err error)
 	GetWaitTime() time.Duration
-	WaitNextStart(now time.Time) (time.Duration, error)
+	WhenToSendRep(now time.Time) (time.Duration, error)
 }

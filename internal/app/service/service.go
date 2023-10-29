@@ -2,7 +2,6 @@ package service
 
 import (
 	"PriceWatcher/internal/app/price"
-	custTime "PriceWatcher/internal/app/price/time"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/configer"
 	interSend "PriceWatcher/internal/interfaces/sender"
@@ -39,10 +38,13 @@ func (s PriceWatcherService) GetWaitTime() time.Duration {
 	return s.priceService.GetWaitTime()
 }
 
-func (s PriceWatcherService) WaitNextStart(now time.Time) (time.Duration, error) {
-	return s.priceService.WaitNextStart(now)
-}
+func (s PriceWatcherService) WaitToSendRep(now time.Time) error {
+	dur, err := s.priceService.WhenToSendRep(now)
+	if err != nil {
+		return err
+	}
 
-func (PriceWatcherService) CanCall(del time.Duration) bool {
-	return custTime.CanCall(del)
+	time.Sleep(dur)
+
+	return nil
 }

@@ -130,6 +130,6 @@ func (s Service) GetWaitTime() time.Duration {
 	return getWaitTime(s.cl.Now())
 }
 
-func (Service) WaitNextStart(now time.Time) (time.Duration, error) {
-	return waitNextStart(now)
+func (Service) WhenToSendRep(now time.Time) (time.Duration, error) {
+	return whenToSendRep(now)
 }

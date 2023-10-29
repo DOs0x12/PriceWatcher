@@ -45,7 +45,7 @@ func sendReportWithLogs(serv service.PriceWatcherService) {
 }
 
 func waitToSendRepWithLogs(serv service.PriceWatcherService, now time.Time) {
-	_, err := serv.WaitNextStart(now)
+	err := serv.WaitToSendRep(now)
 	if err != nil {
 		msg := fmt.Sprintf("An error occurs while waiting when to send a report: %v", err)
 		panic(msg)
