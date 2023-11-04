@@ -1,11 +1,11 @@
 package bank
 
 import (
-	custTime "PriceWatcher/internal/app/price/time"
+	priceTime "PriceWatcher/internal/app/price/time"
 	"time"
 )
 
-func getWaitTime(now time.Time, callHours []int) time.Duration {
+func getWaitTime(now time.Time, callHours []int, rand priceTime.Randomizer) time.Duration {
 	curHour := now.Hour()
 	nextHour := -1
 
@@ -25,10 +25,10 @@ func getWaitTime(now time.Time, callHours []int) time.Duration {
 	}
 
 	callTime := getCallTime(now, nextHour, nextDay)
-
 	variation := 20
+	randDur := rand.RandomMin(variation)
 
-	return custTime.GetWaitDurWithRandomComp(now, callTime, variation)
+	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
 }
 
 func getCallTime(now time.Time, hour int, nextDay bool) time.Time {

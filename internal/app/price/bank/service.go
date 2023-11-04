@@ -1,7 +1,8 @@
 package bank
 
 import (
-	custTime "PriceWatcher/internal/app/time"
+	priceTime "PriceWatcher/internal/app/price/time"
+	appTime "PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/requester"
@@ -14,13 +15,13 @@ import (
 type Service struct {
 	req  requester.Requester
 	ext  extractor.Extractor
-	cl   custTime.Clock
+	cl   appTime.Clock
 	conf config.Config
 }
 
 func NewService(req requester.Requester,
 	ext extractor.Extractor,
-	cl custTime.Clock,
+	cl appTime.Clock,
 	conf config.Config) Service {
 	return Service{
 		req:  req,
@@ -52,7 +53,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 }
 
 func (s Service) GetWaitTime() time.Duration {
-	return getWaitTime(s.cl.Now(), s.conf.SendingHours)
+	return getWaitTime(s.cl.Now(), s.conf.SendingHours, priceTime.Randomizer{})
 }
 
 func (Service) WhenToSendRep(now time.Time) (time.Duration, error) {
