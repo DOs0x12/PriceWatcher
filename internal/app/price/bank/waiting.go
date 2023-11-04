@@ -8,13 +8,17 @@ import (
 func getWaitTime(now time.Time, callHours []int) time.Duration {
 	curHour := now.Hour()
 	nextHour := -1
+
 	for hour := range callHours {
 		if curHour <= hour {
 			nextHour = hour
+
+			break
 		}
 	}
 
 	nextDay := false
+
 	if nextHour == -1 {
 		nextHour = callHours[0]
 		nextDay = true
