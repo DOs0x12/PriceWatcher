@@ -11,9 +11,9 @@ func getWaitTime(now time.Time, rand priceTime.Randomizer) time.Duration {
 	var callMinutes int
 
 	if curMinutes < callPeriod {
-		callMinutes = callPeriod - curMinutes
+		callMinutes = callPeriod
 	} else {
-		callMinutes = callPeriod - (curMinutes - callPeriod)
+		callMinutes = 2 * callPeriod
 	}
 
 	callTime := getCallTimeFromMinutes(now, callMinutes)
