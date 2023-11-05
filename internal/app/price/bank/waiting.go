@@ -8,7 +8,7 @@ func getCallTime(now time.Time, callHours []int) time.Time {
 	curHour := now.Hour()
 	nextHour := -1
 
-	for hour := range callHours {
+	for _, hour := range callHours {
 		if curHour <= hour {
 			nextHour = hour
 
