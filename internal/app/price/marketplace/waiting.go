@@ -1,11 +1,10 @@
 package marketplace
 
 import (
-	priceTime "PriceWatcher/internal/app/price/time"
 	"time"
 )
 
-func getWaitTime(now time.Time, rand priceTime.Randomizer) time.Duration {
+func getCallTime(now time.Time) time.Time {
 	curMinutes := now.Minute()
 	callPeriod := 30
 	var callMinutes int
@@ -16,11 +15,7 @@ func getWaitTime(now time.Time, rand priceTime.Randomizer) time.Duration {
 		callMinutes = 2 * callPeriod
 	}
 
-	callTime := getCallTimeFromMinutes(now, callMinutes)
-	variation := 10
-	randDur := rand.RandomMin(variation)
-
-	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
+	return getCallTimeFromMinutes(now, callMinutes)
 }
 
 func getCallTimeFromMinutes(now time.Time, minutes int) time.Time {

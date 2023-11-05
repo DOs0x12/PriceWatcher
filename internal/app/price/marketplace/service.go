@@ -128,7 +128,13 @@ func capitalize(str string) string {
 }
 
 func (s Service) GetWaitTime() time.Duration {
-	return getWaitTime(s.cl.Now(), priceTime.Randomizer{})
+	variation := 10
+	rand := priceTime.Randomizer{}
+	randDur := rand.RandomMin(variation)
+	now := s.cl.Now()
+	callTime := getCallTime(now)
+
+	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
 }
 
 func (Service) WhenToSendRep(now time.Time) (time.Duration, error) {
