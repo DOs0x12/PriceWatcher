@@ -9,7 +9,7 @@ func getCallTime(now time.Time, callHours []int) time.Time {
 	nextHour := -1
 
 	for _, hour := range callHours {
-		if curHour <= hour {
+		if curHour < hour {
 			nextHour = hour
 
 			break
