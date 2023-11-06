@@ -2,7 +2,6 @@ package bank
 
 import (
 	priceTime "PriceWatcher/internal/app/price/time"
-	appTime "PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/requester"
@@ -15,18 +14,16 @@ import (
 type Service struct {
 	req  requester.Requester
 	ext  extractor.Extractor
-	cl   appTime.Clock
 	conf config.Config
 }
 
-func NewService(req requester.Requester,
+func NewService(
+	req requester.Requester,
 	ext extractor.Extractor,
-	cl appTime.Clock,
 	conf config.Config) Service {
 	return Service{
 		req:  req,
 		ext:  ext,
-		cl:   cl,
 		conf: conf,
 	}
 }
@@ -52,11 +49,10 @@ func (s Service) ServePrice() (message, subject string, err error) {
 	return msg, sub, nil
 }
 
-func (s Service) GetWaitTime() time.Duration {
+func (s Service) GetWaitTime(now time.Time) time.Duration {
 	variation := 20
 	rand := priceTime.Randomizer{}
 	randDur := rand.RandomMin(variation)
-	now := s.cl.Now()
 	callTime := getCallTime(now, s.conf.SendingHours)
 
 	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)

@@ -4,7 +4,6 @@ import (
 	"PriceWatcher/internal/app"
 	"PriceWatcher/internal/app/interruption"
 	"PriceWatcher/internal/app/service"
-	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/infrastructure/configer"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
@@ -23,7 +22,7 @@ func main() {
 	logrus.Infoln("Start the application")
 
 	interruption.WatchForInterruption(cancel)
-	app.Watch(ctx.Done(), serv, time.RealClock{})
+	app.Watch(ctx.Done(), serv)
 
 	logrus.Infoln("The application is done")
 }

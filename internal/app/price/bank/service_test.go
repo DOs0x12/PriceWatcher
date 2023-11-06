@@ -5,15 +5,7 @@ import (
 	"PriceWatcher/internal/entities/page"
 	"io"
 	"testing"
-	"time"
 )
-
-var testNow time.Time
-
-type testClock struct{}
-
-func (testClock) Now() time.Time                         { return testNow }
-func (testClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
 
 var (
 	reqCall bool
@@ -37,7 +29,7 @@ func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
 }
 
 func testCalls(t *testing.T) {
-	serv := NewService(reqWithCall{}, extWithCall{}, testClock{}, config.Config{})
+	serv := NewService(reqWithCall{}, extWithCall{}, config.Config{})
 	serv.ServePrice()
 
 	if !reqCall {

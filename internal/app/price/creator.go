@@ -3,7 +3,6 @@ package price
 import (
 	"PriceWatcher/internal/app/price/bank"
 	mpService "PriceWatcher/internal/app/price/marketplace"
-	"PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -35,7 +34,7 @@ func createBankPriceService(conf config.Config) PriceService {
 	req := bankReq.BankRequester{}
 	ext := createBankExtractor()
 
-	return bank.NewService(req, ext, time.RealClock{}, conf)
+	return bank.NewService(req, ext, conf)
 }
 
 func createMarketplacePriceService(conf config.Config) PriceService {
@@ -45,7 +44,7 @@ func createMarketplacePriceService(conf config.Config) PriceService {
 	ext := createMarketplaceExtractor(marketplaceTypeInLowers)
 	analyser := analyser.MarketplaceAnalyser{}
 
-	return mpService.NewService(wr, req, ext, analyser, time.RealClock{}, conf)
+	return mpService.NewService(wr, req, ext, analyser, conf)
 }
 
 func createMarketplaceExtractor(marketplaceType string) extractor.Extractor {

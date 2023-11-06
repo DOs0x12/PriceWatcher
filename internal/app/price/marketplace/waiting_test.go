@@ -5,20 +5,12 @@ import (
 	"time"
 )
 
-var testWNow time.Time
-
-type testWClock struct{}
-
-func (testWClock) Now() time.Time                         { return testWNow }
-func (testWClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
-
 func TestGetCallTime(t *testing.T) {
 	now := time.Now()
-	tW := testWClock{}
 	testMinute := 25
-	testWNow = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
+	testNow := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
 
-	got := getCallTime(tW.Now())
+	got := getCallTime(testNow)
 
 	wantMinute := 30
 	want := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), wantMinute, 0, 0, now.Location())
@@ -28,9 +20,9 @@ func TestGetCallTime(t *testing.T) {
 	}
 
 	testMinute = 30
-	testWNow = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
+	testNow = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
 
-	got = getCallTime(tW.Now())
+	got = getCallTime(testNow)
 
 	want = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
 
@@ -39,9 +31,9 @@ func TestGetCallTime(t *testing.T) {
 	}
 
 	testMinute = 31
-	testWNow = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
+	testNow = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), testMinute, 0, 0, now.Location())
 
-	got = getCallTime(tW.Now())
+	got = getCallTime(testNow)
 
 	want = time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, now.Location())
 

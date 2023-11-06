@@ -2,7 +2,6 @@ package marketplace
 
 import (
 	priceTime "PriceWatcher/internal/app/price/time"
-	appTime "PriceWatcher/internal/app/time"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
@@ -23,7 +22,6 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
-	cl       appTime.Clock
 	conf     config.Config
 }
 
@@ -32,7 +30,6 @@ func NewService(
 	req requester.Requester,
 	ext extractor.Extractor,
 	analyser analyser.Analyser,
-	cl appTime.Clock,
 	conf config.Config) Service {
 
 	return Service{
@@ -40,7 +37,6 @@ func NewService(
 		req:      req,
 		ext:      ext,
 		analyser: analyser,
-		cl:       cl,
 		conf:     conf,
 	}
 }
@@ -127,11 +123,10 @@ func capitalize(str string) string {
 	return string(runes)
 }
 
-func (s Service) GetWaitTime() time.Duration {
+func (s Service) GetWaitTime(now time.Time) time.Duration {
 	variation := 10
 	rand := priceTime.Randomizer{}
 	randDur := rand.RandomMin(variation)
-	now := s.cl.Now()
 	callTime := getCallTime(now)
 
 	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)

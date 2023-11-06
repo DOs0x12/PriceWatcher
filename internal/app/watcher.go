@@ -2,15 +2,14 @@ package app
 
 import (
 	"PriceWatcher/internal/app/service"
-	custTime "PriceWatcher/internal/app/time"
 	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTime.Clock) {
-	dur := getWaitTimeWithLogs(serv)
+func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
+	dur := getWaitTimeWithLogs(serv, time.Now())
 	t := time.NewTicker(dur)
 	defer t.Stop()
 
@@ -20,10 +19,11 @@ func Watch(done <-chan struct{}, serv service.PriceWatcherService, clock custTim
 			logrus.Infoln("Shutting down the application")
 			return
 		case <-t.C:
+			now := time.Now()
 			serveWithLogs(serv)
-			waitToSendRepWithLogs(serv, clock.Now())
+			waitToSendRepWithLogs(serv, now)
 			sendReportWithLogs(serv)
-			dur = getWaitTimeWithLogs(serv)
+			dur = getWaitTimeWithLogs(serv, now)
 			t.Reset(dur)
 		}
 	}
@@ -52,8 +52,8 @@ func waitToSendRepWithLogs(serv service.PriceWatcherService, now time.Time) {
 	}
 }
 
-func getWaitTimeWithLogs(serv service.PriceWatcherService) time.Duration {
-	dur := serv.GetWaitTime()
+func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
+	dur := serv.GetWaitTime(now)
 	logrus.Infof("Waiting %v", dur)
 
 	return dur

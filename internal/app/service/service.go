@@ -34,8 +34,8 @@ func (s PriceWatcherService) SendReport() error {
 	return s.sender.Send(msg, sub, conf.Email)
 }
 
-func (s PriceWatcherService) GetWaitTime() time.Duration {
-	return s.priceService.GetWaitTime()
+func (s PriceWatcherService) GetWaitTime(now time.Time) time.Duration {
+	return s.priceService.GetWaitTime(now)
 }
 
 func (s PriceWatcherService) WaitToSendRep(now time.Time) error {
