@@ -9,7 +9,7 @@ func getCallTime(now time.Time) time.Time {
 	callPeriod := 30
 	var callMinutes int
 
-	if curMinutes < callPeriod {
+	if curMinutes <= callPeriod {
 		callMinutes = callPeriod
 	} else {
 		callMinutes = 2 * callPeriod
