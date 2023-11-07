@@ -55,6 +55,7 @@ func createMarketplaceExtractor(marketplaceType string) extractor.Extractor {
 
 	marketplaceTypeInLowers := strings.ToLower(marketplaceType)
 
+	//TODO: write an error if no type
 	if marketplaceTypeInLowers == wbType {
 		pageReg = "([0-9])*(\u00a0)*([0-9])*(\u00a0)[₽]"
 		tag = "ins"
