@@ -22,7 +22,7 @@ func NewWatcherService(sender interSend.Sender, conf configer.Configer) (PriceWa
 	service := PriceWatcherService{
 		priceService: priceService,
 		sender:       sender,
-		conf:         conf,
+		conf:         config,
 	}
 
 	return service, nil

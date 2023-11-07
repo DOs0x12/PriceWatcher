@@ -20,25 +20,34 @@ func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
 			return
 		case <-t.C:
 			now := time.Now()
-			serveWithLogs(serv)
-			waitToSendRepWithLogs(serv, now)
-			sendReportWithLogs(serv)
+			msg, sub := serveWithLogs(serv)
+
+			if msg != "" {
+				waitToSendRepWithLogs(serv, now)
+				sendReportWithLogs(serv, msg, sub)
+			}
+
 			dur = getWaitTimeWithLogs(serv, now)
 			t.Reset(dur)
 		}
 	}
 }
 
-func serveWithLogs(serv service.PriceWatcherService) {
-	if err := serv.Serve(); err != nil {
+func serveWithLogs(serv service.PriceWatcherService) (string, string) {
+	msg, sub, err := serv.Serve()
+	if err != nil {
 		logrus.Errorf("An error occurs while serving a price: %v", err)
+
+		return "", ""
 	}
 
 	logrus.Info("The price is processed")
+
+	return msg, sub
 }
 
-func sendReportWithLogs(serv service.PriceWatcherService) {
-	err := serv.SendReport()
+func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
+	err := serv.SendReport(msg, sub)
 	if err != nil {
 		logrus.Errorf("cannot send the report: %v", err)
 	}
