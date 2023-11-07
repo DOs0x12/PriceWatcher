@@ -32,7 +32,7 @@ func (s PriceWatcherService) GetWaitTime(now time.Time) time.Duration {
 }
 
 func (s PriceWatcherService) WaitToSendRep(now time.Time) error {
-	dur, err := s.priceService.WhenToSendRep(now)
+	dur, err := s.priceService.WaitPerStart(now)
 	if err != nil {
 		return err
 	}

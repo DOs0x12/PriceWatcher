@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func WhenToSendRep(now time.Time, targetMin int) (time.Duration, error) {
+func WaitPerStart(now time.Time, targetMin int) (time.Duration, error) {
 	minInHour := 60
 	secInMin := 60
 	curMin := now.Minute()
