@@ -56,6 +56,8 @@ func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
 	if err != nil {
 		logrus.Errorf("cannot send the report: %v", err)
 	}
+
+	logrus.Info("A report is sended")
 }
 
 func waitPerStartWithLogs(serv service.PriceWatcherService, now time.Time) {
