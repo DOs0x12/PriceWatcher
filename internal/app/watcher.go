@@ -10,7 +10,9 @@ import (
 
 func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
 	dur := getWaitTimeWithLogs(serv, time.Now())
-	t := time.NewTicker(dur)
+
+	t := time.NewTimer(dur)
+	callChan := t.C
 	defer t.Stop()
 
 	for {
@@ -18,17 +20,19 @@ func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
 		case <-done:
 			logrus.Infoln("Shutting down the application")
 			return
-		case <-t.C:
-			now := time.Now()
+		case <-callChan:
 			msg, sub := serveWithLogs(serv)
 
+			now := time.Now()
 			waitPerStartWithLogs(serv, now)
 
 			if msg != "" {
 				sendReportWithLogs(serv, msg, sub)
 			}
 
+			now = time.Now()
 			dur = getWaitTimeWithLogs(serv, now)
+
 			t.Reset(dur)
 		}
 	}
