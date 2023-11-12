@@ -1,15 +1,13 @@
 package file
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
-var fileName = "last_price.txt"
+var fileName = "last_price.yaml"
 
 type WriteReader struct{}
 
@@ -25,13 +23,13 @@ func (WriteReader) Write(prices map[string]float64) error {
 		}
 	}()
 
-	for k, v := range prices {
-		val := strconv.FormatFloat(float64(v), 'f', 2, 32)
-		data := fmt.Sprintf("%v %v\n", k, val)
+	yVal, err := yaml.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("cannot marshall price values to an yaml value: %v", err)
+	}
 
-		if _, err := file.WriteString(data); err != nil {
-			return fmt.Errorf("cannot write a price to the file %v: %v", fileName, err)
-		}
+	if _, err := file.Write(yVal); err != nil {
+		return fmt.Errorf("cannot write a price to the file %v: %v", fileName, err)
 	}
 
 	return nil
@@ -39,49 +37,14 @@ func (WriteReader) Write(prices map[string]float64) error {
 
 func (WriteReader) Read() (map[string]float64, error) {
 	itemPrices := make(map[string]float64)
-	file, err := os.Open(fileName)
+	file, err := os.ReadFile(fileName)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return itemPrices, nil
-		}
-
-		return nil, err
+		return nil, fmt.Errorf("cannot read the file %v: %v", fileName, err)
 	}
 
-	defer func() {
-		if err := file.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		err = addItemPrice(itemPrices, scanner.Text())
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("cannot read a price from the file %v: %v", fileName, err)
+	if err := yaml.Unmarshal(file, &itemPrices); err != nil {
+		return nil, fmt.Errorf("cannot unmarshall price values from the file %v: %v", fileName, err)
 	}
 
 	return itemPrices, nil
-}
-
-func addItemPrice(prices map[string]float64, dataLine string) error {
-	dataTokenCount := 2
-	data := strings.Split(dataLine, " ")
-	if len(data) < dataTokenCount {
-		return fmt.Errorf("data \"%v\" in the file %v is in not appropriate format", data, fileName)
-	}
-
-	price, err := strconv.ParseFloat(data[1], 32)
-	if err != nil {
-		return err
-	}
-
-	prices[data[0]] = price
-
-	return nil
 }
