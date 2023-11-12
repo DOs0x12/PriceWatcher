@@ -1,30 +1,17 @@
 package time
 
 import (
-	"fmt"
 	"time"
 )
 
-func WaitPerStart(now time.Time, targetMin int) (time.Duration, error) {
-	minInHour := 60
-	secInMin := 60
-	curMin := now.Minute()
-	waitMin := targetMin - curMin
-	waitSec := secInMin - now.Second()
+func WaitPerStart(now time.Time, period int) (time.Duration, error) {
+	curPer := period
 
-	if targetMin < curMin {
-		waitMin += minInHour
+	for now.Minute() > curPer {
+		curPer += period
 	}
 
-	if waitSec < secInMin {
-		waitMin--
-	}
+	tarTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), curPer, 0, 0, now.Location())
 
-	if waitSec == secInMin {
-		waitSec = 0
-	}
-
-	durStr := fmt.Sprintf("%vm%vs", waitMin, waitSec)
-
-	return time.ParseDuration(durStr)
+	return tarTime.Sub(now), nil
 }

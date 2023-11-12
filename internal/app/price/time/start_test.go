@@ -16,36 +16,50 @@ type testTimeParam struct {
 
 func TestGetWaitTime(t *testing.T) {
 	par := testTimeParam{
-		periodMin:  45,
+		periodMin:  60,
 		testMin:    55,
 		testSecond: 31,
-		wantMin:    49,
+		wantMin:    4,
 		wantSec:    29,
 	}
 	testWhenToSendRep(t, par)
 
 	par.testMin = 46
 	par.testSecond = 0
-	par.wantMin = 59
+	par.wantMin = 14
 	par.wantSec = 0
 	testWhenToSendRep(t, par)
 
-	par.testMin = 45
+	par.testMin = 0
 	par.testSecond = 0
-	par.wantMin = 0
+	par.wantMin = 60
 	par.wantSec = 0
 	testWhenToSendRep(t, par)
 
-	par.testMin = 44
+	par.testMin = 59
 	par.testSecond = 0
 	par.wantMin = 1
 	par.wantSec = 0
 	testWhenToSendRep(t, par)
 
-	par.testMin = 44
+	par.testMin = 59
 	par.testSecond = 5
 	par.wantMin = 0
 	par.wantSec = 55
+	testWhenToSendRep(t, par)
+
+	par.periodMin = 30
+	par.testMin = 59
+	par.testSecond = 5
+	par.wantMin = 0
+	par.wantSec = 55
+	testWhenToSendRep(t, par)
+
+	par.periodMin = 30
+	par.testMin = 1
+	par.testSecond = 0
+	par.wantMin = 29
+	par.wantSec = 0
 	testWhenToSendRep(t, par)
 }
 
@@ -53,7 +67,7 @@ func testWhenToSendRep(t *testing.T, par testTimeParam) {
 	nT := time.Now()
 
 	testNow :=
-		time.Date(nT.Year(), nT.Month(), nT.Day(), nT.Hour(), par.testMin, par.testSecond, nT.Nanosecond(), nT.Location())
+		time.Date(nT.Year(), nT.Month(), nT.Day(), nT.Hour(), par.testMin, par.testSecond, 0, nT.Location())
 
 	durStr := fmt.Sprintf("%vm%vs", par.wantMin, par.wantSec)
 
