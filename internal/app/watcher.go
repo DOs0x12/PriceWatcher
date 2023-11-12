@@ -24,7 +24,9 @@ func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
 			msg, sub := serveWithLogs(serv)
 
 			now := time.Now()
-			waitPerStartWithLogs(serv, now)
+			dur = perStartWithLogs(serv, now)
+
+			time.Sleep(dur)
 
 			if msg != "" {
 				sendReportWithLogs(serv, msg, sub)
@@ -60,14 +62,16 @@ func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
 	logrus.Info("A report is sended")
 }
 
-func waitPerStartWithLogs(serv service.PriceWatcherService, now time.Time) {
-	logrus.Info("Waiting the start of the next period")
-
-	err := serv.WaitNextPerStart(now)
+func perStartWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
+	dur, err := serv.PerStartDur(now)
 	if err != nil {
 		msg := fmt.Sprintf("An error occurs while waiting the next period start: %v", err)
 		panic(msg)
 	}
+
+	logrus.Infof("Waiting the start of the next period %v", dur)
+
+	return dur
 }
 
 func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {

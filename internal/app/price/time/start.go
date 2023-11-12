@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-func WaitPerStart(now time.Time, period int) (time.Duration, error) {
+func PerStartDur(now time.Time, period int) (time.Duration, error) {
 	curPer := period
 
 	for now.Minute() > curPer {

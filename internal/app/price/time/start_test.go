@@ -76,7 +76,7 @@ func testWhenToSendRep(t *testing.T, par testTimeParam) {
 		t.Errorf("An error occurs while parsing duration in the test: %v", err)
 	}
 
-	got, err := WaitPerStart(testNow, par.periodMin)
+	got, err := PerStartDur(testNow, par.periodMin)
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
 	}

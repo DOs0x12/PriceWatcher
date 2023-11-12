@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func waitPerStart(now time.Time) (time.Duration, error) {
+func perStartDur(now time.Time) (time.Duration, error) {
 	targetMin := 30
-	return custTime.WaitPerStart(now, targetMin)
+	return custTime.PerStartDur(now, targetMin)
 }
