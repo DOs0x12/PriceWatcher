@@ -63,7 +63,7 @@ func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
 func waitPerStartWithLogs(serv service.PriceWatcherService, now time.Time) {
 	logrus.Info("Waiting the start of the next period")
 
-	err := serv.WaitToSendRep(now)
+	err := serv.WaitNextPerStart(now)
 	if err != nil {
 		msg := fmt.Sprintf("An error occurs while waiting the next period start: %v", err)
 		panic(msg)
