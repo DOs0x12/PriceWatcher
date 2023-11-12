@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -38,6 +39,11 @@ func (WriteReader) Write(prices map[string]float64) error {
 func (WriteReader) Read() (map[string]float64, error) {
 	itemPrices := make(map[string]float64)
 	file, err := os.ReadFile(fileName)
+
+	if err != nil && errors.Is(err, os.ErrNotExist) {
+		return itemPrices, nil
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("cannot read the file %v: %v", fileName, err)
 	}
