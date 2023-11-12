@@ -31,6 +31,6 @@ func (s PriceWatcherService) GetWaitTime(now time.Time) time.Duration {
 	return s.priceService.GetWaitTime(now)
 }
 
-func (s PriceWatcherService) PerStartDur(now time.Time) (time.Duration, error) {
+func (s PriceWatcherService) PerStartDur(now time.Time) time.Duration {
 	return s.priceService.PerStartDur(now)
 }

@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-func perStartDur(now time.Time) (time.Duration, error) {
-	targetMin := 60
-	return custTime.PerStartDur(now, targetMin)
+func perStartDur(now time.Time) time.Duration {
+	return custTime.PerStartDur(now, custTime.Hour)
 }

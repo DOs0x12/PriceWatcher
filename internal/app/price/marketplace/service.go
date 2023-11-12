@@ -109,7 +109,7 @@ func (s Service) GetWaitTime(now time.Time) time.Duration {
 	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
 }
 
-func (Service) PerStartDur(now time.Time) (time.Duration, error) {
+func (Service) PerStartDur(now time.Time) time.Duration {
 	return perStartDur(now)
 }
 

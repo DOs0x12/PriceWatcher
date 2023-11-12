@@ -7,7 +7,7 @@ import (
 )
 
 type testTimeParam struct {
-	periodMin  int
+	nt         NearestTime
 	testMin    int
 	testSecond int
 	wantMin    int
@@ -16,7 +16,7 @@ type testTimeParam struct {
 
 func TestGetWaitTime(t *testing.T) {
 	par := testTimeParam{
-		periodMin:  60,
+		nt:         Hour,
 		testMin:    55,
 		testSecond: 31,
 		wantMin:    4,
@@ -24,42 +24,17 @@ func TestGetWaitTime(t *testing.T) {
 	}
 	testWhenToSendRep(t, par)
 
-	par.testMin = 46
+	par.nt = HalfHour
+	par.testMin = 21
 	par.testSecond = 0
-	par.wantMin = 14
+	par.wantMin = 9
 	par.wantSec = 0
 	testWhenToSendRep(t, par)
 
-	par.testMin = 0
-	par.testSecond = 0
-	par.wantMin = 60
-	par.wantSec = 0
-	testWhenToSendRep(t, par)
-
-	par.testMin = 59
-	par.testSecond = 0
-	par.wantMin = 1
-	par.wantSec = 0
-	testWhenToSendRep(t, par)
-
-	par.testMin = 59
+	par.testMin = 31
 	par.testSecond = 5
-	par.wantMin = 0
+	par.wantMin = 28
 	par.wantSec = 55
-	testWhenToSendRep(t, par)
-
-	par.periodMin = 30
-	par.testMin = 59
-	par.testSecond = 5
-	par.wantMin = 0
-	par.wantSec = 55
-	testWhenToSendRep(t, par)
-
-	par.periodMin = 30
-	par.testMin = 1
-	par.testSecond = 0
-	par.wantMin = 29
-	par.wantSec = 0
 	testWhenToSendRep(t, par)
 }
 
@@ -76,10 +51,7 @@ func testWhenToSendRep(t *testing.T, par testTimeParam) {
 		t.Errorf("An error occurs while parsing duration in the test: %v", err)
 	}
 
-	got, err := PerStartDur(testNow, par.periodMin)
-	if err != nil {
-		t.Errorf("The method retuns an error: %v", err)
-	}
+	got := PerStartDur(testNow, par.nt)
 
 	if want != got {
 		t.Errorf("Got %v, wanted %v", got, want)

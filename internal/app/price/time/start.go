@@ -4,14 +4,27 @@ import (
 	"time"
 )
 
-func PerStartDur(now time.Time, period int) (time.Duration, error) {
-	curPer := period
+type NearestTime int
 
-	for now.Minute() > curPer {
-		curPer += period
+const (
+	Hour NearestTime = iota
+	HalfHour
+)
+
+func PerStartDur(now time.Time, nt NearestTime) time.Duration {
+	if nt == Hour {
+		tarTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, now.Location())
+
+		return tarTime.Sub(now)
 	}
 
-	tarTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), curPer, 0, 0, now.Location())
+	halfHour := 30
+	tarTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), halfHour, 0, 0, now.Location())
 
-	return tarTime.Sub(now), nil
+	if now.Minute() > halfHour {
+		tarTime = tarTime.Add(time.Duration(halfHour) * time.Minute)
+	}
+
+	return tarTime.Sub(now)
+
 }

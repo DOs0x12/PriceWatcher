@@ -2,7 +2,6 @@ package app
 
 import (
 	"PriceWatcher/internal/app/service"
-	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -63,12 +62,7 @@ func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
 }
 
 func perStartWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
-	dur, err := serv.PerStartDur(now)
-	if err != nil {
-		msg := fmt.Sprintf("An error occurs while waiting the next period start: %v", err)
-		panic(msg)
-	}
-
+	dur := serv.PerStartDur(now)
 	logrus.Infof("Waiting the start of the next period %v", dur)
 
 	return dur
