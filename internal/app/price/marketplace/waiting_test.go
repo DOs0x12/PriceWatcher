@@ -14,7 +14,7 @@ func TestGetWaitDurWithRandomComp(t *testing.T) {
 	callTime := time.Date(now.Year(), now.Month(), now.Day(), testCallHour, 0, 0, 0, now.Location())
 	randDur, _ := time.ParseDuration("0h")
 
-	got := GetWaitDurWithRandomComp(testNow, callTime, randDur)
+	got := getWaitDurWithRandomComp(testNow, callTime, randDur)
 
 	subHours := testCallHour - testHour
 	want, _ := time.ParseDuration(fmt.Sprintf("%vh", subHours))
@@ -22,35 +22,26 @@ func TestGetWaitDurWithRandomComp(t *testing.T) {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
-	got = GetWaitDurWithRandomComp(testNow, testNow, randDur)
+	got = getWaitDurWithRandomComp(testNow, testNow, randDur)
 
 	want, _ = time.ParseDuration(fmt.Sprintf("%vh", 0))
 	if want != got {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
-	got = GetWaitDurWithRandomComp(callTime, testNow, randDur)
+	got = getWaitDurWithRandomComp(callTime, testNow, randDur)
 
 	want, _ = time.ParseDuration(fmt.Sprintf("%vh", 0))
 	if want != got {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
 
-	randDur, _ = time.ParseDuration("2h")
+	randDur, _ = time.ParseDuration("5m")
 
-	got = GetWaitDurWithRandomComp(testNow, callTime, randDur)
+	got = getWaitDurWithRandomComp(testNow, callTime, randDur)
 
 	want, _ = time.ParseDuration(fmt.Sprintf("%vh", subHours))
-	if want != got {
-		t.Errorf("Got %v, wanted %v", got, want)
-	}
-
-	randMinutes := 30
-	randDur, _ = time.ParseDuration(fmt.Sprintf("%vm", randMinutes))
-
-	got = GetWaitDurWithRandomComp(testNow, callTime, randDur)
-
-	want, _ = time.ParseDuration(fmt.Sprintf("%vm", randMinutes))
+	want += randDur
 	if want != got {
 		t.Errorf("Got %v, wanted %v", got, want)
 	}
