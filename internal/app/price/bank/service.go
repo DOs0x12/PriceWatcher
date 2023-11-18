@@ -58,5 +58,5 @@ func (s Service) GetWaitTime(now time.Time) time.Duration {
 }
 
 func (Service) PerStartDur(now time.Time) time.Duration {
-	return perStartDur(now)
+	return priceTime.PerStartDur(now, priceTime.Hour)
 }
