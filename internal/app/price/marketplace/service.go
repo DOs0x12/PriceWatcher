@@ -101,11 +101,11 @@ func capitalize(str string) string {
 }
 
 func (s Service) GetWaitTime(now time.Time) time.Duration {
-	variation := 10
-	randDur := priceTime.RandomMin(variation)
+	variation := 600
+	randDur := priceTime.RandomSec(variation)
 	callTime := getCallTime(now)
 
-	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
+	return getWaitDurWithRandomComp(now, callTime, randDur)
 }
 
 func (Service) PerStartDur(now time.Time) time.Duration {
