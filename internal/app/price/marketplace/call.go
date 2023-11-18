@@ -7,15 +7,12 @@ import (
 func getCallTime(now time.Time) time.Time {
 	curMinutes := now.Minute()
 	callPeriod := 30
-	var callMinutes int
 
 	if curMinutes < callPeriod {
-		callMinutes = callPeriod
-	} else {
-		callMinutes = 2 * callPeriod
+		return getCallTimeFromMinutes(now, callPeriod)
 	}
 
-	return getCallTimeFromMinutes(now, callMinutes)
+	return getCallTimeFromMinutes(now, 2*callPeriod)
 }
 
 func getCallTimeFromMinutes(now time.Time, minutes int) time.Time {
