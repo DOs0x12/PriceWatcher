@@ -50,8 +50,8 @@ func (s Service) ServePrice() (message, subject string, err error) {
 }
 
 func (s Service) GetWaitTime(now time.Time) time.Duration {
-	variation := 20
-	randDur := priceTime.RandomMin(variation)
+	variation := 1800
+	randDur := priceTime.RandomSec(variation)
 	callTime := getCallTime(now, s.conf.SendingHours)
 
 	return priceTime.GetWaitDurWithRandomComp(now, callTime, randDur)
