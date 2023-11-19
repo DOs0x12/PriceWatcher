@@ -1,6 +1,10 @@
 package config
 
 type Config struct {
+	Services []ServiceConf
+}
+
+type ServiceConf struct {
 	SendingHours []int
 	PriceType    string
 	Marketplace  string

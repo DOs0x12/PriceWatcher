@@ -3,18 +3,19 @@ package configer
 import (
 	"PriceWatcher/internal/entities/config"
 	"os"
-
-	"gopkg.in/yaml.v3"
 )
 
-const (
-	debugPath = "../config.yml"
-	path      = "config.yml"
-)
+// var (
+// 	path      = "config.yml"
+// )
 
 type ConfigDto struct {
-	SendingHours []int             `yaml:"sending_hours"`
+	Services []ServiceConfDto `yaml:"services"`
+}
+
+type ServiceConfDto struct {
 	PriceType    string            `yaml:"price_type"`
+	SendingHours []int             `yaml:"sending_hours"`
 	Items        map[string]string `yaml:"items"`
 	Marketplace  string            `yaml:"marketplace"`
 	Email        EmailDto          `yaml:"email"`
@@ -28,36 +29,19 @@ type EmailDto struct {
 	SmtpPort int    `yaml:"smtp_port"`
 }
 
-type Configer struct{}
-
-func (Configer) GetConfig() (config.Config, error) {
-	//confFile, err := os.ReadFile(debugPath)
-	confFile, err := os.ReadFile(path)
-	if err != nil {
-		return config.Config{}, err
-	}
-
-	dto := ConfigDto{Email: EmailDto{}}
-	err = yaml.Unmarshal(confFile, &dto)
-	if err != nil {
-		return config.Config{}, err
-	}
-
-	return cast(dto), nil
+type Configer struct {
+	path string
 }
 
-func cast(confDto ConfigDto) config.Config {
-	return config.Config{
-		SendingHours: confDto.SendingHours,
-		PriceType:    confDto.PriceType,
-		Items:        confDto.Items,
-		Marketplace:  confDto.Marketplace,
-		Email: config.Email{
-			From:     confDto.Email.From,
-			Pass:     confDto.Email.Pass,
-			To:       confDto.Email.To,
-			SmtpHost: confDto.Email.SmtpHost,
-			SmtpPort: confDto.Email.SmtpPort,
-		},
+func (c Configer) GetConfig() (config.Config, error) {
+	confFile, err := os.ReadFile(c.path)
+	if err != nil {
+		return config.Config{}, err
 	}
+
+	return unmarshalConf(confFile)
+}
+
+func NewConfiger(path string) Configer {
+	return Configer{path: path}
 }
