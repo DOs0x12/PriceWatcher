@@ -1,17 +1,26 @@
-#Sets the hours when the app sends price reports to the user
-sending_hours: [12, 17]
+services:
+  #Sets the type of a watched price (bank or marketplace)
+  - price_type: 'marketplace'
+    #If the price type is "marketplace" then add the url of the product for price watching
+    items: 
+      'item1Name': 'https://marketplace-url1.com'
+      'item2Name': 'https://marketplace-url2.com'
+    email:
+      #The email and its password from which a report will be sended
+      from: 'from@mail.com'
+      password: 'password'
+      #The email to which a report will be sended
+      to: 'to@mail.com'
+      #SMTP settings
+      smtp_host: 'smtp.yandex.ru'
+      smtp_port: 465
 
-#Sets the type of a watched price (bank or marketplace)
-price_type: 'marketplace'
-#If the price type is "marketplace" then add the url of the product for price watching
-item_url: 'https://marketplace-url.com'
-
-email:
-    #The email and its password from which a report will be sended
-    from: 'from@mail.com'
-    password: 'password'
-    #The email to which a report will be sended
-    to: 'to@mail.com'
-    #SMTP settings
-    smtp_host: 'smtp.yandex.ru'
-    smtp_port: 465
+  - price_type: 'bank'
+    #Sets the hours when the app sends price reports to the user
+    sending_hours: [12, 17]
+    email:
+      from: 'from@mail.com'
+      password: 'password'
+      to: 'to@mail.com'
+      smtp_host: 'smtp.yandex.ru'
+      smtp_port: 465
