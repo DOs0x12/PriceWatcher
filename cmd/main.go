@@ -3,7 +3,6 @@ package main
 import (
 	"PriceWatcher/internal/app"
 	"PriceWatcher/internal/app/interruption"
-	"PriceWatcher/internal/app/service"
 	"PriceWatcher/internal/infrastructure/configer"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
@@ -14,24 +13,19 @@ import (
 func main() {
 	ctx, cancel := newContext()
 
-	serv, err := newService()
-	if err != nil {
-		logrus.Errorf("Got the error: %v", err)
-	}
-
 	logrus.Infoln("Start the application")
 
 	interruption.WatchForInterruption(cancel)
-	app.Watch(ctx.Done(), serv)
+	startWatching(ctx)
 
 	logrus.Infoln("The application is done")
 }
 
-func newService() (service.PriceWatcherService, error) {
+func startWatching(ctx context.Context) {
 	sen := sender.Sender{}
 	conf := configer.Configer{}
 
-	return service.NewWatcherService(sen, conf)
+	app.StartWatchers(ctx, conf, sen)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {

@@ -13,11 +13,23 @@ func StartWatchers(ctx context.Context, configer configer.Configer, sender sende
 	config, err := configer.GetConfig()
 	if err != nil {
 		logrus.Errorf("can not get the config data: %v", err)
+
+		return
 	}
 
-	for s, _ := range config.Services {
-		service.NewWatcherService(sender, config)
+	for _, s := range config.Services {
+		serv, err := service.NewWatcherService(sender, s)
+		if err != nil {
+			logrus.Errorf("can not create a watcher service: %v", err)
+
+			continue
+		}
+
+		servCtx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		go watch(servCtx.Done(), serv)
 	}
-	//
-	// watcher :=
+
+	<-ctx.Done()
 }

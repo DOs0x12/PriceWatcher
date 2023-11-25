@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Watch(done <-chan struct{}, serv service.PriceWatcherService) {
+func watch(done <-chan struct{}, serv service.PriceWatcherService) {
 	dur := getWaitTimeWithLogs(serv, time.Now())
 
 	t := time.NewTimer(dur)
