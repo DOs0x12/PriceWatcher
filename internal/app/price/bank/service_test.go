@@ -29,7 +29,7 @@ func (extWithCall) ExtractPrice(body io.Reader) (float32, error) {
 }
 
 func testCalls(t *testing.T) {
-	serv := NewService(reqWithCall{}, extWithCall{}, config.Config{})
+	serv := NewService(reqWithCall{}, extWithCall{}, config.ServiceConf{})
 	serv.ServePrice()
 
 	if !reqCall {

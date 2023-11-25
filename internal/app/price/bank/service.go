@@ -14,13 +14,13 @@ import (
 type Service struct {
 	req  requester.Requester
 	ext  extractor.Extractor
-	conf config.Config
+	conf config.ServiceConf
 }
 
 func NewService(
 	req requester.Requester,
 	ext extractor.Extractor,
-	conf config.Config) Service {
+	conf config.ServiceConf) Service {
 	return Service{
 		req:  req,
 		ext:  ext,

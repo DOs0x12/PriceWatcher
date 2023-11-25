@@ -72,7 +72,7 @@ var (
 func testUpChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
-	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	config := config.ServiceConf{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
 	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithUpChangedCall{}, config)
 
 	serv.ServePrice()
@@ -97,7 +97,7 @@ func testUpChangedServePriceCalls(t *testing.T) {
 func testNotChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
-	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	config := config.ServiceConf{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
 	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithNotChangedCall{}, config)
 
 	serv.ServePrice()
@@ -122,7 +122,7 @@ func testNotChangedServePriceCalls(t *testing.T) {
 func testDownChangedServePriceCalls(t *testing.T) {
 	itemName := "test"
 	itemValue := "1.0"
-	config := config.Config{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
+	config := config.ServiceConf{Items: map[string]string{itemName: itemValue}, PriceType: "marketplace"}
 	serv := NewService(wrWithCall{}, reqWithCall{}, extWithCall{}, analyserWithDownChangedCall{}, config)
 
 	serv.ServePrice()

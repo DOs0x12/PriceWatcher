@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func NewPriceService(conf config.Config) (PriceService, error) {
+func NewPriceService(conf config.ServiceConf) (PriceService, error) {
 	bankPriceType := "bank"
 	marketplacePriceType := "marketplace"
 
@@ -30,14 +30,14 @@ func NewPriceService(conf config.Config) (PriceService, error) {
 	return nil, fmt.Errorf("a price service is not created from the price type %v", conf.Marketplace)
 }
 
-func createBankPriceService(conf config.Config) PriceService {
+func createBankPriceService(conf config.ServiceConf) PriceService {
 	req := bankReq.BankRequester{}
 	ext := createBankExtractor()
 
 	return bank.NewService(req, ext, conf)
 }
 
-func createMarketplacePriceService(conf config.Config) PriceService {
+func createMarketplacePriceService(conf config.ServiceConf) PriceService {
 	wr := infraFile.WriteReader{}
 	req := marketplace.MarketplaceRequester{}
 	marketplaceTypeInLowers := strings.ToLower(conf.Marketplace)

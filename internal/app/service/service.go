@@ -10,7 +10,7 @@ import (
 type PriceWatcherService struct {
 	priceService price.PriceService
 	sender       interSend.Sender
-	conf         config.Config
+	conf         config.ServiceConf
 }
 
 func (s PriceWatcherService) Serve() (string, string, error) {

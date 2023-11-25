@@ -22,7 +22,7 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
-	conf     config.Config
+	conf     config.ServiceConf
 }
 
 func NewService(
@@ -30,7 +30,7 @@ func NewService(
 	req requester.Requester,
 	ext extractor.Extractor,
 	analyser analyser.Analyser,
-	conf config.Config) Service {
+	conf config.ServiceConf) Service {
 
 	return Service{
 		wr:       wr,

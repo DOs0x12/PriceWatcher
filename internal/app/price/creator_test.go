@@ -18,7 +18,7 @@ func TestNewPriceService(t *testing.T) {
 
 func createBankService(t *testing.T) {
 	priceType := "bank"
-	config := config.Config{PriceType: priceType}
+	config := config.ServiceConf{PriceType: priceType}
 
 	serv, err := NewPriceService(config)
 	if err != nil {
@@ -40,7 +40,7 @@ func createBankService(t *testing.T) {
 
 func createMarketplaceService(marketplaceType string) (PriceService, error) {
 	priceType := "marketplace"
-	config := config.Config{PriceType: priceType}
+	config := config.ServiceConf{PriceType: priceType}
 
 	return NewPriceService(config)
 }
@@ -84,7 +84,7 @@ func checkMarketplaceService(serv PriceService, t *testing.T) {
 func getCreationError(t *testing.T) {
 	priceType := "test"
 	marketplaceType := "test"
-	config := config.Config{PriceType: priceType, Marketplace: marketplaceType}
+	config := config.ServiceConf{PriceType: priceType, Marketplace: marketplaceType}
 
 	_, err := NewPriceService(config)
 	errTemplt := "a price service is not created from the price type"

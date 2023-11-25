@@ -2,18 +2,11 @@ package service
 
 import (
 	"PriceWatcher/internal/app/price"
-	"PriceWatcher/internal/interfaces/configer"
+	"PriceWatcher/internal/entities/config"
 	interSend "PriceWatcher/internal/interfaces/sender"
-	"fmt"
 )
 
-func NewWatcherService(sender interSend.Sender, conf configer.Configer) (PriceWatcherService, error) {
-
-	config, err := conf.GetConfig()
-	if err != nil {
-		return PriceWatcherService{}, fmt.Errorf("can not get the config data: %v", err)
-	}
-
+func NewWatcherService(sender interSend.Sender, config config.ServiceConf) (PriceWatcherService, error) {
 	priceService, err := price.NewPriceService(config)
 	if err != nil {
 		return PriceWatcherService{}, err
