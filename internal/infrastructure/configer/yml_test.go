@@ -12,7 +12,6 @@ services:
     email:
       from: 'test@mail.com'
       password: '123'
-      #to: 'test@mail.com'
       to: 'test@mail.com'
       smtp_host: 'smtp.test.com'
       smtp_port: 465
@@ -25,7 +24,6 @@ services:
     email:
       from: 'test@mail.com'
       password: '123'
-      #to: 'test@mail.com'
       to: 'test@mail.com'
       smtp_host: 'smtp.test.com'
       smtp_port: 465`
