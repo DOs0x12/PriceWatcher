@@ -5,10 +5,6 @@ import (
 	"os"
 )
 
-// var (
-// 	path      = "config.yml"
-// )
-
 type ConfigDto struct {
 	Services []ServiceConfDto `yaml:"services"`
 }

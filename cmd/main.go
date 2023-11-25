@@ -23,7 +23,9 @@ func main() {
 
 func startWatching(ctx context.Context) {
 	sen := sender.Sender{}
-	conf := configer.Configer{}
+
+	configPath := "config.yml"
+	conf := configer.NewConfiger(configPath)
 
 	app.StartWatchers(ctx, conf, sen)
 }
