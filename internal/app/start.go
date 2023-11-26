@@ -28,7 +28,7 @@ func StartWatchers(ctx context.Context, configer configer.Configer, sender sende
 		servCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		go watch(servCtx.Done(), serv)
+		go watch(servCtx, serv)
 	}
 
 	<-ctx.Done()

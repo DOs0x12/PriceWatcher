@@ -2,41 +2,54 @@ package app
 
 import (
 	"PriceWatcher/internal/app/service"
+	"context"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-func watch(done <-chan struct{}, serv service.PriceWatcherService) {
+func watch(ctx context.Context, serv service.PriceWatcherService) {
 	dur := getWaitTimeWithLogs(serv, time.Now())
 
 	t := time.NewTimer(dur)
 	callChan := t.C
 	defer t.Stop()
 
+	callCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	for {
 		select {
-		case <-done:
+		case <-ctx.Done():
 			logrus.Infoln("Shutting down the application")
 			return
 		case <-callChan:
-			msg, sub := serveWithLogs(serv)
-
-			now := time.Now()
-			dur = perStartWithLogs(serv, now)
-
-			time.Sleep(dur)
-
-			if msg != "" {
-				sendReportWithLogs(serv, msg, sub)
-			}
-
-			now = time.Now()
-			dur = getWaitTimeWithLogs(serv, now)
-
-			t.Reset(dur)
+			go servePriceWithTiming(callCtx, serv, t)
 		}
 	}
+}
+
+func servePriceWithTiming(ctx context.Context, serv service.PriceWatcherService, timer *time.Timer) {
+	msg, sub := serveWithLogs(serv)
+
+	now := time.Now()
+	dur := perStartWithLogs(serv, now)
+
+	select {
+	case <-ctx.Done():
+		logrus.Infoln("Interrupting waiting the next period")
+		return
+	case <-time.After(dur):
+	}
+
+	if msg != "" {
+		sendReportWithLogs(serv, msg, sub)
+	}
+
+	now = time.Now()
+	dur = getWaitTimeWithLogs(serv, now)
+
+	timer.Reset(dur)
 }
 
 func serveWithLogs(serv service.PriceWatcherService) (string, string) {
