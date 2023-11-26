@@ -8,8 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func watch(ctx context.Context, serv service.PriceWatcherService) {
-	dur := getWaitTimeWithLogs(serv, time.Now())
+func watch(ctx context.Context, serv service.PriceWatcherService, servName string) {
+	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
 	t := time.NewTimer(dur)
 	callChan := t.C
@@ -21,69 +21,73 @@ func watch(ctx context.Context, serv service.PriceWatcherService) {
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Infoln("Shutting down the application")
+			logrus.Infoln(servName + ": shutting down the application")
 			return
 		case <-callChan:
-			go servePriceWithTiming(callCtx, serv, t)
+			go servePriceWithTiming(callCtx, serv, t, servName)
 		}
 	}
 }
 
-func servePriceWithTiming(ctx context.Context, serv service.PriceWatcherService, timer *time.Timer) {
-	msg, sub := serveWithLogs(serv)
+func servePriceWithTiming(
+	ctx context.Context,
+	serv service.PriceWatcherService,
+	timer *time.Timer,
+	servName string) {
+	msg, sub := serveWithLogs(serv, servName)
 
 	now := time.Now()
-	dur := perStartWithLogs(serv, now)
+	dur := perStartWithLogs(serv, now, servName)
 
 	select {
 	case <-ctx.Done():
-		logrus.Infoln("Interrupting waiting the next period")
+		logrus.Infoln(servName + ": interrupting waiting the next period")
 		return
 	case <-time.After(dur):
 	}
 
 	if msg != "" {
-		sendReportWithLogs(serv, msg, sub)
+		sendReportWithLogs(serv, msg, sub, servName)
 	}
 
 	now = time.Now()
-	dur = getWaitTimeWithLogs(serv, now)
+	dur = getWaitTimeWithLogs(serv, now, servName)
 
 	timer.Reset(dur)
 }
 
-func serveWithLogs(serv service.PriceWatcherService) (string, string) {
+func serveWithLogs(serv service.PriceWatcherService, servName string) (string, string) {
 	msg, sub, err := serv.Serve()
 	if err != nil {
-		logrus.Errorf("An error occurs while serving a price: %v", err)
+		logrus.Errorf("%v: an error occurs while serving a price: %v", servName, err)
 
 		return "", ""
 	}
 
-	logrus.Info("The price is processed")
+	logrus.Info(servName + ": the price is processed")
 
 	return msg, sub
 }
 
-func sendReportWithLogs(serv service.PriceWatcherService, msg, sub string) {
+func sendReportWithLogs(serv service.PriceWatcherService, msg, sub, servName string) {
 	err := serv.SendReport(msg, sub)
 	if err != nil {
-		logrus.Errorf("cannot send the report: %v", err)
+		logrus.Errorf("%v: cannot send the report: %v", servName, err)
 	}
 
-	logrus.Info("A report is sended")
+	logrus.Info(servName + ": a report is sended")
 }
 
-func perStartWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
+func perStartWithLogs(serv service.PriceWatcherService, now time.Time, servName string) time.Duration {
 	dur := serv.PerStartDur(now)
-	logrus.Infof("Waiting the start of the next period %v", dur)
+	logrus.Infof("%v: waiting the start of the next period %v", servName, dur)
 
 	return dur
 }
 
-func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time) time.Duration {
+func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time, servName string) time.Duration {
 	dur := serv.GetWaitTime(now)
-	logrus.Infof("Waiting %v", dur)
+	logrus.Infof("%v: waiting %v", servName, dur)
 
 	return dur
 }

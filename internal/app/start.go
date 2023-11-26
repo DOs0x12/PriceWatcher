@@ -20,7 +20,7 @@ func StartWatchers(ctx context.Context, configer configer.Configer, sender sende
 	for _, s := range config.Services {
 		serv, err := service.NewWatcherService(sender, s)
 		if err != nil {
-			logrus.Errorf("can not create a watcher service: %v", err)
+			logrus.Errorf("%v: can not create a watcher service: %v", s.PriceType, err)
 
 			continue
 		}
@@ -28,7 +28,7 @@ func StartWatchers(ctx context.Context, configer configer.Configer, sender sende
 		servCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		go watch(servCtx, serv)
+		go watch(servCtx, serv, s.PriceType)
 	}
 
 	<-ctx.Done()
