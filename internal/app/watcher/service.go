@@ -17,7 +17,8 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		return
 	}
 
-	finishedJobs := make(chan string)
+	serviceCount := len(config.Services)
+	finishedJobs := make(chan string, serviceCount)
 
 	for _, s := range config.Services {
 		serv, err := service.NewWatcherService(sender, s)
@@ -30,8 +31,8 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		servCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		go watch(servCtx, serv, s.PriceType)
+		go watch(servCtx, serv, s.PriceType, finishedJobs)
 	}
 
-	waitJobs(ctx, finishedJobs, len(config.Services))
+	waitJobs(ctx, finishedJobs, serviceCount)
 }

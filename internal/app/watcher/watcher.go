@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func watch(ctx context.Context, serv service.PriceWatcherService, servName string) {
+func watch(ctx context.Context, serv service.PriceWatcherService, servName string, finishedJobs chan<- string) {
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
 	t := time.NewTimer(dur)
@@ -22,6 +22,7 @@ func watch(ctx context.Context, serv service.PriceWatcherService, servName strin
 		select {
 		case <-ctx.Done():
 			logrus.Infoln(servName + ": shutting down the application")
+			finishedJobs <- servName
 			return
 		case <-callChan:
 			go servePriceWithTiming(callCtx, serv, t, servName)
