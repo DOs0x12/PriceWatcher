@@ -34,3 +34,7 @@ func (s PriceWatcherService) GetWaitTime(now time.Time) time.Duration {
 func (s PriceWatcherService) PerStartDur(now time.Time) time.Duration {
 	return s.priceService.PerStartDur(now)
 }
+
+func (s PriceWatcherService) GetName() string {
+	return s.priceService.GetName()
+}

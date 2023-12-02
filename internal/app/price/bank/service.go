@@ -60,3 +60,7 @@ func (s Service) GetWaitTime(now time.Time) time.Duration {
 func (Service) PerStartDur(now time.Time) time.Duration {
 	return priceTime.PerStartDur(now, priceTime.Hour)
 }
+
+func (s Service) GetName() string {
+	return s.conf.PriceType
+}

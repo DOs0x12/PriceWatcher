@@ -31,7 +31,7 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		servCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		go watch(servCtx, serv, s.PriceType, finishedJobs)
+		go watch(servCtx, serv, finishedJobs)
 	}
 
 	waitJobs(ctx, finishedJobs, serviceCount)

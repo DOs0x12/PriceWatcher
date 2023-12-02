@@ -152,3 +152,7 @@ func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string
 
 	return nil
 }
+
+func (s Service) GetName() string {
+	return s.conf.PriceType
+}

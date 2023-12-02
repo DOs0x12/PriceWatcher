@@ -8,7 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func watch(ctx context.Context, serv service.PriceWatcherService, servName string, finishedJobs chan<- string) {
+func watch(ctx context.Context, serv service.PriceWatcherService, finishedJobs chan<- string) {
+	servName := serv.GetName()
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
 	t := time.NewTimer(dur)
