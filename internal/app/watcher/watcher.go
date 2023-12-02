@@ -1,4 +1,4 @@
-package app
+package watcher
 
 import (
 	"PriceWatcher/internal/app/service"

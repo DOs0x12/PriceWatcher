@@ -1,8 +1,8 @@
 package main
 
 import (
-	"PriceWatcher/internal/app"
 	"PriceWatcher/internal/app/interruption"
+	"PriceWatcher/internal/app/watcher"
 	"PriceWatcher/internal/infrastructure/configer"
 	"PriceWatcher/internal/infrastructure/sender"
 	"context"
@@ -27,7 +27,7 @@ func startWatching(ctx context.Context) {
 	configPath := "config.yml"
 	conf := configer.NewConfiger(configPath)
 
-	app.StartWatchers(ctx, conf, sen)
+	watcher.StartWatchers(ctx, conf, sen)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
