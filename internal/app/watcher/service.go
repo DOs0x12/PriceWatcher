@@ -17,6 +17,8 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		return
 	}
 
+	watcherNames := make(chan string)
+
 	for _, s := range config.Services {
 		serv, err := service.NewWatcherService(sender, s)
 		if err != nil {
@@ -31,5 +33,5 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		go watch(servCtx, serv, s.PriceType)
 	}
 
-	<-ctx.Done()
+	waitJobs(ctx, watcherNames, len(config.Services))
 }
