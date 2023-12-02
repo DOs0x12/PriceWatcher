@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func StartWatchers(ctx context.Context, configer configer.Configer, sender sender.Sender) {
+func ServeWatchers(ctx context.Context, configer configer.Configer, sender sender.Sender) {
 	config, err := configer.GetConfig()
 	if err != nil {
 		logrus.Errorf("can not get the config data: %v", err)
