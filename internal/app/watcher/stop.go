@@ -6,11 +6,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func waitJobs(ctx context.Context, jobNames <-chan string, jobCount int) {
+func waitJobs(ctx context.Context, finishedJobs <-chan string, jobCount int) {
 	<-ctx.Done()
 
 	for i := 0; i < jobCount; i++ {
-		jobName := <-jobNames
+		jobName := <-finishedJobs
 		logrus.Infof("The job %v is done", jobName)
 	}
 
