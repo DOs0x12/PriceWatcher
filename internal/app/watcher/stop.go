@@ -11,7 +11,7 @@ func waitJobs(ctx context.Context, finishedJobs <-chan string, jobCount int) {
 
 	for i := 0; i < jobCount; i++ {
 		jobName := <-finishedJobs
-		logrus.Infof("The job %v is done", jobName)
+		logrus.Infof("%v: the job is done", jobName)
 	}
 
 	logrus.Infof("All jobs is done")

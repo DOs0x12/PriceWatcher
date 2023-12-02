@@ -22,8 +22,7 @@ func watch(ctx context.Context, serv service.PriceWatcherService, finishedJobs c
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Infoln(servName + ": shutting down the application")
-			finishedJobs <- servName
+			finishJobWithLogs(servName, finishedJobs)
 			return
 		case <-callChan:
 			go servePriceWithTiming(callCtx, serv, t, servName)
@@ -92,4 +91,9 @@ func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time, servNa
 	logrus.Infof("%v: waiting %v", servName, dur)
 
 	return dur
+}
+
+func finishJobWithLogs(servName string, finishedJobs chan<- string) {
+	logrus.Infoln(servName + ": shutting down the application")
+	finishedJobs <- servName
 }

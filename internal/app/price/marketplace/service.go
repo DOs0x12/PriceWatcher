@@ -121,14 +121,16 @@ func waitNextCallWithRand() {
 }
 
 func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string, name, address string) error {
+	serveName := s.GetName()
+
 	response, err := s.req.RequestPage(address)
 	if err != nil {
-		return fmt.Errorf("cannot get a page with the current price: %w", err)
+		return fmt.Errorf("%v: cannot get a page with the current price: %w", serveName, err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return fmt.Errorf("cannot extract the price from the body: %w", err)
+		return fmt.Errorf("%v: cannot extract the price from the body: %w", serveName, err)
 	}
 
 	changed, up, amount := s.analyser.AnalysePrice(price, float32(curPrices[name]))
@@ -139,7 +141,7 @@ func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string
 
 		curPrices[name] = float64(price)
 
-		logrus.Info("The item price has been changed. A report is sended")
+		logrus.Infof("%v: the item price has been changed. A report is sended", serveName)
 
 		return nil
 	}
@@ -148,7 +150,7 @@ func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string
 		curPrices[name] = float64(price)
 	}
 
-	logrus.Info("The item price has been not changed")
+	logrus.Infof("%v: the item price has been not changed", serveName)
 
 	return nil
 }

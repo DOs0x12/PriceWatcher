@@ -31,16 +31,18 @@ func NewService(
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 func (s Service) ServePrice() (message, subject string, err error) {
-	logrus.Info("Start processing a price")
+	serveName := s.GetName()
+
+	logrus.Infof("%v: start processing a price", serveName)
 
 	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
-		return "", "", fmt.Errorf("cannot get a page with the current price: %w", err)
+		return "", "", fmt.Errorf("%v: cannot get a page with the current price: %w", serveName, err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("cannot extract the price from the body: %w", err)
+		return "", "", fmt.Errorf("%v: cannot extract the price from the body: %w", serveName, err)
 	}
 
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
