@@ -7,11 +7,13 @@ import (
 	"syscall"
 )
 
-func WatchForInterruption(cancel context.CancelFunc) {
+func WatchForInterruption(cancels ...context.CancelFunc) {
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-c
-		cancel()
+		for _, cancel := range cancels {
+			cancel()
+		}
 	}()
 }

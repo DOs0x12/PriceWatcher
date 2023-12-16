@@ -5,11 +5,17 @@ import (
 	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/sender"
 	"context"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
 
-func ServeWatchers(ctx context.Context, configer configer.Configer, sender sender.Sender) {
+func ServeWatchers(wg *sync.WaitGroup,
+	ctx context.Context,
+	configer configer.Configer,
+	sender sender.Sender) {
+	defer wg.Done()
+
 	config, err := configer.GetConfig()
 	if err != nil {
 		logrus.Errorf("can not get the config data: %v", err)
@@ -17,10 +23,12 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		return
 	}
 
-	serviceCount := len(config.Services)
-	finishedJobs := make(chan string, serviceCount)
+	services := config.Services
+	servCount := len(services)
+	servWG := sync.WaitGroup{}
+	servWG.Add(servCount)
 
-	for _, s := range config.Services {
+	for _, s := range services {
 		serv, err := service.NewWatcherService(sender, s)
 		if err != nil {
 			logrus.Errorf("%v: can not create a watcher service: %v", s.PriceType, err)
@@ -31,8 +39,10 @@ func ServeWatchers(ctx context.Context, configer configer.Configer, sender sende
 		servCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		go watch(servCtx, serv, finishedJobs)
+		go watch(&servWG, servCtx, serv)
 	}
 
-	waitJobs(ctx, finishedJobs, serviceCount)
+	servWG.Wait()
+
+	logrus.Infof("All the jobs is done")
 }

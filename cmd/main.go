@@ -8,6 +8,7 @@ import (
 	"PriceWatcher/internal/infrastructure/sender"
 	infraTelebot "PriceWatcher/internal/infrastructure/telebot"
 	"context"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,31 +17,36 @@ func main() {
 	watcherCtx, watcherCancel := newContext()
 	botCtx, botCancel := newContext()
 
-	defer botCancel()
-
 	logrus.Infoln("Start the application")
 
-	interruption.WatchForInterruption(watcherCancel)
-	startBot(botCtx)
-	startWatching(watcherCtx)
+	interruption.WatchForInterruption(watcherCancel, botCancel)
+
+	servCount := 2
+	wg := &sync.WaitGroup{}
+	wg.Add(servCount)
+
+	startBot(wg, botCtx)
+	startWatching(wg, watcherCtx)
+
+	wg.Wait()
 
 	logrus.Infoln("The application is done")
 }
 
-func startWatching(ctx context.Context) {
+func startWatching(wg *sync.WaitGroup, ctx context.Context) {
 	sen := sender.Sender{}
 
 	configPath := "config.yml"
 	conf := configer.NewConfiger(configPath)
 
-	watcher.ServeWatchers(ctx, conf, sen)
+	watcher.ServeWatchers(wg, ctx, conf, sen)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(ctx context.Context) {
+func startBot(wg *sync.WaitGroup, ctx context.Context) {
 	bot, err := infraTelebot.NewTelebot("6892592660:AAEf69s7JICdEKVTCboSGBeRC43HELUcfiY")
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
@@ -48,7 +54,7 @@ func startBot(ctx context.Context) {
 		return
 	}
 
-	_, err = telebot.Start(ctx, bot)
+	err = telebot.Start(wg, ctx, bot)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 

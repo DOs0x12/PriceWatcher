@@ -3,12 +3,13 @@ package watcher
 import (
 	"PriceWatcher/internal/app/service"
 	"context"
+	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-func watch(ctx context.Context, serv service.PriceWatcherService, finishedJobs chan<- string) {
+func watch(wg *sync.WaitGroup, ctx context.Context, serv service.PriceWatcherService) {
 	servName := serv.GetName()
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
@@ -17,12 +18,14 @@ func watch(ctx context.Context, serv service.PriceWatcherService, finishedJobs c
 	defer t.Stop()
 
 	callCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	defer func() {
+		cancel()
+		finishJobWithLogs(wg, servName)
+	}()
 
 	for {
 		select {
 		case <-ctx.Done():
-			finishJobWithLogs(servName, finishedJobs)
 			return
 		case <-callChan:
 			go servePriceWithTiming(callCtx, serv, t, servName)
@@ -93,7 +96,8 @@ func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time, servNa
 	return dur
 }
 
-func finishJobWithLogs(servName string, finishedJobs chan<- string) {
-	logrus.Infoln(servName + ": shutting down the application")
-	finishedJobs <- servName
+func finishJobWithLogs(wg *sync.WaitGroup, servName string) {
+	logrus.Infof("%v: shutting down the job", servName)
+	wg.Done()
+	logrus.Infof("%v: the job is done", servName)
 }
