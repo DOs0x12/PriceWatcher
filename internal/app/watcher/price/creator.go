@@ -1,8 +1,8 @@
 package price
 
 import (
-	"PriceWatcher/internal/app/price/bank"
-	mpService "PriceWatcher/internal/app/price/marketplace"
+	"PriceWatcher/internal/app/watcher/price/bank"
+	mpService "PriceWatcher/internal/app/watcher/price/marketplace"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"

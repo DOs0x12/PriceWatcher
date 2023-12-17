@@ -1,7 +1,7 @@
 package bank
 
 import (
-	priceTime "PriceWatcher/internal/app/price/time"
+	priceTime "PriceWatcher/internal/app/watcher/price/time"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/requester"

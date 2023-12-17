@@ -34,10 +34,9 @@ func main() {
 }
 
 func startWatching(ctx context.Context, wg *sync.WaitGroup) {
-	sen := sender.Sender{}
-
 	configPath := "config.yml"
 	conf := configer.NewConfiger(configPath)
+	sen := sender.Sender{}
 
 	watcher.ServeWatchers(ctx, wg, conf, sen)
 }

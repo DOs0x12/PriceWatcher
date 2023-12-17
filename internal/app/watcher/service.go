@@ -1,7 +1,7 @@
 package watcher
 
 import (
-	"PriceWatcher/internal/app/service"
+	"PriceWatcher/internal/app/watcher/price"
 	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/sender"
 	"context"
@@ -13,7 +13,7 @@ import (
 func ServeWatchers(ctx context.Context,
 	wg *sync.WaitGroup,
 	configer configer.Configer,
-	sender sender.Sender) {
+	sen sender.Sender) {
 	defer wg.Done()
 
 	config, err := configer.GetConfig()
@@ -24,19 +24,18 @@ func ServeWatchers(ctx context.Context,
 	}
 
 	services := config.Services
-	servCount := len(services)
 	servWG := sync.WaitGroup{}
-	servWG.Add(servCount)
 
 	for _, s := range services {
-		serv, err := service.NewWatcherService(sender, s)
+		serv, err := price.NewPriceService(s)
 		if err != nil {
 			logrus.Errorf("%v: can not create a watcher service: %v", s.PriceType, err)
 
 			continue
 		}
 
-		go watch(ctx, &servWG, serv)
+		servWG.Add(1)
+		go watch(ctx, &servWG, serv, sen, s.Email)
 	}
 
 	servWG.Wait()

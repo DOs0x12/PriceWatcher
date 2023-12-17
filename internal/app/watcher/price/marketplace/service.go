@@ -1,7 +1,7 @@
 package marketplace
 
 import (
-	priceTime "PriceWatcher/internal/app/price/time"
+	priceTime "PriceWatcher/internal/app/watcher/price/time"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"

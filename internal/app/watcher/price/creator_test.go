@@ -1,8 +1,8 @@
 package price
 
 import (
-	"PriceWatcher/internal/app/price/bank"
-	"PriceWatcher/internal/app/price/marketplace"
+	"PriceWatcher/internal/app/watcher/price/bank"
+	"PriceWatcher/internal/app/watcher/price/marketplace"
 	"PriceWatcher/internal/entities/config"
 	"reflect"
 	"strings"

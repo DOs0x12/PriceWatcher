@@ -1,7 +1,9 @@
 package watcher
 
 import (
-	"PriceWatcher/internal/app/service"
+	"PriceWatcher/internal/app/watcher/price"
+	"PriceWatcher/internal/entities/config"
+	"PriceWatcher/internal/interfaces/sender"
 	"context"
 	"sync"
 	"time"
@@ -9,7 +11,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func watch(ctx context.Context, wg *sync.WaitGroup, serv service.PriceWatcherService) {
+func watch(ctx context.Context,
+	wg *sync.WaitGroup,
+	serv price.PriceService,
+	sen sender.Sender,
+	email config.Email) {
 	servName := serv.GetName()
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
@@ -26,16 +32,18 @@ func watch(ctx context.Context, wg *sync.WaitGroup, serv service.PriceWatcherSer
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go servePriceWithTiming(ctx, serv, t, servName)
+			go servePriceWithTiming(ctx, serv, sen, t, servName, email)
 		}
 	}
 }
 
 func servePriceWithTiming(
 	ctx context.Context,
-	serv service.PriceWatcherService,
+	serv price.PriceService,
+	sen sender.Sender,
 	timer *time.Timer,
-	servName string) {
+	servName string,
+	email config.Email) {
 	msg, sub := serveWithLogs(serv, servName)
 
 	now := time.Now()
@@ -49,7 +57,7 @@ func servePriceWithTiming(
 	}
 
 	if msg != "" {
-		sendReportWithLogs(serv, msg, sub, servName)
+		sendReportWithLogs(sen, msg, sub, servName, email)
 	}
 
 	now = time.Now()
@@ -58,8 +66,8 @@ func servePriceWithTiming(
 	timer.Reset(dur)
 }
 
-func serveWithLogs(serv service.PriceWatcherService, servName string) (string, string) {
-	msg, sub, err := serv.Serve()
+func serveWithLogs(serv price.PriceService, servName string) (string, string) {
+	msg, sub, err := serv.ServePrice()
 	if err != nil {
 		logrus.Errorf("%v: an error occurs while serving a price: %v", servName, err)
 
@@ -71,8 +79,8 @@ func serveWithLogs(serv service.PriceWatcherService, servName string) (string, s
 	return msg, sub
 }
 
-func sendReportWithLogs(serv service.PriceWatcherService, msg, sub, servName string) {
-	err := serv.SendReport(msg, sub)
+func sendReportWithLogs(sender sender.Sender, msg, sub, servName string, email config.Email) {
+	err := sender.Send(msg, sub, email)
 	if err != nil {
 		logrus.Errorf("%v: cannot send the report: %v", servName, err)
 	}
@@ -80,14 +88,14 @@ func sendReportWithLogs(serv service.PriceWatcherService, msg, sub, servName str
 	logrus.Info(servName + ": a report is sended")
 }
 
-func perStartWithLogs(serv service.PriceWatcherService, now time.Time, servName string) time.Duration {
+func perStartWithLogs(serv price.PriceService, now time.Time, servName string) time.Duration {
 	dur := serv.PerStartDur(now)
 	logrus.Infof("%v: waiting the start of the next period %v", servName, dur)
 
 	return dur
 }
 
-func getWaitTimeWithLogs(serv service.PriceWatcherService, now time.Time, servName string) time.Duration {
+func getWaitTimeWithLogs(serv price.PriceService, now time.Time, servName string) time.Duration {
 	dur := serv.GetWaitTime(now)
 	logrus.Infof("%v: waiting %v", servName, dur)
 
