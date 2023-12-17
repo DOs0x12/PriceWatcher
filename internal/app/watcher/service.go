@@ -10,8 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ServeWatchers(wg *sync.WaitGroup,
-	ctx context.Context,
+func ServeWatchers(ctx context.Context,
+	wg *sync.WaitGroup,
 	configer configer.Configer,
 	sender sender.Sender) {
 	defer wg.Done()
@@ -36,10 +36,7 @@ func ServeWatchers(wg *sync.WaitGroup,
 			continue
 		}
 
-		servCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-
-		go watch(&servWG, servCtx, serv)
+		go watch(ctx, &servWG, serv)
 	}
 
 	servWG.Wait()

@@ -25,28 +25,28 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(servCount)
 
-	startBot(wg, botCtx)
-	startWatching(wg, watcherCtx)
+	startBot(botCtx, wg)
+	startWatching(watcherCtx, wg)
 
 	wg.Wait()
 
 	logrus.Infoln("The application is done")
 }
 
-func startWatching(wg *sync.WaitGroup, ctx context.Context) {
+func startWatching(ctx context.Context, wg *sync.WaitGroup) {
 	sen := sender.Sender{}
 
 	configPath := "config.yml"
 	conf := configer.NewConfiger(configPath)
 
-	watcher.ServeWatchers(wg, ctx, conf, sen)
+	watcher.ServeWatchers(ctx, wg, conf, sen)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(wg *sync.WaitGroup, ctx context.Context) {
+func startBot(ctx context.Context, wg *sync.WaitGroup) {
 	bot, err := infraTelebot.NewTelebot("6892592660:AAEf69s7JICdEKVTCboSGBeRC43HELUcfiY")
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
@@ -54,7 +54,7 @@ func startBot(wg *sync.WaitGroup, ctx context.Context) {
 		return
 	}
 
-	err = telebot.Start(wg, ctx, bot)
+	err = telebot.Start(ctx, wg, bot)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 

@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func watch(wg *sync.WaitGroup, ctx context.Context, serv service.PriceWatcherService) {
+func watch(ctx context.Context, wg *sync.WaitGroup, serv service.PriceWatcherService) {
 	servName := serv.GetName()
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
@@ -17,9 +17,7 @@ func watch(wg *sync.WaitGroup, ctx context.Context, serv service.PriceWatcherSer
 	callChan := t.C
 	defer t.Stop()
 
-	callCtx, cancel := context.WithCancel(ctx)
 	defer func() {
-		cancel()
 		finishJobWithLogs(wg, servName)
 	}()
 
@@ -28,7 +26,7 @@ func watch(wg *sync.WaitGroup, ctx context.Context, serv service.PriceWatcherSer
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go servePriceWithTiming(callCtx, serv, t, servName)
+			go servePriceWithTiming(ctx, serv, t, servName)
 		}
 	}
 }

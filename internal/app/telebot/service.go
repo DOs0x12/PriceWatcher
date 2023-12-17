@@ -8,25 +8,22 @@ import (
 	"sync"
 )
 
-func Start(wg *sync.WaitGroup, ctx context.Context, bot telebot.Bot) error {
+func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot) error {
+	defer wg.Done()
+
 	commands := createCommands()
 	if err := bot.Start(commands...); err != nil {
-		wg.Done()
-
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
 
 	if err := bot.RegisterCommands(commands); err != nil {
-		wg.Done()
-
 		return fmt.Errorf("can not register commands in the bot: %v", err)
 	}
 
-	go func(wg *sync.WaitGroup) {
+	go func() {
 		<-ctx.Done()
 		bot.Stop()
-		wg.Done()
-	}(wg)
+	}()
 
 	return nil
 }
