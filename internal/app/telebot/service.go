@@ -1,7 +1,10 @@
 package telebot
 
 import (
+	botCom "PriceWatcher/internal/app/telebot/command"
+	"PriceWatcher/internal/app/telebot/command/price"
 	botEnt "PriceWatcher/internal/entities/telebot"
+	infraFile "PriceWatcher/internal/infrastructure/file"
 	"PriceWatcher/internal/interfaces/telebot"
 	"context"
 	"fmt"
@@ -29,13 +32,17 @@ func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot) error {
 }
 
 func createCommands() []botEnt.Command {
+	wr := infraFile.WriteReader{}
+	pCom := price.NewPriceCommand(wr)
+	commands := botCom.CreateCommands(pCom)
+
 	botComms := make([]botEnt.Command, len(commands))
 
 	for i, command := range commands {
 		botCommand := botEnt.Command{
-			Name:        command.name,
-			Description: command.description,
-			Action:      command.action,
+			Name:        command.Name,
+			Description: command.Description,
+			Action:      command.Action,
 		}
 
 		botComms[i] = botCommand
