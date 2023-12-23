@@ -1,3 +1,5 @@
+#Sets the API key for the telegram bot to get the control of the information from marketplaces
+botKey: 'botKey'
 services:
   #Sets the type of a watched price (bank or marketplace)
   - price_type: 'marketplace'

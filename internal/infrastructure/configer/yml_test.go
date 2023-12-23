@@ -6,6 +6,7 @@ import (
 )
 
 var ymlData = `
+botKey: 'someKey'
 services:
   - price_type: 'bank'
     sending_hours: [12, 17]

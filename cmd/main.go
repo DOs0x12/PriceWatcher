@@ -25,28 +25,28 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(servCount)
 
-	startBot(botCtx, wg)
-	startWatching(watcherCtx, wg)
+	configer := GetConfiger()
+
+	startBot(botCtx, wg, configer)
+	startWatching(watcherCtx, wg, configer)
 
 	wg.Wait()
 
 	logrus.Infoln("The application is done")
 }
 
-func startWatching(ctx context.Context, wg *sync.WaitGroup) {
-	configPath := "config.yml"
-	conf := configer.NewConfiger(configPath)
+func startWatching(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer) {
 	sen := sender.Sender{}
 
-	watcher.ServeWatchers(ctx, wg, conf, sen)
+	watcher.ServeWatchers(ctx, wg, configer, sen)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(ctx context.Context, wg *sync.WaitGroup) {
-	bot, err := infraTelebot.NewTelebot("6892592660:AAEf69s7JICdEKVTCboSGBeRC43HELUcfiY")
+func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer) {
+	bot, err := infraTelebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
@@ -59,4 +59,10 @@ func startBot(ctx context.Context, wg *sync.WaitGroup) {
 
 		return
 	}
+}
+
+func GetConfiger() configer.Configer {
+	configPath := "config.yml"
+
+	return configer.NewConfiger(configPath)
 }

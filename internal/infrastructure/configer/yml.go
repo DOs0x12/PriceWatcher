@@ -18,7 +18,7 @@ func unmarshalConf(data []byte) (config.Config, error) {
 
 func cast(confDto ConfigDto) config.Config {
 	serviceCount := len(confDto.Services)
-	conf := config.Config{Services: make([]config.ServiceConf, 0, serviceCount)}
+	conf := config.Config{BotKey: confDto.BotKey, Services: make([]config.ServiceConf, 0, serviceCount)}
 
 	for _, s := range confDto.Services {
 		serv := config.ServiceConf{

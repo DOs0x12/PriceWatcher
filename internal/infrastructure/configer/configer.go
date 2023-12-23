@@ -6,6 +6,7 @@ import (
 )
 
 type ConfigDto struct {
+	BotKey   string           `yaml:"botKey"`
 	Services []ServiceConfDto `yaml:"services"`
 }
 

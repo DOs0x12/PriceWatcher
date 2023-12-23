@@ -2,6 +2,7 @@ package telebot
 
 import (
 	"PriceWatcher/internal/entities/telebot"
+	"PriceWatcher/internal/interfaces/configer"
 	"fmt"
 	"time"
 
@@ -13,8 +14,15 @@ type Telebot struct {
 	bot *tgbot.BotAPI
 }
 
-func NewTelebot(token string) (Telebot, error) {
-	botApi, err := tgbot.NewBotAPI(token)
+func NewTelebot(configer configer.Configer) (Telebot, error) {
+	config, err := configer.GetConfig()
+	if err != nil {
+		var zero Telebot
+
+		return zero, fmt.Errorf("can not get the config data: %v", err)
+	}
+
+	botApi, err := tgbot.NewBotAPI(config.BotKey)
 	if err != nil {
 		var zero Telebot
 		return zero, fmt.Errorf("getting an error at connecting to the bot: %v", err)
