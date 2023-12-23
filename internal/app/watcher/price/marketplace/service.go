@@ -14,7 +14,6 @@ import (
 	"unicode"
 
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/slices"
 )
 
 type Service struct {
@@ -50,21 +49,9 @@ func (s Service) ServePrice() (message, subject string, err error) {
 		return "", "", err
 	}
 
-	crossedKeys := make([]string, len(curPrices))
-
 	for k := range curPrices {
-		if _, ok := itemPrices[k]; ok {
-			crossedKeys = append(crossedKeys, k)
-
-			continue
-		}
-
-		delete(curPrices, k)
-	}
-
-	for k := range itemPrices {
-		if !slices.Contains(crossedKeys, k) {
-			curPrices[k] = 0.0
+		if _, ok := itemPrices[k]; !ok {
+			delete(curPrices, k)
 		}
 	}
 
