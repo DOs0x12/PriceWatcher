@@ -1,6 +1,8 @@
 package file
 
+import "PriceWatcher/internal/entities/price"
+
 type WriteReader interface {
-	WritePrices(prices map[string]float64) error
-	ReadPrices() (map[string]float64, error)
+	WritePrices(prices map[string]price.ItemPrice) error
+	ReadPrices() (map[string]price.ItemPrice, error)
 }

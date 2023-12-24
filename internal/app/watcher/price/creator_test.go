@@ -4,6 +4,7 @@ import (
 	"PriceWatcher/internal/app/watcher/price/bank"
 	"PriceWatcher/internal/app/watcher/price/marketplace"
 	"PriceWatcher/internal/entities/config"
+	"PriceWatcher/internal/entities/price"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,8 +12,12 @@ import (
 
 type FakeWriteReader struct{}
 
-func (FakeWriteReader) WritePrices(prices map[string]float64) error
-func (FakeWriteReader) ReadPrices() (map[string]float64, error)
+func (FakeWriteReader) WritePrices(prices map[string]price.ItemPrice) error {
+	return nil
+}
+func (FakeWriteReader) ReadPrices() (map[string]price.ItemPrice, error) {
+	return make(map[string]price.ItemPrice), nil
+}
 
 func TestNewPriceService(t *testing.T) {
 	createBankService(t)

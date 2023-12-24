@@ -1,6 +1,7 @@
 package file
 
 import (
+	"PriceWatcher/internal/entities/price"
 	"errors"
 	"fmt"
 	"os"
@@ -16,7 +17,12 @@ func NewWR() WriteReader {
 	return WriteReader{}
 }
 
-func (WriteReader) WritePrices(prices map[string]float64) error {
+type ItemPriceDto struct {
+	Address string  `yaml:"address"`
+	Price   float64 `yaml:"price"`
+}
+
+func (WriteReader) WritePrices(prices map[string]price.ItemPrice) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return fmt.Errorf("cannot create a file: %v", err)
@@ -28,7 +34,9 @@ func (WriteReader) WritePrices(prices map[string]float64) error {
 		}
 	}()
 
-	yVal, err := yaml.Marshal(prices)
+	curPrices := castTo(prices)
+
+	yVal, err := yaml.Marshal(curPrices)
 	if err != nil {
 		return fmt.Errorf("cannot marshall price values to an yaml value: %v", err)
 	}
@@ -40,8 +48,18 @@ func (WriteReader) WritePrices(prices map[string]float64) error {
 	return nil
 }
 
-func (WriteReader) ReadPrices() (map[string]float64, error) {
-	itemPrices := make(map[string]float64)
+func castTo(prices map[string]price.ItemPrice) map[string]ItemPriceDto {
+	priceDtos := make(map[string]ItemPriceDto)
+
+	for k, v := range prices {
+		priceDtos[k] = ItemPriceDto{Address: v.Address, Price: v.Price}
+	}
+
+	return priceDtos
+}
+
+func (WriteReader) ReadPrices() (map[string]price.ItemPrice, error) {
+	itemPrices := make(map[string]price.ItemPrice)
 	file, err := os.ReadFile(fileName)
 
 	if err != nil && errors.Is(err, os.ErrNotExist) {
@@ -52,9 +70,21 @@ func (WriteReader) ReadPrices() (map[string]float64, error) {
 		return nil, fmt.Errorf("cannot read the file %v: %v", fileName, err)
 	}
 
-	if err := yaml.Unmarshal(file, &itemPrices); err != nil {
+	itemPriceDtos := make(map[string]ItemPriceDto)
+
+	if err := yaml.Unmarshal(file, &itemPriceDtos); err != nil {
 		return nil, fmt.Errorf("cannot unmarshall price values from the file %v: %v", fileName, err)
 	}
 
-	return itemPrices, nil
+	return castFrom(itemPriceDtos), nil
+}
+
+func castFrom(priceDtos map[string]ItemPriceDto) map[string]price.ItemPrice {
+	prices := make(map[string]price.ItemPrice)
+
+	for k, v := range priceDtos {
+		prices[k] = price.ItemPrice{Address: v.Address, Price: v.Price}
+	}
+
+	return prices
 }

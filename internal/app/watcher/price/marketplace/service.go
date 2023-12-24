@@ -5,6 +5,7 @@ import (
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
+	priceEnt "PriceWatcher/internal/entities/price"
 	"PriceWatcher/internal/interfaces/file"
 	"PriceWatcher/internal/interfaces/requester"
 	"fmt"
@@ -107,7 +108,7 @@ func waitNextCallWithRand() {
 	time.Sleep(dur)
 }
 
-func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string, name, address string) error {
+func (s Service) serveItemPrice(curPrices map[string]priceEnt.ItemPrice, messages *[]string, name, address string) error {
 	serveName := s.GetName()
 
 	response, err := s.req.RequestPage(address)
@@ -120,21 +121,28 @@ func (s Service) serveItemPrice(curPrices map[string]float64, messages *[]string
 		return fmt.Errorf("%v: cannot extract the price from the body: %w", serveName, err)
 	}
 
-	changed, up, amount := s.analyser.AnalysePrice(price, float32(curPrices[name]))
+	curPrice, ok := curPrices[name]
+	if !ok {
+		curPrice = priceEnt.ItemPrice{Address: address, Price: 0.0}
+		curPrices[name] = curPrice
+	}
+
+	changed, up, amount := s.analyser.AnalysePrice(price, float32(curPrice.Price))
 
 	if changed && !up {
 		msg := fmt.Sprintf("Цена на %v %v уменьшилась на %.2fр. Текущая цена: %.2fр\n", name, address, amount, price)
 		*messages = append(*messages, msg)
 
-		curPrices[name] = float64(price)
+		curPrice.Price = float64(price)
 
 		logrus.Infof("%v: the item price has been changed. A report is sended", serveName)
 
 		return nil
 	}
 
-	if curPrices[name] == 0.0 {
-		curPrices[name] = float64(price)
+	if curPrice.Price == 0.0 {
+		curPrice.Price = float64(price)
+		curPrices[name] = curPrice
 	}
 
 	logrus.Infof("%v: the item price has been not changed", serveName)

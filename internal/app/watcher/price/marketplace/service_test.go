@@ -3,22 +3,23 @@ package marketplace
 import (
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/entities/page"
+	"PriceWatcher/internal/entities/price"
 	"io"
 	"testing"
 )
 
 type wrWithCall struct{}
 
-func (wrWithCall) WritePrices(prices map[string]float64) error {
+func (wrWithCall) WritePrices(prices map[string]price.ItemPrice) error {
 	rwWriteCall = true
 
 	return nil
 }
 
-func (wrWithCall) ReadPrices() (map[string]float64, error) {
+func (wrWithCall) ReadPrices() (map[string]price.ItemPrice, error) {
 	rwReadCall = true
 
-	return map[string]float64{"test": 0.0}, nil
+	return map[string]price.ItemPrice{"test": {Address: "address", Price: 0.0}}, nil
 }
 
 type reqWithCall struct{}
