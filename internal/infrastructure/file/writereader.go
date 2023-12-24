@@ -17,7 +17,7 @@ type WriteReader struct {
 }
 
 func NewWR() WriteReader {
-	return WriteReader{}
+	return WriteReader{mu: &sync.Mutex{}}
 }
 
 type ItemPriceDto struct {
