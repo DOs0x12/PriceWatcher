@@ -45,6 +45,8 @@ func (s Service) ServePrice() (message, subject string, err error) {
 
 	itemPrices := s.conf.Items
 
+	s.wr.Lock()
+
 	curPrices, err := s.wr.ReadPrices()
 	if err != nil {
 		return "", "", err
@@ -78,6 +80,8 @@ func (s Service) ServePrice() (message, subject string, err error) {
 	if err != nil {
 		return "", "", err
 	}
+
+	s.wr.Unlock()
 
 	return strings.Join(messages, "\n"), sub, nil
 }

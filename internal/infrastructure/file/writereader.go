@@ -5,13 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 )
 
 var fileName = "last_price.yaml"
 
-type WriteReader struct{}
+type WriteReader struct {
+	mu *sync.Mutex
+}
 
 func NewWR() WriteReader {
 	return WriteReader{}
@@ -87,4 +90,12 @@ func castFrom(priceDtos map[string]ItemPriceDto) map[string]price.ItemPrice {
 	}
 
 	return prices
+}
+
+func (wr WriteReader) Lock() {
+	wr.mu.Lock()
+}
+
+func (wr WriteReader) Unlock() {
+	wr.mu.Unlock()
 }

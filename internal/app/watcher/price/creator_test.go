@@ -15,9 +15,14 @@ type FakeWriteReader struct{}
 func (FakeWriteReader) WritePrices(prices map[string]price.ItemPrice) error {
 	return nil
 }
+
 func (FakeWriteReader) ReadPrices() (map[string]price.ItemPrice, error) {
 	return make(map[string]price.ItemPrice), nil
 }
+
+func (FakeWriteReader) Lock() {}
+
+func (FakeWriteReader) Unlock() {}
 
 func TestNewPriceService(t *testing.T) {
 	createBankService(t)

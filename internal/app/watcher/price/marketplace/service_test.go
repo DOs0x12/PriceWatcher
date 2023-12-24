@@ -22,6 +22,10 @@ func (wrWithCall) ReadPrices() (map[string]price.ItemPrice, error) {
 	return map[string]price.ItemPrice{"test": {Address: "address", Price: 0.0}}, nil
 }
 
+func (wrWithCall) Lock() {}
+
+func (wrWithCall) Unlock() {}
+
 type reqWithCall struct{}
 
 func (reqWithCall) RequestPage(url string) (page.Response, error) {

@@ -17,7 +17,7 @@ func NewPriceCommand(wr file.WriteReader) PriceCommand {
 }
 
 func (c PriceCommand) GetCurrentPrices() string {
-	items, err := c.wr.ReadPrices()
+	items, err := c.wr.Read()
 	if err != nil {
 		logrus.Errorf("Can not get the current prices: %v", err)
 
