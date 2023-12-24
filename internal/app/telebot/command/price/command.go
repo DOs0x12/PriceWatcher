@@ -1,6 +1,7 @@
 package price
 
 import (
+	"PriceWatcher/internal/entities/price"
 	"PriceWatcher/internal/interfaces/file"
 	"fmt"
 	"strings"
@@ -17,7 +18,9 @@ func NewPriceCommand(wr file.WriteReader) PriceCommand {
 }
 
 func (c PriceCommand) GetCurrentPrices() string {
-	items, err := c.wr.Read()
+	c.wr.Lock()
+	items, err := c.wr.ReadPrices()
+	c.wr.Unlock()
 	if err != nil {
 		logrus.Errorf("Can not get the current prices: %v", err)
 
@@ -27,12 +30,12 @@ func (c PriceCommand) GetCurrentPrices() string {
 	return formMessage(items)
 }
 
-func formMessage(items map[string]float64) string {
+func formMessage(items map[string]price.ItemPrice) string {
 	builder := strings.Builder{}
 
 	for name, val := range items {
 		builder.WriteString(name + ": ")
-		builder.WriteString(fmt.Sprintf("%.2f\n", val))
+		builder.WriteString(fmt.Sprintf("%.2f\n%v\n\n", val.Price, val.Address))
 	}
 
 	return builder.String()
