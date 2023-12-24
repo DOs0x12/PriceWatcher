@@ -11,10 +11,10 @@ import (
 	"sync"
 )
 
-func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot) error {
+func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot, wr infraFile.WriteReader) error {
 	defer wg.Done()
 
-	commands := createCommands()
+	commands := createCommands(wr)
 	if err := bot.Start(commands...); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
@@ -31,8 +31,7 @@ func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot) error {
 	return nil
 }
 
-func createCommands() []botEnt.Command {
-	wr := infraFile.WriteReader{}
+func createCommands(wr infraFile.WriteReader) []botEnt.Command {
 	pCom := price.NewPriceCommand(wr)
 	commands := botCom.CreateCommands(pCom)
 

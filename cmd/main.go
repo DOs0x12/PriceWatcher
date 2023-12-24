@@ -30,7 +30,7 @@ func main() {
 
 	wr := file.NewWR()
 
-	startBot(botCtx, wg, configer)
+	startBot(botCtx, wg, configer, wr)
 	startWatching(watcherCtx, wg, configer, wr)
 
 	wg.Wait()
@@ -48,7 +48,7 @@ func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer) {
+func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer, wr file.WriteReader) {
 	bot, err := infraTelebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
@@ -56,7 +56,7 @@ func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Confige
 		return
 	}
 
-	err = telebot.Start(ctx, wg, bot)
+	err = telebot.Start(ctx, wg, bot, wr)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
