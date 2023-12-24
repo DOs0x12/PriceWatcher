@@ -1,6 +1,6 @@
 package file
 
 type WriteReader interface {
-	Write(prices map[string]float64) error
-	Read() (map[string]float64, error)
+	WritePrices(prices map[string]float64) error
+	ReadPrices() (map[string]float64, error)
 }

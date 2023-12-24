@@ -9,13 +9,13 @@ import (
 
 type wrWithCall struct{}
 
-func (wrWithCall) Write(prices map[string]float64) error {
+func (wrWithCall) WritePrices(prices map[string]float64) error {
 	rwWriteCall = true
 
 	return nil
 }
 
-func (wrWithCall) Read() (map[string]float64, error) {
+func (wrWithCall) ReadPrices() (map[string]float64, error) {
 	rwReadCall = true
 
 	return map[string]float64{"test": 0.0}, nil

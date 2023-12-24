@@ -9,6 +9,11 @@ import (
 	"testing"
 )
 
+type FakeWriteReader struct{}
+
+func (FakeWriteReader) WritePrices(prices map[string]float64) error
+func (FakeWriteReader) ReadPrices() (map[string]float64, error)
+
 func TestNewPriceService(t *testing.T) {
 	createBankService(t)
 	createWBService(t)
@@ -20,7 +25,7 @@ func createBankService(t *testing.T) {
 	priceType := "bank"
 	config := config.ServiceConf{PriceType: priceType}
 
-	serv, err := NewPriceService(config)
+	serv, err := NewPriceService(config, FakeWriteReader{})
 	if err != nil {
 		t.Errorf("The method retuns an error: %v", err)
 	}
@@ -42,7 +47,7 @@ func createMarketplaceService(marketplaceType string) (PriceService, error) {
 	priceType := "marketplace"
 	config := config.ServiceConf{PriceType: priceType}
 
-	return NewPriceService(config)
+	return NewPriceService(config, FakeWriteReader{})
 }
 
 func createWBService(t *testing.T) {
@@ -86,7 +91,7 @@ func getCreationError(t *testing.T) {
 	marketplaceType := "test"
 	config := config.ServiceConf{PriceType: priceType, Marketplace: marketplaceType}
 
-	_, err := NewPriceService(config)
+	_, err := NewPriceService(config, FakeWriteReader{})
 	errTemplt := "a price service is not created from the price type"
 	if err != nil && !strings.Contains(err.Error(), errTemplt) {
 		t.Errorf("Got not wanted error: %v, wanted error template: %v", err, errTemplt)

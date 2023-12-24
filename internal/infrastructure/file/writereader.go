@@ -12,7 +12,11 @@ var fileName = "last_price.yaml"
 
 type WriteReader struct{}
 
-func (WriteReader) Write(prices map[string]float64) error {
+func NewWR() WriteReader {
+	return WriteReader{}
+}
+
+func (WriteReader) WritePrices(prices map[string]float64) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		return fmt.Errorf("cannot create a file: %v", err)
@@ -36,7 +40,7 @@ func (WriteReader) Write(prices map[string]float64) error {
 	return nil
 }
 
-func (WriteReader) Read() (map[string]float64, error) {
+func (WriteReader) ReadPrices() (map[string]float64, error) {
 	itemPrices := make(map[string]float64)
 	file, err := os.ReadFile(fileName)
 

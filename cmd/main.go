@@ -5,6 +5,7 @@ import (
 	"PriceWatcher/internal/app/telebot"
 	"PriceWatcher/internal/app/watcher"
 	"PriceWatcher/internal/infrastructure/configer"
+	"PriceWatcher/internal/infrastructure/file"
 	"PriceWatcher/internal/infrastructure/sender"
 	infraTelebot "PriceWatcher/internal/infrastructure/telebot"
 	"context"
@@ -27,18 +28,20 @@ func main() {
 
 	configer := GetConfiger()
 
+	wr := file.NewWR()
+
 	startBot(botCtx, wg, configer)
-	startWatching(watcherCtx, wg, configer)
+	startWatching(watcherCtx, wg, configer, wr)
 
 	wg.Wait()
 
 	logrus.Infoln("The application is done")
 }
 
-func startWatching(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer) {
+func startWatching(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer, wr file.WriteReader) {
 	sen := sender.Sender{}
 
-	watcher.ServeWatchers(ctx, wg, configer, sen)
+	watcher.ServeWatchers(ctx, wg, configer, sen, wr)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {

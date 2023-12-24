@@ -44,7 +44,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 
 	itemPrices := s.conf.Items
 
-	curPrices, err := s.wr.Read()
+	curPrices, err := s.wr.ReadPrices()
 	if err != nil {
 		return "", "", err
 	}
@@ -73,7 +73,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 		}
 	}
 
-	err = s.wr.Write(curPrices)
+	err = s.wr.WritePrices(curPrices)
 	if err != nil {
 		return "", "", err
 	}
