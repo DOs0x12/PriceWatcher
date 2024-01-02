@@ -56,7 +56,7 @@ func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Confige
 		return
 	}
 
-	err = telebot.Start(ctx, wg, bot, wr)
+	err = telebot.Start(ctx, wg, bot, wr, configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 

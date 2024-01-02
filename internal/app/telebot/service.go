@@ -5,21 +5,23 @@ import (
 	"PriceWatcher/internal/app/telebot/command/price"
 	botEnt "PriceWatcher/internal/entities/telebot"
 	infraFile "PriceWatcher/internal/infrastructure/file"
+	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/telebot"
 	"context"
 	"fmt"
 	"sync"
 )
 
-func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot, wr infraFile.WriteReader) error {
+func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot, wr infraFile.WriteReader, configer configer.Configer) error {
 	defer wg.Done()
 
 	commands := createCommands(wr)
-	if err := bot.Start(commands...); err != nil {
+	commandsWithInput := createCommandsWithInput(configer)
+	if err := bot.Start(commands, commandsWithInput); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
 
-	if err := bot.RegisterCommands(commands); err != nil {
+	if err := bot.RegisterCommands(commands, commandsWithInput); err != nil {
 		return fmt.Errorf("can not register commands in the bot: %v", err)
 	}
 
@@ -39,6 +41,25 @@ func createCommands(wr infraFile.WriteReader) []botEnt.Command {
 
 	for i, command := range commands {
 		botCommand := botEnt.Command{
+			Name:        command.Name,
+			Description: command.Description,
+			Action:      command.Action,
+		}
+
+		botComms[i] = botCommand
+	}
+
+	return botComms
+}
+
+func createCommandsWithInput(configer configer.Configer) []botEnt.CommandWithInput {
+	addCom := price.NewAddItemComm(configer)
+	commands := botCom.CreateCommandsWithInput(addCom)
+
+	botComms := make([]botEnt.CommandWithInput, len(commands))
+
+	for i, command := range commands {
+		botCommand := botEnt.CommandWithInput{
 			Name:        command.Name,
 			Description: command.Description,
 			Action:      command.Action,

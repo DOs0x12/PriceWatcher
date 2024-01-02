@@ -10,7 +10,13 @@ type Command struct {
 	Action      func() string
 }
 
-func CreateCommands(pCom price.PriceCommand) []Command {
+type CommandWithInput struct {
+	Name        string
+	Description string
+	Action      func(input string) string
+}
+
+func CreateCommands(pCom price.CurrentPriceComm) []Command {
 	return []Command{
 		{
 			Name:        "/hello",
@@ -22,6 +28,16 @@ func CreateCommands(pCom price.PriceCommand) []Command {
 			Name:        "/prices",
 			Description: "Get the currents prices",
 			Action:      pCom.GetCurrentPrices,
+		},
+	}
+}
+
+func CreateCommandsWithInput(addCom price.AddItemComm) []CommandWithInput {
+	return []CommandWithInput{
+		{
+			Name:        "/additem",
+			Description: "Add an item for watching its price",
+			Action:      addCom.AddItemToWatch,
 		},
 	}
 }

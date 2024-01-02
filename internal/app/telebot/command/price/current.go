@@ -9,15 +9,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type PriceCommand struct {
+type CurrentPriceComm struct {
 	wr file.WriteReader
 }
 
-func NewPriceCommand(wr file.WriteReader) PriceCommand {
-	return PriceCommand{wr: wr}
+func NewPriceCommand(wr file.WriteReader) CurrentPriceComm {
+	return CurrentPriceComm{wr: wr}
 }
 
-func (c PriceCommand) GetCurrentPrices() string {
+func (c CurrentPriceComm) GetCurrentPrices() string {
 	c.wr.Lock()
 	items, err := c.wr.ReadPrices()
 	c.wr.Unlock()
