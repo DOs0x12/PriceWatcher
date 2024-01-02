@@ -13,12 +13,6 @@ type Command struct {
 func CreateCommands(pCom price.PriceCommand) []Command {
 	return []Command{
 		{
-			Name:        "/start",
-			Description: "Starts the session",
-			Action: func() string {
-				return "The session is started!"
-			},
-		}, {
 			Name:        "/hello",
 			Description: "Say hello to the bot",
 			Action: func() string {
