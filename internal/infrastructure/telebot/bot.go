@@ -62,7 +62,6 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 
 		if !upd.Message.IsCommand() {
 			if addItemComm {
-				//TODO: add the item to the config for watching
 				commandAction(upd.Message.Text)
 				addItemComm = false
 			}
