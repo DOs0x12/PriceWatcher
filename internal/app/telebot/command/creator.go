@@ -1,6 +1,7 @@
 package command
 
 import (
+	"PriceWatcher/internal/app/telebot/command/item"
 	"PriceWatcher/internal/app/telebot/command/price"
 )
 
@@ -32,7 +33,7 @@ func CreateCommands(pCom price.CurrentPriceComm) []Command {
 	}
 }
 
-func CreateCommandsWithInput(addCom price.AddItemComm) []CommandWithInput {
+func CreateCommandsWithInput(addCom item.AddItemComm) []CommandWithInput {
 	return []CommandWithInput{
 		{
 			Name:        "/additem",

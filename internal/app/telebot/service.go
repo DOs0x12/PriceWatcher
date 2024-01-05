@@ -2,6 +2,7 @@ package telebot
 
 import (
 	botCom "PriceWatcher/internal/app/telebot/command"
+	"PriceWatcher/internal/app/telebot/command/item"
 	"PriceWatcher/internal/app/telebot/command/price"
 	botEnt "PriceWatcher/internal/entities/telebot"
 	infraFile "PriceWatcher/internal/infrastructure/file"
@@ -53,7 +54,7 @@ func createCommands(wr infraFile.WriteReader) []botEnt.Command {
 }
 
 func createCommandsWithInput(configer configer.Configer) []botEnt.CommandWithInput {
-	addCom := price.NewAddItemComm(configer)
+	addCom := item.NewAddItemComm(configer)
 	commands := botCom.CreateCommandsWithInput(addCom)
 
 	botComms := make([]botEnt.CommandWithInput, len(commands))

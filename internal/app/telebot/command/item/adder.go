@@ -1,4 +1,4 @@
-package price
+package item
 
 import (
 	"PriceWatcher/internal/interfaces/configer"
