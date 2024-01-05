@@ -95,7 +95,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 		for _, commandWithInput := range commandsWithInput {
 			if upd.Message.Text == commandWithInput.Name {
 				//msg := tgbot.NewMessage(upd.Message.Chat.ID, CommandWithInput.Action())
-				text := "Чтобы добавить товар для отслеживания пришлите даннные в формате: <наименование> <ссылка на товар>"
+				text := "Чтобы добавить товар для отслеживания пришлите даннные в формате: <наименование товара> <ссылка на товар> ,<наименование маркетплейса>"
 				msg := tgbot.NewMessage(upd.Message.Chat.ID, text)
 				maxRetries := 10
 				cnt := 0
