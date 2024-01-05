@@ -52,6 +52,7 @@ func (t Telebot) Stop() {
 }
 
 var addItemComm = false
+var commandAction func(input string) string
 
 func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Command, commandsWithInput []telebot.CommandWithInput) {
 	for upd := range updCh {
@@ -62,6 +63,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 		if !upd.Message.IsCommand() {
 			if addItemComm {
 				//TODO: add the item to the config for watching
+				commandAction(upd.Message.Text)
 				addItemComm = false
 			}
 
@@ -90,8 +92,8 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 			}
 		}
 
-		for _, CommandWithInput := range commandsWithInput {
-			if upd.Message.Text == CommandWithInput.Name {
+		for _, commandWithInput := range commandsWithInput {
+			if upd.Message.Text == commandWithInput.Name {
 				//msg := tgbot.NewMessage(upd.Message.Chat.ID, CommandWithInput.Action())
 				text := "Чтобы добавить товар для отслеживания пришлите даннные в формате: <наименование> <ссылка на товар>"
 				msg := tgbot.NewMessage(upd.Message.Chat.ID, text)
@@ -112,6 +114,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 				}
 
 				addItemComm = true
+				commandAction = commandWithInput.Action
 			}
 		}
 	}
