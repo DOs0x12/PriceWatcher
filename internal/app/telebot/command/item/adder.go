@@ -18,5 +18,6 @@ const successfullMessage = "The item is added for watching"
 func (c AddItemComm) AddItemToWatch(itemValue string) string {
 	values := strings.Split(itemValue, " ")
 	_ = c.configer.AddItemToWatch(values[0], values[1], values[2])
+
 	return successfullMessage
 }

@@ -6,6 +6,7 @@ import (
 	"PriceWatcher/internal/domain/price/extractor"
 	"PriceWatcher/internal/entities/config"
 	priceEnt "PriceWatcher/internal/entities/price"
+	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/file"
 	"PriceWatcher/internal/interfaces/requester"
 	"fmt"
@@ -22,7 +23,8 @@ type Service struct {
 	req      requester.Requester
 	ext      extractor.Extractor
 	analyser analyser.Analyser
-	conf     config.ServiceConf
+	configer configer.Configer
+	name     string
 }
 
 func NewService(
@@ -30,20 +32,28 @@ func NewService(
 	req requester.Requester,
 	ext extractor.Extractor,
 	analyser analyser.Analyser,
-	conf config.ServiceConf) Service {
+	configer configer.Configer,
+	name string) Service {
 
 	return Service{
 		wr:       wr,
 		req:      req,
 		ext:      ext,
 		analyser: analyser,
-		conf:     conf,
+		configer: configer,
+		name:     name,
 	}
 }
 
-func (s Service) ServePrice() (message, subject string, err error) {
+var conf config.ServiceConf
 
-	itemPrices := s.conf.Items
+func (s Service) ServePrice() (message, subject string, err error) {
+	conf, err := s.configer.GetMarketplaceConfig(s.name)
+	if err != nil {
+		return "", "", fmt.Errorf("cannot get the config for a service with the name %v: %w", s.name, err)
+	}
+
+	itemPrices := conf.Items
 
 	s.wr.Lock()
 
@@ -58,7 +68,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 		}
 	}
 
-	priceType := capitalize(s.conf.PriceType)
+	priceType := capitalize(conf.PriceType)
 	sub := fmt.Sprintf("Цена на товар %v", priceType)
 	messages := make([]string, 0)
 	cnt := 0
@@ -155,5 +165,5 @@ func (s Service) serveItemPrice(curPrices map[string]priceEnt.ItemPrice, message
 }
 
 func (s Service) GetName() string {
-	return s.conf.PriceType
+	return conf.PriceType
 }

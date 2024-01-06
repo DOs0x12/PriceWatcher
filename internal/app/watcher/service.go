@@ -29,7 +29,7 @@ func ServeWatchers(ctx context.Context,
 	servWG := sync.WaitGroup{}
 
 	for _, s := range services {
-		serv, err := price.NewPriceService(s, wr)
+		serv, err := price.NewPriceService(s, configer, wr)
 		if err != nil {
 			logrus.Errorf("%v: can not create a watcher service: %v", s.PriceType, err)
 

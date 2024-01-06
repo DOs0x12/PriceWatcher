@@ -8,12 +8,13 @@ import (
 	"PriceWatcher/internal/entities/config"
 	bankReq "PriceWatcher/internal/infrastructure/requester/bank"
 	"PriceWatcher/internal/infrastructure/requester/marketplace"
+	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/file"
 	"fmt"
 	"strings"
 )
 
-func NewPriceService(conf config.ServiceConf, wr file.WriteReader) (PriceService, error) {
+func NewPriceService(conf config.ServiceConf, configer configer.Configer, wr file.WriteReader) (PriceService, error) {
 	bankPriceType := "bank"
 	marketplacePriceType := "marketplace"
 
@@ -24,7 +25,7 @@ func NewPriceService(conf config.ServiceConf, wr file.WriteReader) (PriceService
 	}
 
 	if priceTypeInLowers == marketplacePriceType {
-		return createMarketplacePriceService(conf, wr), nil
+		return createMarketplacePriceService(conf, configer, wr), nil
 	}
 
 	return nil, fmt.Errorf("a price service is not created from the price type %v", conf.Marketplace)
@@ -37,13 +38,13 @@ func createBankPriceService(conf config.ServiceConf) PriceService {
 	return bank.NewService(req, ext, conf)
 }
 
-func createMarketplacePriceService(conf config.ServiceConf, wr file.WriteReader) PriceService {
+func createMarketplacePriceService(conf config.ServiceConf, configer configer.Configer, wr file.WriteReader) PriceService {
 	req := marketplace.MarketplaceRequester{}
 	marketplaceTypeInLowers := strings.ToLower(conf.Marketplace)
 	ext := createMarketplaceExtractor(marketplaceTypeInLowers)
 	analyser := analyser.MarketplaceAnalyser{}
 
-	return mpService.NewService(wr, req, ext, analyser, conf)
+	return mpService.NewService(wr, req, ext, analyser, configer, marketplaceTypeInLowers)
 }
 
 func createMarketplaceExtractor(marketplaceType string) extractor.Extractor {

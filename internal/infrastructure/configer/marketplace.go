@@ -8,8 +8,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func GetMarketplaceConfig(name string) (config.ServiceConf, error) {
-	return config.ServiceConf{}, nil
+func (c Configer) GetMarketplaceConfig(name string) (config.ServiceConf, error) {
+	fullConfig, err := c.GetConfig()
+	if err != nil {
+		return config.ServiceConf{}, err
+	}
+
+	for _, serviceConfig := range fullConfig.Services {
+		if serviceConfig.PriceType == name {
+			return serviceConfig, nil
+		}
+	}
+
+	return config.ServiceConf{}, fmt.Errorf("do not find a service config with the name: %v", name)
 }
 
 func (c Configer) AddItemToWatch(address, name, priceType string) error {
