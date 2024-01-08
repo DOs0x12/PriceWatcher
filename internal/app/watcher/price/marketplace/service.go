@@ -4,7 +4,6 @@ import (
 	priceTime "PriceWatcher/internal/app/watcher/price/time"
 	"PriceWatcher/internal/domain/price/analyser"
 	"PriceWatcher/internal/domain/price/extractor"
-	"PriceWatcher/internal/entities/config"
 	priceEnt "PriceWatcher/internal/entities/price"
 	"PriceWatcher/internal/interfaces/configer"
 	"PriceWatcher/internal/interfaces/file"
@@ -44,8 +43,6 @@ func NewService(
 		name:     name,
 	}
 }
-
-var conf config.ServiceConf
 
 func (s Service) ServePrice() (message, subject string, err error) {
 	conf, err := s.configer.GetMarketplaceConfig(s.name)
@@ -165,5 +162,5 @@ func (s Service) serveItemPrice(curPrices map[string]priceEnt.ItemPrice, message
 }
 
 func (s Service) GetName() string {
-	return conf.PriceType
+	return s.name
 }
