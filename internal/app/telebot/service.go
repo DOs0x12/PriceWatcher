@@ -55,7 +55,8 @@ func createCommands(wr infraFile.WriteReader) []botEnt.Command {
 
 func createCommandsWithInput(configer configer.Configer) []botEnt.CommandWithInput {
 	addCom := item.NewAddItemComm(configer)
-	commands := botCom.CreateCommandsWithInput(addCom)
+	remCom := item.NewRemoveItemComm(configer)
+	commands := botCom.CreateCommandsWithInput(addCom, remCom)
 
 	botComms := make([]botEnt.CommandWithInput, len(commands))
 

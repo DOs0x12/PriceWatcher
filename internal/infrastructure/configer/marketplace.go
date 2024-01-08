@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
@@ -82,6 +83,48 @@ func getItems(node *yaml.Node, priceType string) *yaml.Node {
 	return nil
 }
 
-func (c Configer) RemoveItemFromWatching(address, name, priceType string) error {
-	return nil
+func (c Configer) RemoveItemFromWatching(name, priceType string) error {
+	str, err := os.ReadFile(c.path)
+	if err != nil {
+		return fmt.Errorf("cannot read the file %v: %w", c.path, err)
+	}
+
+	var config yaml.Node
+	yaml.Unmarshal(str, &config)
+
+	itemsNode := getItems(&config, priceType)
+	if itemsNode == nil {
+		return fmt.Errorf("cannot find the items field in the price_type %v: %w", priceType, err)
+	}
+
+	if err := removeItem(name, itemsNode); err != nil {
+		return err
+	}
+
+	file, err := os.Create(c.path)
+	if err != nil {
+		return fmt.Errorf("cannot create a file: %v", err)
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	enc := yaml.NewEncoder(file)
+
+	return enc.Encode(config.Content[0])
+}
+
+func removeItem(name string, itemsNode *yaml.Node) error {
+	for i, item := range itemsNode.Content {
+		if item.Value == name {
+			itemsNode.Content = slices.Delete(itemsNode.Content, i, i+2)
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("cannot find an item with the name: %v", name)
 }

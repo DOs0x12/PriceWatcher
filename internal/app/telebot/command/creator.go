@@ -33,12 +33,16 @@ func CreateCommands(pCom price.CurrentPriceComm) []Command {
 	}
 }
 
-func CreateCommandsWithInput(addCom item.AddItemComm) []CommandWithInput {
+func CreateCommandsWithInput(addCom item.AddItemComm, remCom item.RemoveItemComm) []CommandWithInput {
 	return []CommandWithInput{
 		{
 			Name:        "/additem",
 			Description: "Add an item for watching its price",
 			Action:      addCom.AddItemToWatch,
+		}, {
+			Name:        "/removeitem",
+			Description: "Remove an item from watching its price",
+			Action:      remCom.RemoveItemToWatch,
 		},
 	}
 }

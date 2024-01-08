@@ -51,7 +51,7 @@ func (t Telebot) Stop() {
 	t.bot.StopReceivingUpdates()
 }
 
-var addItemComm = false
+var commWithInteraction = false
 var commandAction func(input string) string
 
 func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Command, commandsWithInput []telebot.CommandWithInput) {
@@ -61,9 +61,9 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 		}
 
 		if !upd.Message.IsCommand() {
-			if addItemComm {
+			if commWithInteraction {
 				commandAction(upd.Message.Text)
-				addItemComm = false
+				commWithInteraction = false
 			}
 
 			continue
@@ -78,7 +78,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 
 				for cnt < maxRetries {
 					if _, err := t.bot.Send(msg); err != nil {
-						logrus.Errorf("Can not send a message: %v", err)
+						logrus.Errorf("Cannot send a message: %v", err)
 
 						time.Sleep(5 * time.Second)
 						cnt++
@@ -93,15 +93,22 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 
 		for _, commandWithInput := range commandsWithInput {
 			if upd.Message.Text == commandWithInput.Name {
-				//msg := tgbot.NewMessage(upd.Message.Chat.ID, CommandWithInput.Action())
-				text := "Чтобы добавить товар для отслеживания, пришлите даннные в формате: <наименование товара> <ссылка на товар> ,<наименование маркетплейса>"
+				var text string
+
+				switch commandWithInput.Name {
+				case "/additem":
+					text = "Чтобы добавить товар для отслеживания, пришлите данные в формате: <наименование товара> <ссылка на товар> <наименование маркетплейса>"
+				default:
+					text = "Чтобы удалить товар из отслеживания, пришлите данные в формате: <наименование товара> <наименование маркетплейса>"
+				}
+
 				msg := tgbot.NewMessage(upd.Message.Chat.ID, text)
 				maxRetries := 10
 				cnt := 0
 
 				for cnt < maxRetries {
 					if _, err := t.bot.Send(msg); err != nil {
-						logrus.Errorf("Can not send a message: %v", err)
+						logrus.Errorf("Cannot send a message: %v", err)
 
 						time.Sleep(5 * time.Second)
 						cnt++
@@ -112,7 +119,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Com
 					break
 				}
 
-				addItemComm = true
+				commWithInteraction = true
 				commandAction = commandWithInput.Action
 			}
 		}
