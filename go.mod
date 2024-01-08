@@ -6,7 +6,7 @@ require golang.org/x/net v0.19.0
 
 require github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 
-require golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc // indirect
+require golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
 
 require (
 	github.com/sirupsen/logrus v1.9.3

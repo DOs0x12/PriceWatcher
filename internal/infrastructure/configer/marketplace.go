@@ -16,7 +16,7 @@ func (c Configer) GetMarketplaceConfig(name string) (config.ServiceConf, error) 
 	}
 
 	for _, serviceConfig := range fullConfig.Services {
-		if serviceConfig.PriceType == name {
+		if serviceConfig.Marketplace == name {
 			return serviceConfig, nil
 		}
 	}
