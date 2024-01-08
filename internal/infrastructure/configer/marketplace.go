@@ -24,7 +24,7 @@ func (c Configer) GetMarketplaceConfig(name string) (config.ServiceConf, error) 
 	return config.ServiceConf{}, fmt.Errorf("do not find a service config with the name: %v", name)
 }
 
-func (c Configer) AddItemToWatch(address, name, priceType string) error {
+func (c Configer) AddItemToWatch(name, address, priceType string) error {
 	str, err := os.ReadFile(c.path)
 	if err != nil {
 		return fmt.Errorf("cannot read the file %v: %w", c.path, err)
