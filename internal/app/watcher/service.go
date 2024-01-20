@@ -15,18 +15,36 @@ func ServeWatchers(ctx context.Context,
 	wg *sync.WaitGroup,
 	configer configer.Configer,
 	sen sender.Sender,
-	wr file.WriteReader) {
+	wr file.WriteReader,
+	restart <-chan interface{}) {
 	defer wg.Done()
 
+	cancel := startJobs(configer, sen, wr)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-restart:
+			logrus.Infof("Restart the watcher jobs")
+			cancel()
+			cancel = startJobs(configer, sen, wr)
+		}
+	}
+}
+
+func startJobs(configer configer.Configer,
+	sen sender.Sender,
+	wr file.WriteReader) context.CancelFunc {
 	config, err := configer.GetConfig()
 	if err != nil {
 		logrus.Errorf("can not get the config data: %v", err)
 
-		return
+		return nil
 	}
 
 	services := config.Services
-	servWG := sync.WaitGroup{}
+	jobCtx, cancel := context.WithCancel(context.Background())
 
 	for _, s := range services {
 		serv, err := price.NewPriceService(s, configer, wr)
@@ -36,11 +54,8 @@ func ServeWatchers(ctx context.Context,
 			continue
 		}
 
-		servWG.Add(1)
-		go watch(ctx, &servWG, serv, sen, s.Email)
+		go watch(jobCtx, serv, sen, s.Email)
 	}
 
-	servWG.Wait()
-
-	logrus.Infof("All the jobs is done")
+	return cancel
 }

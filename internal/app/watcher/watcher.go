@@ -5,14 +5,12 @@ import (
 	"PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/interfaces/sender"
 	"context"
-	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
 func watch(ctx context.Context,
-	wg *sync.WaitGroup,
 	serv price.PriceService,
 	sen sender.Sender,
 	email config.Email) {
@@ -24,7 +22,7 @@ func watch(ctx context.Context,
 	defer t.Stop()
 
 	defer func() {
-		finishJobWithLogs(wg, servName)
+		finishJobWithLogs(servName)
 	}()
 
 	for {
@@ -102,8 +100,6 @@ func getWaitTimeWithLogs(serv price.PriceService, now time.Time, servName string
 	return dur
 }
 
-func finishJobWithLogs(wg *sync.WaitGroup, servName string) {
-	logrus.Infof("%v: shutting down the job", servName)
-	wg.Done()
+func finishJobWithLogs(servName string) {
 	logrus.Infof("%v: the job is done", servName)
 }

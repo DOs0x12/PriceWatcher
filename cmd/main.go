@@ -27,28 +27,36 @@ func main() {
 	wg.Add(servCount)
 
 	configer := GetConfiger()
-
 	wr := file.NewWR()
+	restart := make(chan interface{})
 
-	startBot(botCtx, wg, configer, wr)
-	startWatching(watcherCtx, wg, configer, wr)
+	startBot(botCtx, wg, configer, wr, restart)
+	startWatching(watcherCtx, wg, configer, wr, restart)
 
 	wg.Wait()
 
 	logrus.Infoln("The application is done")
 }
 
-func startWatching(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer, wr file.WriteReader) {
+func startWatching(ctx context.Context,
+	wg *sync.WaitGroup,
+	configer configer.Configer,
+	wr file.WriteReader,
+	restart <-chan interface{}) {
 	sen := sender.Sender{}
 
-	watcher.ServeWatchers(ctx, wg, configer, sen, wr)
+	watcher.ServeWatchers(ctx, wg, configer, sen, wr, restart)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(ctx context.Context, wg *sync.WaitGroup, configer configer.Configer, wr file.WriteReader) {
+func startBot(ctx context.Context,
+	wg *sync.WaitGroup,
+	configer configer.Configer,
+	wr file.WriteReader,
+	restart chan<- interface{}) {
 	bot, err := infraTelebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
