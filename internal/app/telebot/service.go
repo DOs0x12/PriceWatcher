@@ -13,12 +13,17 @@ import (
 	"sync"
 )
 
-func Start(ctx context.Context, wg *sync.WaitGroup, bot telebot.Bot, wr infraFile.WriteReader, configer configer.Configer) error {
+func Start(ctx context.Context,
+	wg *sync.WaitGroup,
+	bot telebot.Bot,
+	wr infraFile.WriteReader,
+	configer configer.Configer,
+	restart chan<- interface{}) error {
 	defer wg.Done()
 
 	commands := createCommands(wr)
 	commandsWithInput := createCommandsWithInput(configer)
-	if err := bot.Start(commands, commandsWithInput); err != nil {
+	if err := bot.Start(commands, commandsWithInput, restart); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
 

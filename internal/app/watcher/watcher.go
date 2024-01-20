@@ -13,7 +13,8 @@ import (
 func watch(ctx context.Context,
 	serv price.PriceService,
 	sen sender.Sender,
-	email config.Email) {
+	email config.Email,
+	jobDone chan<- interface{}) {
 	servName := serv.GetName()
 	dur := getWaitTimeWithLogs(serv, time.Now(), servName)
 
@@ -22,7 +23,7 @@ func watch(ctx context.Context,
 	defer t.Stop()
 
 	defer func() {
-		finishJobWithLogs(servName)
+		finishJobWithLogs(servName, jobDone)
 	}()
 
 	for {
@@ -100,6 +101,7 @@ func getWaitTimeWithLogs(serv price.PriceService, now time.Time, servName string
 	return dur
 }
 
-func finishJobWithLogs(servName string) {
+func finishJobWithLogs(servName string, jobDone chan<- interface{}) {
+	jobDone <- struct{}{}
 	logrus.Infof("%v: the job is done", servName)
 }

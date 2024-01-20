@@ -31,10 +31,12 @@ func NewTelebot(configer configer.Configer) (Telebot, error) {
 	return Telebot{bot: botApi}, nil
 }
 
-func (t Telebot) Start(commands []telebot.Command, commandsWithInput []telebot.CommandWithInput) error {
+func (t Telebot) Start(commands []telebot.Command,
+	commandsWithInput []telebot.CommandWithInput,
+	restart chan<- interface{}) error {
 	updConfig := tgbot.NewUpdate(0)
 	updCh := t.bot.GetUpdatesChan(updConfig)
-	go t.watchUpdates(updCh, commands, commandsWithInput)
+	go t.watchUpdates(updCh, commands, commandsWithInput, restart)
 
 	return nil
 }
@@ -54,7 +56,10 @@ func (t Telebot) Stop() {
 var commWithInteraction = false
 var commandAction func(input string) string
 
-func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel, commands []telebot.Command, commandsWithInput []telebot.CommandWithInput) {
+func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel,
+	commands []telebot.Command,
+	commandsWithInput []telebot.CommandWithInput,
+	restart chan<- interface{}) {
 	for upd := range updCh {
 		if upd.Message == nil {
 			continue

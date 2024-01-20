@@ -60,11 +60,12 @@ func startBot(ctx context.Context,
 	bot, err := infraTelebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
+		wg.Done()
 
 		return
 	}
 
-	err = telebot.Start(ctx, wg, bot, wr, configer)
+	err = telebot.Start(ctx, wg, bot, wr, configer, restart)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
