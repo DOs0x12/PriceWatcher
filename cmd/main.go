@@ -1,13 +1,11 @@
 package main
 
 import (
-	"PriceWatcher/internal/app/interruption"
-	"PriceWatcher/internal/app/telebot"
-	"PriceWatcher/internal/app/watcher"
-	"PriceWatcher/internal/infrastructure/configer"
-	"PriceWatcher/internal/infrastructure/file"
-	"PriceWatcher/internal/infrastructure/sender"
-	infraTelebot "PriceWatcher/internal/infrastructure/telebot"
+	"PriceWatcher/internal"
+	"PriceWatcher/internal/bank"
+	"PriceWatcher/internal/common/interruption"
+	"PriceWatcher/internal/config"
+	"PriceWatcher/internal/extractor"
 	"context"
 	"sync"
 
@@ -27,11 +25,15 @@ func main() {
 	wg.Add(servCount)
 
 	configer := GetConfiger()
-	wr := file.NewWR()
-	restart := make(chan interface{})
+	conf, err := configer.GetConfig()
+	if err != nil {
+		logrus.Error("%v", err)
+	}
+	jobDone := make(chan interface{})
+	bankService := bank.NewService(bank.BankRequester{}, extractor.New("pageReg", "tag"), conf)
 
-	startBot(botCtx, wg, configer, wr, restart)
-	startWatching(watcherCtx, wg, configer, wr, restart)
+	startBot(botCtx, wg, configer, jobDone)
+	startWatching(watcherCtx, wg, configer, bankService, jobDone)
 
 	wg.Wait()
 
@@ -40,12 +42,10 @@ func main() {
 
 func startWatching(ctx context.Context,
 	wg *sync.WaitGroup,
-	configer configer.Configer,
-	wr file.WriteReader,
-	restart <-chan interface{}) {
-	sen := sender.Sender{}
-
-	watcher.ServeWatchers(ctx, wg, configer, sen, wr, restart)
+	configer config.Configer,
+	bankService bank.Service,
+	jobDone chan<- interface{}) {
+	internal.ServeMetalPrice(ctx, wg, bankService, jobDone)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
@@ -54,9 +54,8 @@ func newContext() (ctx context.Context, cancel context.CancelFunc) {
 
 func startBot(ctx context.Context,
 	wg *sync.WaitGroup,
-	configer configer.Configer,
-	wr file.WriteReader,
-	restart chan<- interface{}) {
+	configer config.Configer,
+	jobDone chan<- interface{}) {
 	bot, err := infraTelebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
@@ -65,7 +64,7 @@ func startBot(ctx context.Context,
 		return
 	}
 
-	err = telebot.Start(ctx, wg, bot, wr, configer, restart)
+	err = telebot.Start(ctx, wg, bot, wr, configer, jobDone)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
@@ -73,8 +72,8 @@ func startBot(ctx context.Context,
 	}
 }
 
-func GetConfiger() configer.Configer {
+func GetConfiger() config.Configer {
 	configPath := "config.yml"
 
-	return configer.NewConfiger(configPath)
+	return config.NewConfiger(configPath)
 }

@@ -1,10 +1,9 @@
 package bank
 
 import (
-	priceTime "PriceWatcher/internal/app/watcher/price/time"
-	"PriceWatcher/internal/domain/price/extractor"
-	"PriceWatcher/internal/entities/config"
-	"PriceWatcher/internal/interfaces/requester"
+	priceTime "PriceWatcher/internal/common/time"
+	"PriceWatcher/internal/config"
+	"PriceWatcher/internal/extractor"
 	"fmt"
 	"time"
 
@@ -12,15 +11,15 @@ import (
 )
 
 type Service struct {
-	req  requester.Requester
+	req  BankRequester
 	ext  extractor.Extractor
-	conf config.ServiceConf
+	conf config.Config
 }
 
 func NewService(
-	req requester.Requester,
+	req BankRequester,
 	ext extractor.Extractor,
-	conf config.ServiceConf) Service {
+	conf config.Config) Service {
 	return Service{
 		req:  req,
 		ext:  ext,
@@ -31,18 +30,16 @@ func NewService(
 var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
 
 func (s Service) ServePrice() (message, subject string, err error) {
-	serveName := s.GetName()
-
-	logrus.Infof("%v: start processing a price", serveName)
+	logrus.Infof("Start processing a price")
 
 	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
-		return "", "", fmt.Errorf("%v: cannot get a page with the current price: %w", serveName, err)
+		return "", "", fmt.Errorf("Cannot get a page with the current price: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("%v: cannot extract the price from the body: %w", serveName, err)
+		return "", "", fmt.Errorf("Cannot extract the price from the body: %w", err)
 	}
 
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
@@ -60,9 +57,5 @@ func (s Service) GetWaitTime(now time.Time) time.Duration {
 }
 
 func (Service) PerStartDur(now time.Time) time.Duration {
-	return priceTime.PerStartDur(now, priceTime.Hour)
-}
-
-func (s Service) GetName() string {
-	return s.conf.PriceType
+	return priceTime.PerStartDur(now)
 }
