@@ -33,12 +33,12 @@ func (s Service) ServePrice() (message, subject string, err error) {
 
 	response, err := s.req.RequestPage(bankUrl)
 	if err != nil {
-		return "", "", fmt.Errorf("Cannot get a page with the current price: %w", err)
+		return "", "", fmt.Errorf("cannot get a page with the current price: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("Cannot extract the price from the body: %w", err)
+		return "", "", fmt.Errorf("cannot extract the price from the body: %w", err)
 	}
 
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
