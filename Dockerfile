@@ -14,10 +14,6 @@ COPY --from=build-stage /price-watcher /price-watcher
 ENV TZ=Europe/Moscow \
     DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update
-RUN apt install wget -y
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt install -y ./google-chrome-stable_current_amd64.deb
-RUN rm google-chrome-stable_current_amd64.deb
 #RUN apk add --no-cache tzdata
 RUN apt-get install -y tzdata
 ENV TZ=Europe/Moscow
