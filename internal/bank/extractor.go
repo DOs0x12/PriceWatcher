@@ -1,4 +1,4 @@
-package extractor
+package bank
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ type PriceExtractor struct {
 	tag     string
 }
 
-func New(pageReg, tag string) PriceExtractor {
+func NewPriceExtractor(pageReg, tag string) PriceExtractor {
 	return PriceExtractor{pageReg: pageReg, tag: tag}
 }
 

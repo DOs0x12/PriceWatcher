@@ -5,7 +5,6 @@ import (
 	"PriceWatcher/internal/bank"
 	"PriceWatcher/internal/common/interruption"
 	"PriceWatcher/internal/config"
-	"PriceWatcher/internal/extractor"
 	"PriceWatcher/internal/telebot"
 	"context"
 	"sync"
@@ -31,7 +30,7 @@ func main() {
 		logrus.Error("%w", err)
 	}
 	jobDone := make(chan interface{})
-	bankService := bank.NewService(bank.BankRequester{}, extractor.New("pageReg", "tag"), conf)
+	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor("pageReg", "tag"), conf)
 
 	startBot(botCtx, wg, configer, jobDone)
 	startWatching(watcherCtx, wg, bankService, jobDone)

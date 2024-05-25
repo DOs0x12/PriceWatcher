@@ -3,7 +3,6 @@ package bank
 import (
 	priceTime "PriceWatcher/internal/common/time"
 	"PriceWatcher/internal/config"
-	"PriceWatcher/internal/extractor"
 	"fmt"
 	"time"
 
@@ -12,13 +11,13 @@ import (
 
 type Service struct {
 	req  BankRequester
-	ext  extractor.Extractor
+	ext  Extractor
 	conf config.Config
 }
 
 func NewService(
 	req BankRequester,
-	ext extractor.Extractor,
+	ext Extractor,
 	conf config.Config) Service {
 	return Service{
 		req:  req,
