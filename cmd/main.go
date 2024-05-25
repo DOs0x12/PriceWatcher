@@ -6,6 +6,7 @@ import (
 	"PriceWatcher/internal/common/interruption"
 	"PriceWatcher/internal/config"
 	"PriceWatcher/internal/extractor"
+	"PriceWatcher/internal/telebot"
 	"context"
 	"sync"
 
@@ -27,13 +28,13 @@ func main() {
 	configer := GetConfiger()
 	conf, err := configer.GetConfig()
 	if err != nil {
-		logrus.Error("%v", err)
+		logrus.Error("%w", err)
 	}
 	jobDone := make(chan interface{})
 	bankService := bank.NewService(bank.BankRequester{}, extractor.New("pageReg", "tag"), conf)
 
 	startBot(botCtx, wg, configer, jobDone)
-	startWatching(watcherCtx, wg, configer, bankService, jobDone)
+	startWatching(watcherCtx, wg, bankService, jobDone)
 
 	wg.Wait()
 
@@ -42,7 +43,6 @@ func main() {
 
 func startWatching(ctx context.Context,
 	wg *sync.WaitGroup,
-	configer config.Configer,
 	bankService bank.Service,
 	jobDone chan<- interface{}) {
 	internal.ServeMetalPrice(ctx, wg, bankService, jobDone)
@@ -56,7 +56,7 @@ func startBot(ctx context.Context,
 	wg *sync.WaitGroup,
 	configer config.Configer,
 	jobDone chan<- interface{}) {
-	bot, err := infraTelebot.NewTelebot(configer)
+	bot, err := telebot.NewTelebot(configer)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 		wg.Done()
@@ -64,7 +64,7 @@ func startBot(ctx context.Context,
 		return
 	}
 
-	err = telebot.Start(ctx, wg, bot, wr, configer, jobDone)
+	err = telebot.Start(ctx, wg, bot, configer, jobDone)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
