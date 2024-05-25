@@ -23,8 +23,6 @@ func NewPriceExtractor(pageReg, tag string) PriceExtractor {
 	return PriceExtractor{pageReg: pageReg, tag: tag}
 }
 
-var priceReg = `([0-9]+\.*[0-9]*[0-9]*)`
-
 func (ext PriceExtractor) ExtractPrice(body io.Reader) (float32, error) {
 	doc, err := html.Parse(body)
 	if err != nil {
@@ -71,7 +69,7 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 func (ext PriceExtractor) getPrice(data string) float32 {
 	cleanedData := strings.ReplaceAll(data, "\u00a0", "")
 	cleanedData = strings.ReplaceAll(cleanedData, "\u2009", "")
-	re := regexp.MustCompile(priceReg)
+	re := regexp.MustCompile(ext.pageReg)
 	match := re.FindStringSubmatch(cleanedData)[0]
 	price, _ := strconv.ParseFloat(match, 32)
 
