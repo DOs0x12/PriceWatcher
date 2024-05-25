@@ -30,7 +30,7 @@ func main() {
 		logrus.Error("%w", err)
 	}
 	jobDone := make(chan interface{})
-	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor("pageReg", "tag"), conf)
+	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9])*(&nbsp;)([0-9])*,([0-9])*`, "div"), conf)
 
 	startBot(botCtx, wg, configer, jobDone)
 	startWatching(watcherCtx, wg, bankService, jobDone)
