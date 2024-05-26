@@ -26,12 +26,10 @@ func NewService(
 	}
 }
 
-var bankUrl = "https://investzoloto.ru/gold-sber-oms/"
-
 func (s Service) ServePrice() (message, subject string, err error) {
 	logrus.Infof("Start processing a price")
 
-	response, err := s.req.RequestPage(bankUrl)
+	response, err := s.req.RequestPage()
 	if err != nil {
 		return "", "", fmt.Errorf("cannot get a page with the current price: %w", err)
 	}

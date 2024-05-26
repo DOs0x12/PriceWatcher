@@ -13,7 +13,7 @@ import (
 
 type BankRequester struct{}
 
-func (r BankRequester) RequestPage(url string) (pageEnt.Response, error) {
+func (r BankRequester) RequestPage() (pageEnt.Response, error) {
 	u := launcher.New().Bin("/usr/bin/chromium-browser").MustLaunch()
 	browser := rod.New().ControlURL(u).Timeout(time.Minute).MustConnect()
 	browser.MustIgnoreCertErrors(true)
@@ -22,6 +22,7 @@ func (r BankRequester) RequestPage(url string) (pageEnt.Response, error) {
 	page := stealth.MustPage(browser)
 	page.MustNavigate("https://www.sberbank.ru/ru/quotes/metalbeznal")
 	time.Sleep(20 * time.Second)
+
 	html, err := page.HTML()
 	if err != nil {
 		return pageEnt.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)

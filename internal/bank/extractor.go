@@ -68,10 +68,8 @@ func isNodeWithPriceForBuying(n *html.Node, tag string, re *regexp.Regexp) bool 
 
 func (ext PriceExtractor) getPrice(data string) float32 {
 	cleanedData := strings.ReplaceAll(data, "\u00a0", "")
-	cleanedData = strings.ReplaceAll(cleanedData, "\u2009", "")
-	re := regexp.MustCompile(ext.pageReg)
-	match := re.FindStringSubmatch(cleanedData)[0]
-	price, _ := strconv.ParseFloat(match, 32)
+	cleanedData = strings.ReplaceAll(cleanedData, ",", ".")
+	price, _ := strconv.ParseFloat(cleanedData, 32)
 
 	return float32(price)
 }

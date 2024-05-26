@@ -36,7 +36,7 @@ func servePriceWithTiming(
 	ctx context.Context,
 	serv bank.Service,
 	timer *time.Timer) {
-	_, _ = serveWithLogs(serv)
+	//msg, _ := serveWithLogs(serv)
 
 	now := time.Now()
 	dur := perStartWithLogs(serv, now)

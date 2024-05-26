@@ -21,7 +21,7 @@ func (c CurrentPriceComm) GetCurrentPrices() string {
 		logrus.Error("%w", err)
 	}
 
-	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9])*(&nbsp;)([0-9])*,([0-9])*`, "div"), conf)
+	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
 	msg, _, err := bankService.ServePrice()
 	if err != nil {
 		return fmt.Sprintf("error: %v", err)
