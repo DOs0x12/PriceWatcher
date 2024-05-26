@@ -7,20 +7,21 @@ import (
 	"time"
 
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/stealth"
 )
 
 type BankRequester struct{}
 
 func (r BankRequester) RequestPage(url string) (pageEnt.Response, error) {
-	browser := rod.New().Timeout(time.Minute).MustConnect()
+	u := launcher.New().Bin("/usr/bin/chromium-browser").MustLaunch()
+	browser := rod.New().ControlURL(u).Timeout(time.Minute).MustConnect()
+	browser.MustIgnoreCertErrors(true)
 	defer browser.MustClose()
 
 	page := stealth.MustPage(browser)
 	page.MustNavigate("https://www.sberbank.ru/ru/quotes/metalbeznal")
 	time.Sleep(20 * time.Second)
-	page.HTML()
-
 	html, err := page.HTML()
 	if err != nil {
 		return pageEnt.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)
