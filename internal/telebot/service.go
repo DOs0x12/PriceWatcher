@@ -36,7 +36,8 @@ func Start(ctx context.Context,
 
 func createCommands() []botEnt.Command {
 	pCom := price.NewPriceCommand()
-	commands := botCom.CreateCommands(pCom)
+	subCom := price.SubscribingComm{}
+	commands := botCom.CreateCommands(pCom, subCom)
 
 	botComms := make([]botEnt.Command, len(commands))
 

@@ -10,7 +10,7 @@ type Command struct {
 	Action      func() string
 }
 
-func CreateCommands(pCom price.CurrentPriceComm) []Command {
+func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) []Command {
 	return []Command{
 		{
 			Name:        "/hello",
@@ -22,6 +22,10 @@ func CreateCommands(pCom price.CurrentPriceComm) []Command {
 			Name:        "/prices",
 			Description: "Get the currents prices",
 			Action:      pCom.GetCurrentPrices,
+		}, {
+			Name:        "/subscribe",
+			Description: "Subscribe to messages of the current gold price ",
+			Action:      subCom.SubscribeUser,
 		},
 	}
 }
