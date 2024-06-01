@@ -1,13 +1,11 @@
 package command
 
-import (
-	"PriceWatcher/internal/telebot/command/price"
-)
+import "PriceWatcher/internal/telebot/command/price"
 
 type Command struct {
 	Name        string
 	Description string
-	Action      func() string
+	Action      func(interface{}) string
 }
 
 func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) []Command {
@@ -15,7 +13,7 @@ func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) [
 		{
 			Name:        "/hello",
 			Description: "Say hello to the bot",
-			Action: func() string {
+			Action: func(interface{}) string {
 				return "Hello there!"
 			},
 		}, {

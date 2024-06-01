@@ -2,6 +2,7 @@ package telebot
 
 import (
 	"PriceWatcher/internal/config"
+	"PriceWatcher/internal/entities/subscribing"
 	botEnt "PriceWatcher/internal/entities/telebot"
 	botCom "PriceWatcher/internal/telebot/command"
 	"PriceWatcher/internal/telebot/command/price"
@@ -14,7 +15,8 @@ func Start(ctx context.Context,
 	wg *sync.WaitGroup,
 	bot Telebot,
 	configer config.Configer,
-	restart chan<- interface{}) error {
+	restart chan<- interface{},
+	subscribers subscribing.Subscribers) error {
 	defer wg.Done()
 
 	commands := createCommands()

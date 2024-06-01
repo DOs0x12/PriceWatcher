@@ -14,7 +14,7 @@ func NewPriceCommand() CurrentPriceComm {
 	return CurrentPriceComm{}
 }
 
-func (c CurrentPriceComm) GetCurrentPrices() string {
+func (c CurrentPriceComm) GetCurrentPrices(input interface{}) string {
 	configer := GetConfiger()
 	conf, err := configer.GetConfig()
 	if err != nil {

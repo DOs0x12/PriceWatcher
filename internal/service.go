@@ -2,6 +2,8 @@ package internal
 
 import (
 	"PriceWatcher/internal/bank"
+	"PriceWatcher/internal/entities/subscribing"
+	"PriceWatcher/internal/telebot"
 	"context"
 	"sync"
 	"time"
@@ -9,7 +11,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ServeMetalPrice(ctx context.Context, wg *sync.WaitGroup, bankService bank.Service, jobDone chan<- interface{}) {
+func ServeMetalPrice(ctx context.Context,
+	wg *sync.WaitGroup,
+	bankService bank.Service,
+	jobDone chan<- interface{},
+	bot telebot.Telebot,
+	subscribers subscribing.Subscribers) {
 	defer wg.Done()
 
 	dur := getWaitTimeWithLogs(bankService, time.Now())
@@ -27,7 +34,7 @@ func ServeMetalPrice(ctx context.Context, wg *sync.WaitGroup, bankService bank.S
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go servePriceWithTiming(ctx, bankService, t)
+			go servePriceWithTiming(ctx, bankService, t, bot, subscribers)
 		}
 	}
 }
@@ -35,8 +42,10 @@ func ServeMetalPrice(ctx context.Context, wg *sync.WaitGroup, bankService bank.S
 func servePriceWithTiming(
 	ctx context.Context,
 	serv bank.Service,
-	timer *time.Timer) {
-	//msg, _ := serveWithLogs(serv)
+	timer *time.Timer,
+	bot telebot.Telebot,
+	subscribers subscribing.Subscribers) {
+	msg, _ := serveWithLogs(serv)
 
 	now := time.Now()
 	dur := perStartWithLogs(serv, now)
@@ -49,9 +58,11 @@ func servePriceWithTiming(
 	case <-time.After(dur):
 	}
 
-	// if msg != "" {
-	// 	sendReportWithLogs(sen, msg, sub, servName, email)
-	// }
+	if msg != "" {
+		for _, chatID := range subscribers.ChatIDs {
+			bot.SendCurrentPrice(msg, chatID)
+		}
+	}
 
 	now = time.Now()
 	dur = getWaitTimeWithLogs(serv, now)

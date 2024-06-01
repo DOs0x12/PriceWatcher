@@ -5,6 +5,7 @@ import (
 	"PriceWatcher/internal/bank"
 	"PriceWatcher/internal/common/interruption"
 	"PriceWatcher/internal/config"
+	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/telebot"
 	"context"
 	"sync"
@@ -32,8 +33,18 @@ func main() {
 	jobDone := make(chan interface{})
 	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
 
-	startBot(botCtx, wg, configer, jobDone)
-	startWatching(watcherCtx, wg, bankService, jobDone)
+	bot, err := telebot.NewTelebot(configer)
+	if err != nil {
+		logrus.Errorf("bot: %v", err)
+		wg.Done()
+
+		return
+	}
+
+	subscribers := subscribing.Subscribers{ChatIDs: make([]int64, 0)}
+
+	startBot(botCtx, wg, bot, configer, jobDone, subscribers)
+	startWatching(watcherCtx, wg, bankService, jobDone, bot, subscribers)
 
 	wg.Wait()
 
@@ -43,8 +54,10 @@ func main() {
 func startWatching(ctx context.Context,
 	wg *sync.WaitGroup,
 	bankService bank.Service,
-	jobDone chan<- interface{}) {
-	internal.ServeMetalPrice(ctx, wg, bankService, jobDone)
+	jobDone chan<- interface{},
+	bot telebot.Telebot,
+	subscribers subscribing.Subscribers) {
+	internal.ServeMetalPrice(ctx, wg, bankService, jobDone, bot, subscribers)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
@@ -53,17 +66,12 @@ func newContext() (ctx context.Context, cancel context.CancelFunc) {
 
 func startBot(ctx context.Context,
 	wg *sync.WaitGroup,
+	bot telebot.Telebot,
 	configer config.Configer,
-	jobDone chan<- interface{}) {
-	bot, err := telebot.NewTelebot(configer)
-	if err != nil {
-		logrus.Errorf("bot: %v", err)
-		wg.Done()
+	jobDone chan<- interface{},
+	subscribers subscribing.Subscribers) {
 
-		return
-	}
-
-	err = telebot.Start(ctx, wg, bot, configer, jobDone)
+	err := telebot.Start(ctx, wg, bot, configer, jobDone, subscribers)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 

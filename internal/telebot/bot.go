@@ -66,7 +66,7 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel,
 
 		for _, command := range commands {
 			if upd.Message.Text == command.Name {
-				msg := tgbot.NewMessage(upd.Message.Chat.ID, command.Action())
+				msg := tgbot.NewMessage(upd.Message.Chat.ID, command.Action(upd))
 
 				maxRetries := 10
 				cnt := 0
