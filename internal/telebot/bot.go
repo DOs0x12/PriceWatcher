@@ -52,9 +52,6 @@ func (t Telebot) Stop() {
 	t.bot.StopReceivingUpdates()
 }
 
-var commWithInteraction = false
-var commandAction func(input string) string
-
 func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel,
 	commands []telebot.Command,
 	restart chan<- interface{}) {
@@ -64,11 +61,6 @@ func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel,
 		}
 
 		if !upd.Message.IsCommand() {
-			if commWithInteraction {
-				commandAction(upd.Message.Text)
-				commWithInteraction = false
-			}
-
 			continue
 		}
 
