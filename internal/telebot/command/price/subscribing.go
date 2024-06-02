@@ -7,7 +7,7 @@ import (
 )
 
 type SubscribingComm struct {
-	Subscribers subscribing.Subscribers
+	Subscribers *subscribing.Subscribers
 }
 
 func (c SubscribingComm) SubscribeUser(input interface{}) string {

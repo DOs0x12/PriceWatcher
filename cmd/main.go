@@ -41,7 +41,7 @@ func main() {
 		return
 	}
 
-	subscribers := subscribing.Subscribers{ChatIDs: make([]int64, 0)}
+	subscribers := &subscribing.Subscribers{ChatIDs: make([]int64, 0)}
 
 	startBot(botCtx, wg, bot, configer, jobDone, subscribers)
 	startWatching(watcherCtx, wg, bankService, jobDone, bot, subscribers)
@@ -56,7 +56,7 @@ func startWatching(ctx context.Context,
 	bankService bank.Service,
 	jobDone chan<- interface{},
 	bot telebot.Telebot,
-	subscribers subscribing.Subscribers) {
+	subscribers *subscribing.Subscribers) {
 	internal.ServeMetalPrice(ctx, wg, bankService, jobDone, bot, subscribers)
 }
 
@@ -69,7 +69,7 @@ func startBot(ctx context.Context,
 	bot telebot.Telebot,
 	configer config.Configer,
 	jobDone chan<- interface{},
-	subscribers subscribing.Subscribers) {
+	subscribers *subscribing.Subscribers) {
 
 	err := telebot.Start(ctx, wg, bot, configer, jobDone, subscribers)
 	if err != nil {

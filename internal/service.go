@@ -16,7 +16,7 @@ func ServeMetalPrice(ctx context.Context,
 	bankService bank.Service,
 	jobDone chan<- interface{},
 	bot telebot.Telebot,
-	subscribers subscribing.Subscribers) {
+	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
 	dur := getWaitTimeWithLogs(bankService, time.Now())
@@ -44,8 +44,13 @@ func servePriceWithTiming(
 	serv bank.Service,
 	timer *time.Timer,
 	bot telebot.Telebot,
-	subscribers subscribing.Subscribers) {
+	subscribers *subscribing.Subscribers) {
 	msg, _ := serveWithLogs(serv)
+	if msg != "" {
+		for _, chatID := range subscribers.ChatIDs {
+			bot.SendCurrentPrice(msg, chatID)
+		}
+	}
 
 	now := time.Now()
 	dur := perStartWithLogs(serv, now)
@@ -56,12 +61,6 @@ func servePriceWithTiming(
 
 		return
 	case <-time.After(dur):
-	}
-
-	if msg != "" {
-		for _, chatID := range subscribers.ChatIDs {
-			bot.SendCurrentPrice(msg, chatID)
-		}
 	}
 
 	now = time.Now()

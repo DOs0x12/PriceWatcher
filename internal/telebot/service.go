@@ -16,10 +16,10 @@ func Start(ctx context.Context,
 	bot Telebot,
 	configer config.Configer,
 	restart chan<- interface{},
-	subscribers subscribing.Subscribers) error {
+	subscribers *subscribing.Subscribers) error {
 	defer wg.Done()
 
-	commands := createCommands()
+	commands := createCommands(subscribers)
 	if err := bot.Start(commands, restart); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
@@ -36,9 +36,9 @@ func Start(ctx context.Context,
 	return nil
 }
 
-func createCommands() []botEnt.Command {
+func createCommands(subscribers *subscribing.Subscribers) []botEnt.Command {
 	pCom := price.NewPriceCommand()
-	subCom := price.SubscribingComm{}
+	subCom := price.SubscribingComm{Subscribers: subscribers}
 	commands := botCom.CreateCommands(pCom, subCom)
 
 	botComms := make([]botEnt.Command, len(commands))
