@@ -14,7 +14,7 @@ import (
 type BankRequester struct{}
 
 func (r BankRequester) RequestPage() (pageEnt.Response, error) {
-	u := launcher.New().Bin("/usr/bin/chromium-browser").MustLaunch()
+	u := launcher.New().Bin("/usr/bin/chromium").MustLaunch()
 	browser := rod.New().ControlURL(u).Timeout(time.Minute).MustConnect()
 	browser.MustIgnoreCertErrors(true)
 	defer browser.MustClose()

@@ -35,3 +35,6 @@ go.work
 
 #Config file
 config.yml
+
+#certs
+*.crt
