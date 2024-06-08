@@ -38,3 +38,6 @@ config.yml
 
 #certs
 *.crt
+
+#Data file
+subscribers.yml

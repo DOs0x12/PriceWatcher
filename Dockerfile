@@ -27,5 +27,5 @@ RUN apt install -y tzdata
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt clean
-COPY config.yml /config.yml
+RUN mkdir /gold-price-watcher-data
 CMD ["/price-watcher"]

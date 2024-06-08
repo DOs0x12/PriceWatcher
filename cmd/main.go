@@ -6,6 +6,7 @@ import (
 	"PriceWatcher/internal/common/interruption"
 	"PriceWatcher/internal/config"
 	"PriceWatcher/internal/entities/subscribing"
+	subFile "PriceWatcher/internal/subscribing"
 	"PriceWatcher/internal/telebot"
 	"context"
 	"sync"
@@ -41,12 +42,24 @@ func main() {
 		return
 	}
 
-	subscribers := &subscribing.Subscribers{ChatIDs: make([]int64, 0)}
+	subService := subFile.SubscribingService{}
+	subscribers, err := subService.GetSubscribers()
+	if err != nil {
+		logrus.Errorf("cannot get subscribers: %v", err)
+		wg.Done()
+
+		return
+	}
 
 	startBot(botCtx, wg, bot, configer, subscribers)
 	startWatching(watcherCtx, wg, bankService, bot, subscribers)
 
 	wg.Wait()
+
+	err = subService.SaveSubscribers(subscribers)
+	if err != nil {
+		logrus.Errorf("cannot save the data of subscribers: %v", err)
+	}
 
 	logrus.Infoln("The application is done")
 }
@@ -78,7 +91,7 @@ func startBot(ctx context.Context,
 }
 
 func GetConfiger() config.Configer {
-	configPath := "config.yml"
+	configPath := "gold-price-watcher-data/config.yml"
 
 	return config.NewConfiger(configPath)
 }
