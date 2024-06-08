@@ -14,7 +14,6 @@ import (
 func ServeMetalPrice(ctx context.Context,
 	wg *sync.WaitGroup,
 	bankService bank.Service,
-	jobDone chan<- interface{},
 	bot telebot.Telebot,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
@@ -24,10 +23,6 @@ func ServeMetalPrice(ctx context.Context,
 	t := time.NewTimer(dur)
 	callChan := t.C
 	defer t.Stop()
-
-	defer func() {
-		finishJobWithLogs(jobDone)
-	}()
 
 	for {
 		select {
@@ -103,11 +98,6 @@ func getWaitTimeWithLogs(serv bank.Service, now time.Time) time.Duration {
 	logrus.Infof("Waiting %v", dur)
 
 	return dur
-}
-
-func finishJobWithLogs(jobDone chan<- interface{}) {
-	jobDone <- struct{}{}
-	logrus.Infof("the job is done")
 }
 
 // func ServeWatchers(ctx context.Context,

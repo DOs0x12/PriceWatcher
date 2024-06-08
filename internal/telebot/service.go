@@ -15,12 +15,11 @@ func Start(ctx context.Context,
 	wg *sync.WaitGroup,
 	bot Telebot,
 	configer config.Configer,
-	restart chan<- interface{},
 	subscribers *subscribing.Subscribers) error {
 	defer wg.Done()
 
 	commands := createCommands(subscribers)
-	if err := bot.Start(commands, restart); err != nil {
+	if err := bot.Start(ctx, commands); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
 	}
 

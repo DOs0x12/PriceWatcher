@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		logrus.Error("%w", err)
 	}
-	jobDone := make(chan interface{})
+
 	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
 
 	bot, err := telebot.NewTelebot(configer)
@@ -43,8 +43,8 @@ func main() {
 
 	subscribers := &subscribing.Subscribers{ChatIDs: make([]int64, 0)}
 
-	startBot(botCtx, wg, bot, configer, jobDone, subscribers)
-	startWatching(watcherCtx, wg, bankService, jobDone, bot, subscribers)
+	startBot(botCtx, wg, bot, configer, subscribers)
+	startWatching(watcherCtx, wg, bankService, bot, subscribers)
 
 	wg.Wait()
 
@@ -54,10 +54,9 @@ func main() {
 func startWatching(ctx context.Context,
 	wg *sync.WaitGroup,
 	bankService bank.Service,
-	jobDone chan<- interface{},
 	bot telebot.Telebot,
 	subscribers *subscribing.Subscribers) {
-	internal.ServeMetalPrice(ctx, wg, bankService, jobDone, bot, subscribers)
+	internal.ServeMetalPrice(ctx, wg, bankService, bot, subscribers)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
@@ -68,10 +67,9 @@ func startBot(ctx context.Context,
 	wg *sync.WaitGroup,
 	bot telebot.Telebot,
 	configer config.Configer,
-	jobDone chan<- interface{},
 	subscribers *subscribing.Subscribers) {
 
-	err := telebot.Start(ctx, wg, bot, configer, jobDone, subscribers)
+	err := telebot.Start(ctx, wg, bot, configer, subscribers)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 

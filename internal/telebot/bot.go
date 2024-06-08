@@ -3,6 +3,7 @@ package telebot
 import (
 	"PriceWatcher/internal/config"
 	"PriceWatcher/internal/entities/telebot"
+	"context"
 	"fmt"
 	"time"
 
@@ -31,11 +32,13 @@ func NewTelebot(configer config.Configer) (Telebot, error) {
 	return Telebot{bot: botApi}, nil
 }
 
-func (t Telebot) Start(commands []telebot.Command,
-	restart chan<- interface{}) error {
+func (t Telebot) Start(ctx context.Context,
+	commands []telebot.Command) error {
 	updConfig := tgbot.NewUpdate(0)
-	updCh := t.bot.GetUpdatesChan(updConfig)
-	go t.watchUpdates(updCh, commands, restart)
+	go func() {
+		updCh := t.bot.GetUpdatesChan(updConfig)
+		t.watchUpdates(ctx, updCh, commands)
+	}()
 
 	return nil
 }
@@ -52,38 +55,43 @@ func (t Telebot) Stop() {
 	t.bot.StopReceivingUpdates()
 }
 
-func (t Telebot) watchUpdates(updCh tgbot.UpdatesChannel,
-	commands []telebot.Command,
-	restart chan<- interface{}) {
-	for upd := range updCh {
-		if upd.Message == nil {
-			continue
-		}
+func (t Telebot) watchUpdates(ctx context.Context,
+	updCh tgbot.UpdatesChannel,
+	commands []telebot.Command) {
+	for {
+		select {
+		case upd := <-updCh:
+			if upd.Message == nil {
+				continue
+			}
 
-		if !upd.Message.IsCommand() {
-			continue
-		}
+			if !upd.Message.IsCommand() {
+				continue
+			}
 
-		for _, command := range commands {
-			if upd.Message.Text == command.Name {
-				msg := tgbot.NewMessage(upd.Message.Chat.ID, command.Action(upd))
+			for _, command := range commands {
+				if upd.Message.Text == command.Name {
+					msg := tgbot.NewMessage(upd.Message.Chat.ID, command.Action(upd))
 
-				maxRetries := 10
-				cnt := 0
+					maxRetries := 10
+					cnt := 0
 
-				for cnt < maxRetries {
-					if _, err := t.bot.Send(msg); err != nil {
-						logrus.Errorf("Cannot send a message: %v", err)
+					for cnt < maxRetries {
+						if _, err := t.bot.Send(msg); err != nil {
+							logrus.Errorf("Cannot send a message: %v", err)
 
-						time.Sleep(5 * time.Second)
-						cnt++
+							time.Sleep(5 * time.Second)
+							cnt++
 
-						continue
+							continue
+						}
+
+						break
 					}
-
-					break
 				}
 			}
+		case <-ctx.Done():
+			return
 		}
 	}
 }
