@@ -7,10 +7,10 @@ RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
 WORKDIR /app/cmd
-RUN CGO_ENABLED=0 GOOS=linux go build -o /price-watcher
+RUN CGO_ENABLED=0 GOOS=linux go build -o /gold-price-watcher
 
 FROM ubuntu:latest AS release-stage
-COPY --from=build-stage /price-watcher /price-watcher
+COPY --from=build-stage /gold-price-watcher /gold-price-watcher
 
 RUN apt -y update
 RUN apt install -y software-properties-common
@@ -19,7 +19,7 @@ RUN apt -y update
 RUN apt install -y chromium
 
 RUN apt install -y ca-certificates
-COPY *.crt /usr/local/share/ca-certificates
+COPY ${data_path}/*.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 #RUN apk add --no-cache tzdata
@@ -28,4 +28,4 @@ ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt clean
 RUN mkdir /gold-price-watcher-data
-CMD ["/price-watcher"]
+CMD ["/gold-price-watcher"]
