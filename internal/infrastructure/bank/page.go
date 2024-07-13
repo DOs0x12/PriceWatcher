@@ -1,7 +1,7 @@
 package bank
 
 import (
-	pageEnt "PriceWatcher/internal/entities/page"
+	pageEnt "PriceWatcher/internal/entities/bank/page"
 	"fmt"
 	"strings"
 	"time"
