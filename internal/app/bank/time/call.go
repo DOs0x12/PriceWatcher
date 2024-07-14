@@ -1,10 +1,10 @@
-package bank
+package time
 
 import (
 	"time"
 )
 
-func getCallTime(now time.Time, callHours []int) time.Time {
+func GetCallTime(now time.Time, callHours []int) time.Time {
 	curHour := now.Hour()
 	nextHour := -1
 
