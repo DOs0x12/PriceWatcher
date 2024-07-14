@@ -1,6 +1,6 @@
 package interfaces
 
-import "PriceWatcher/internal/entities/bank/subscribing"
+import "PriceWatcher/internal/entities/subscribing"
 
 type Subscribers interface {
 	GetSubscribers() (*subscribing.Subscribers, error)
