@@ -1,22 +1,6 @@
 package config
 
 type Config struct {
-	BotKey   string
-	Services []ServiceConf
-}
-
-type ServiceConf struct {
+	BotKey       string
 	SendingHours []int
-	PriceType    string
-	Marketplace  string
-	Items        map[string]string
-	Email        Email
-}
-
-type Email struct {
-	From     string
-	Pass     string
-	To       string
-	SmtpHost string
-	SmtpPort int
 }
