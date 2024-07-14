@@ -1,8 +1,11 @@
 package bank
 
 import (
-	priceTime "PriceWatcher/internal/common/time"
-	"PriceWatcher/internal/config"
+	priceTime "PriceWatcher/internal/app/bank/time"
+	domBank "PriceWatcher/internal/domain/bank"
+	entConfig "PriceWatcher/internal/entities/config"
+	infraBank "PriceWatcher/internal/infrastructure/bank"
+
 	"fmt"
 	"time"
 
@@ -10,15 +13,15 @@ import (
 )
 
 type Service struct {
-	req  BankRequester
-	ext  Extractor
-	conf config.Config
+	req  infraBank.BankRequester
+	ext  domBank.PriceExtractor
+	conf entConfig.Config
 }
 
 func NewService(
-	req BankRequester,
-	ext Extractor,
-	conf config.Config) Service {
+	req infraBank.BankRequester,
+	ext domBank.PriceExtractor,
+	conf entConfig.Config) Service {
 	return Service{
 		req:  req,
 		ext:  ext,
@@ -48,7 +51,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 func (s Service) GetWaitTime(now time.Time) time.Duration {
 	variation := 1800
 	randDur := priceTime.RandomSec(variation)
-	callTime := getCallTime(now, s.conf.SendingHours)
+	callTime := priceTime.GetCallTime(now, s.conf.SendingHours)
 
 	return getWaitDurWithRandomComp(now, callTime, randDur)
 }
