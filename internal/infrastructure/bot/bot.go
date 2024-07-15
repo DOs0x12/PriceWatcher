@@ -26,6 +26,7 @@ func NewTelebot(configer config.Configer) (Telebot, error) {
 	botApi, err := tgbot.NewBotAPI(config.BotKey)
 	if err != nil {
 		var zero Telebot
+
 		return zero, fmt.Errorf("getting an error at connecting to the bot: %v", err)
 	}
 
