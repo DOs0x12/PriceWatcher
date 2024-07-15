@@ -5,6 +5,7 @@ import (
 	domBank "PriceWatcher/internal/domain/bank"
 	entConfig "PriceWatcher/internal/entities/config"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
+	"PriceWatcher/internal/interfaces"
 
 	"fmt"
 	"time"
@@ -13,8 +14,8 @@ import (
 )
 
 type Service struct {
-	req  infraBank.BankRequester
-	ext  domBank.PriceExtractor
+	req  interfaces.Requester
+	ext  interfaces.Extractor
 	conf entConfig.Config
 }
 
