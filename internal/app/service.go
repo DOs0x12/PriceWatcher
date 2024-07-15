@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"PriceWatcher/internal/bank"
+	"PriceWatcher/internal/app/bank"
 	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/telebot"
 	"context"
