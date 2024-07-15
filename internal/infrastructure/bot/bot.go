@@ -12,10 +12,11 @@ import (
 )
 
 type Telebot struct {
-	bot *tgbot.BotAPI
+	bot      *tgbot.BotAPI
+	commands []telebot.Command
 }
 
-func NewTelebot(configer config.Configer) (Telebot, error) {
+func NewTelebot(configer config.Configer, commands []telebot.Command) (Telebot, error) {
 	config, err := configer.GetConfig()
 	if err != nil {
 		var zero Telebot
@@ -30,21 +31,24 @@ func NewTelebot(configer config.Configer) (Telebot, error) {
 		return zero, fmt.Errorf("getting an error at connecting to the bot: %v", err)
 	}
 
-	return Telebot{bot: botApi}, nil
+	return Telebot{bot: botApi, commands: commands}, nil
 }
 
-func (t Telebot) Start(ctx context.Context,
-	commands []telebot.Command) error {
+func (t Telebot) Start(ctx context.Context) error {
+	if err := t.registerCommands(t.commands); err != nil {
+		return fmt.Errorf("cannot start the bot: %v", err)
+	}
+
 	updConfig := tgbot.NewUpdate(0)
 	go func() {
 		updCh := t.bot.GetUpdatesChan(updConfig)
-		t.watchUpdates(ctx, updCh, commands)
+		t.watchUpdates(ctx, updCh, t.commands)
 	}()
 
 	return nil
 }
 
-func (t Telebot) RegisterCommands(commands []telebot.Command) error {
+func (t Telebot) registerCommands(commands []telebot.Command) error {
 	if err := t.configureCommands(commands); err != nil {
 		return fmt.Errorf("getting an error at registering commands: %v", err)
 	}

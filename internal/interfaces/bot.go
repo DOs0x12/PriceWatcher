@@ -1,0 +1,8 @@
+package interfaces
+
+import "context"
+
+type Bot interface {
+	Start(ctx context.Context)
+	Stop()
+}
