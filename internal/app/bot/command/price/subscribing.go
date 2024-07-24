@@ -14,5 +14,5 @@ func (c SubscribingComm) SubscribeUser(input interface{}) string {
 	upd := input.(tgbotapi.Update)
 	c.Subscribers.ChatIDs = append(c.Subscribers.ChatIDs, upd.Message.Chat.ID)
 
-	return "Subscribed!"
+	return "The user is subscribed for current metal price notifications!"
 }
