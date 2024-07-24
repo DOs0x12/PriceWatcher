@@ -5,7 +5,7 @@ import (
 	"PriceWatcher/internal/entities/telebot"
 )
 
-func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) []telebot.Command {
+func CreateCommands(subCom price.SubscribingComm) []telebot.Command {
 	return []telebot.Command{
 		{
 			Name:        "/hello",
@@ -13,10 +13,6 @@ func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) [
 			Action: func(interface{}) string {
 				return "Hello there!"
 			},
-		}, {
-			Name:        "/prices",
-			Description: "Get the currents prices",
-			Action:      pCom.GetCurrentPrices,
 		}, {
 			Name:        "/subscribe",
 			Description: "Subscribe to messages of the current gold price ",
