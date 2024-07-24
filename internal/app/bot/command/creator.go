@@ -1,15 +1,12 @@
 package command
 
-import "PriceWatcher/internal/telebot/command/price"
+import (
+	"PriceWatcher/internal/app/bot/command/price"
+	"PriceWatcher/internal/entities/telebot"
+)
 
-type Command struct {
-	Name        string
-	Description string
-	Action      func(interface{}) string
-}
-
-func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) []Command {
-	return []Command{
+func CreateCommands(pCom price.CurrentPriceComm, subCom price.SubscribingComm) []telebot.Command {
+	return []telebot.Command{
 		{
 			Name:        "/hello",
 			Description: "Say hello to the bot",
