@@ -79,7 +79,7 @@ func (t Telebot) watchUpdates(ctx context.Context,
 					chatID := upd.Message.Chat.ID
 					comResult := command.Action(upd)
 
-					if err := t.sendCurrentPrice(comResult, chatID); err != nil {
+					if err := t.SendMessage(comResult, chatID); err != nil {
 						logrus.Errorf("cannot send a message: %v", err)
 					}
 				}
@@ -90,7 +90,7 @@ func (t Telebot) watchUpdates(ctx context.Context,
 	}
 }
 
-func (t Telebot) sendCurrentPrice(msg string, chatID int64) error {
+func (t Telebot) SendMessage(msg string, chatID int64) error {
 	tgMsg := tgbot.NewMessage(chatID, msg)
 
 	maxRetries := 10

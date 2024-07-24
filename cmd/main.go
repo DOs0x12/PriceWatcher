@@ -1,13 +1,17 @@
 package main
 
 import (
-	"PriceWatcher/internal"
-	"PriceWatcher/internal/bank"
-	"PriceWatcher/internal/common/interruption"
-	"PriceWatcher/internal/config"
-	"PriceWatcher/internal/entities/subscribing"
-	subFile "PriceWatcher/internal/subscribing"
-	"PriceWatcher/internal/telebot"
+	internalApp "PriceWatcher/internal/app"
+	bankApp "PriceWatcher/internal/app/bank"
+	"PriceWatcher/internal/app/bank/interruption"
+	appBotComm "PriceWatcher/internal/app/bot/command"
+	appPrice "PriceWatcher/internal/app/bot/command/price"
+	bankDom "PriceWatcher/internal/domain/bank"
+	subEnt "PriceWatcher/internal/entities/subscribing"
+	botEnt "PriceWatcher/internal/entities/telebot"
+	bankInfra "PriceWatcher/internal/infrastructure/bank"
+	botInfra "PriceWatcher/internal/infrastructure/bot"
+	"PriceWatcher/internal/infrastructure/config"
 	"context"
 	"sync"
 
@@ -26,23 +30,16 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(servCount)
 
-	configer := GetConfiger()
+	configer := NewConfiger()
 	conf, err := configer.GetConfig()
 	if err != nil {
 		logrus.Error("%w", err)
 	}
 
-	bankService := bank.NewService(bank.BankRequester{}, bank.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
+	bankService := bankApp.NewService(bankInfra.BankRequester{},
+		bankDom.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
 
-	bot, err := telebot.NewTelebot(configer)
-	if err != nil {
-		logrus.Errorf("bot: %v", err)
-		wg.Done()
-
-		return
-	}
-
-	subService := subFile.SubscribingService{}
+	subService := bankInfra.SubscribingService{}
 	subscribers, err := subService.GetSubscribers()
 	if err != nil {
 		logrus.Errorf("cannot get subscribers: %v", err)
@@ -51,7 +48,16 @@ func main() {
 		return
 	}
 
-	startBot(botCtx, wg, bot, configer, subscribers)
+	commands := createCommands(subscribers)
+	bot, err := botInfra.NewTelebot(configer, commands)
+	if err != nil {
+		logrus.Errorf("bot: %v", err)
+		wg.Done()
+
+		return
+	}
+
+	startBot(botCtx, bot)
 	startWatching(watcherCtx, wg, bankService, bot, subscribers)
 
 	wg.Wait()
@@ -66,23 +72,19 @@ func main() {
 
 func startWatching(ctx context.Context,
 	wg *sync.WaitGroup,
-	bankService bank.Service,
-	bot telebot.Telebot,
-	subscribers *subscribing.Subscribers) {
-	internal.ServeMetalPrice(ctx, wg, bankService, bot, subscribers)
+	bankService bankApp.Service,
+	bot botInfra.Telebot,
+	subscribers *subEnt.Subscribers) {
+	internalApp.ServeMetalPrice(ctx, wg, bankService, bot, subscribers)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithCancel(context.Background())
 }
 
-func startBot(ctx context.Context,
-	wg *sync.WaitGroup,
-	bot telebot.Telebot,
-	configer config.Configer,
-	subscribers *subscribing.Subscribers) {
+func startBot(ctx context.Context, bot botInfra.Telebot) {
 
-	err := telebot.Start(ctx, wg, bot, configer, subscribers)
+	err := bot.Start(ctx)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
 
@@ -90,8 +92,14 @@ func startBot(ctx context.Context,
 	}
 }
 
-func GetConfiger() config.Configer {
+func NewConfiger() config.Configer {
 	configPath := "gold-price-watcher-data/config.yml"
 
 	return config.NewConfiger(configPath)
+}
+
+func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
+	subCom := appPrice.SubscribingComm{Subscribers: subscribers}
+
+	return appBotComm.CreateCommands(subCom)
 }
