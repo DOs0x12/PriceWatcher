@@ -3,6 +3,6 @@ package interfaces
 import "context"
 
 type Bot interface {
-	Start(ctx context.Context)
+	Start(ctx context.Context) error
 	Stop()
 }

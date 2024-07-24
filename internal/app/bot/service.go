@@ -1,11 +1,8 @@
 package telebot
 
 import (
-	"PriceWatcher/internal/config"
 	"PriceWatcher/internal/entities/subscribing"
-	botEnt "PriceWatcher/internal/entities/telebot"
-	botCom "PriceWatcher/internal/telebot/command"
-	"PriceWatcher/internal/telebot/command/price"
+	"PriceWatcher/internal/interfaces"
 	"context"
 	"fmt"
 	"sync"
@@ -13,18 +10,12 @@ import (
 
 func Start(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot Telebot,
-	configer config.Configer,
+	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) error {
 	defer wg.Done()
 
-	commands := createCommands(subscribers)
-	if err := bot.Start(ctx, commands); err != nil {
+	if err := bot.Start(ctx); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)
-	}
-
-	if err := bot.RegisterCommands(commands); err != nil {
-		return fmt.Errorf("can not register commands in the bot: %v", err)
 	}
 
 	go func() {
@@ -33,24 +24,4 @@ func Start(ctx context.Context,
 	}()
 
 	return nil
-}
-
-func createCommands(subscribers *subscribing.Subscribers) []botEnt.Command {
-	pCom := price.NewPriceCommand()
-	subCom := price.SubscribingComm{Subscribers: subscribers}
-	commands := botCom.CreateCommands(pCom, subCom)
-
-	botComms := make([]botEnt.Command, len(commands))
-
-	for i, command := range commands {
-		botCommand := botEnt.Command{
-			Name:        command.Name,
-			Description: command.Description,
-			Action:      command.Action,
-		}
-
-		botComms[i] = botCommand
-	}
-
-	return botComms
 }
