@@ -3,7 +3,7 @@ package internal
 import (
 	"PriceWatcher/internal/app/bank"
 	"PriceWatcher/internal/entities/subscribing"
-	"PriceWatcher/internal/telebot"
+	"PriceWatcher/internal/interfaces"
 	"context"
 	"sync"
 	"time"
@@ -14,7 +14,7 @@ import (
 func ServeMetalPrice(ctx context.Context,
 	wg *sync.WaitGroup,
 	bankService bank.Service,
-	bot telebot.Telebot,
+	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
@@ -38,12 +38,12 @@ func servePriceWithTiming(
 	ctx context.Context,
 	serv bank.Service,
 	timer *time.Timer,
-	bot telebot.Telebot,
+	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) {
 	msg, _ := serveWithLogs(serv)
 	if msg != "" {
 		for _, chatID := range subscribers.ChatIDs {
-			bot.SendCurrentPrice(msg, chatID)
+			bot.SendMessage(msg, chatID)
 		}
 	}
 
