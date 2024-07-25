@@ -34,8 +34,10 @@ func main() {
 		logrus.Error("Cannot get the config: %w", err)
 	}
 
-	bankService := bankApp.NewService(bankInfra.BankRequester{},
-		bankDom.NewPriceExtractor(`([0-9]).*([0-9])*,([0-9])*`, "div"), conf)
+	priceRegEx := `([0-9]).*([0-9])*,([0-9])*`
+	priceTag := "div"
+	priceExtractor := bankDom.NewPriceExtractor(priceRegEx, priceTag)
+	bankService := bankApp.NewService(bankInfra.BankRequester{}, priceExtractor, conf)
 
 	subService := bankInfra.SubscribingService{}
 	subscribers, err := subService.GetSubscribers()
