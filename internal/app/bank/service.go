@@ -4,8 +4,11 @@ import (
 	priceTime "PriceWatcher/internal/app/bank/time"
 	domBank "PriceWatcher/internal/domain/bank"
 	entConfig "PriceWatcher/internal/entities/config"
+	"PriceWatcher/internal/entities/subscribing"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
 	"PriceWatcher/internal/interfaces"
+	"context"
+	"sync"
 
 	"fmt"
 	"time"
@@ -30,7 +33,85 @@ func NewService(
 	}
 }
 
-func (s Service) ServePrice() (message, subject string, err error) {
+func (s Service) WatchPrice(ctx context.Context,
+	wg *sync.WaitGroup,
+	bot interfaces.Bot,
+	subscribers *subscribing.Subscribers) {
+	defer wg.Done()
+
+	dur := s.getWaitTimeWithLogs(time.Now())
+
+	t := time.NewTimer(dur)
+	callChan := t.C
+	defer t.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-callChan:
+			go s.servePriceWithTiming(ctx, t, bot, subscribers)
+		}
+	}
+}
+
+func (s Service) servePriceWithTiming(
+	ctx context.Context,
+	timer *time.Timer,
+	bot interfaces.Bot,
+	subscribers *subscribing.Subscribers) {
+	msg, _ := s.serveWithLogs()
+	if msg != "" {
+		for _, chatID := range subscribers.ChatIDs {
+			bot.SendMessage(msg, chatID)
+		}
+	}
+
+	now := time.Now()
+	dur := s.perStartWithLogs(now)
+
+	select {
+	case <-ctx.Done():
+		logrus.Infoln("Interrupting waiting the next period")
+
+		return
+	case <-time.After(dur):
+	}
+
+	now = time.Now()
+	dur = s.getWaitTimeWithLogs(now)
+
+	timer.Reset(dur)
+}
+
+func (s Service) serveWithLogs() (string, string) {
+	msg, sub, err := s.servePrice()
+	if err != nil {
+		logrus.Errorf("An error occurs while serving a price: %v", err)
+
+		return "", ""
+	}
+
+	logrus.Info("The price is processed")
+
+	return msg, sub
+}
+
+func (s Service) perStartWithLogs(now time.Time) time.Duration {
+	dur := perStartDur(now)
+	logrus.Infof("Waiting the start of the next period %v", dur)
+
+	return dur
+}
+
+func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
+	dur := s.getWaitTime(now)
+	logrus.Infof("Waiting %v", dur)
+
+	return dur
+}
+
+func (s Service) servePrice() (message, subject string, err error) {
 	logrus.Infof("Start processing a price")
 
 	response, err := s.req.RequestPage()
@@ -49,7 +130,7 @@ func (s Service) ServePrice() (message, subject string, err error) {
 	return msg, sub, nil
 }
 
-func (s Service) GetWaitTime(now time.Time) time.Duration {
+func (s Service) getWaitTime(now time.Time) time.Duration {
 	variation := 1800
 	randDur := priceTime.RandomSec(variation)
 	callTime := priceTime.GetCallTime(now, s.conf.SendingHours)
@@ -57,6 +138,6 @@ func (s Service) GetWaitTime(now time.Time) time.Duration {
 	return getWaitDurWithRandomComp(now, callTime, randDur)
 }
 
-func (Service) PerStartDur(now time.Time) time.Duration {
+func perStartDur(now time.Time) time.Duration {
 	return priceTime.PerStartDur(now)
 }
