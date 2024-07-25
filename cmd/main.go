@@ -31,7 +31,7 @@ func main() {
 	configer := NewConfiger()
 	conf, err := configer.GetConfig()
 	if err != nil {
-		logrus.Error("Cannot get the config: %w", err)
+		logrus.Errorf("Cannot get the config: %v", err)
 
 		return
 	}
