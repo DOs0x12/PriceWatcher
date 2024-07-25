@@ -5,6 +5,7 @@ import (
 	"PriceWatcher/internal/infrastructure/config"
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -14,9 +15,10 @@ import (
 type Telebot struct {
 	bot      *tgbot.BotAPI
 	commands []telebot.Command
+	wg       *sync.WaitGroup
 }
 
-func NewTelebot(configer config.Configer, commands []telebot.Command) (Telebot, error) {
+func NewTelebot(wg *sync.WaitGroup, configer config.Configer, commands []telebot.Command) (Telebot, error) {
 	config, err := configer.GetConfig()
 	if err != nil {
 		var zero Telebot
@@ -31,7 +33,7 @@ func NewTelebot(configer config.Configer, commands []telebot.Command) (Telebot, 
 		return zero, fmt.Errorf("getting an error at connecting to the bot: %v", err)
 	}
 
-	return Telebot{bot: botApi, commands: commands}, nil
+	return Telebot{wg: wg, bot: botApi, commands: commands}, nil
 }
 
 func (t Telebot) Start(ctx context.Context) error {
@@ -58,11 +60,14 @@ func (t Telebot) registerCommands(commands []telebot.Command) error {
 
 func (t Telebot) Stop() {
 	t.bot.StopReceivingUpdates()
+	t.wg.Done()
 }
 
 func (t Telebot) watchUpdates(ctx context.Context,
 	updCh tgbot.UpdatesChannel,
 	commands []telebot.Command) {
+	t.wg.Done()
+
 	for {
 		select {
 		case upd := <-updCh:

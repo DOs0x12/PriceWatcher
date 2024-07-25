@@ -43,16 +43,14 @@ func main() {
 	subscribers, err := subService.GetSubscribers()
 	if err != nil {
 		logrus.Errorf("cannot get subscribers: %v", err)
-		wg.Done()
 
 		return
 	}
 
 	commands := createCommands(subscribers)
-	bot, err := botInfra.NewTelebot(configer, commands)
+	bot, err := botInfra.NewTelebot(wg, configer, commands)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
-		wg.Done()
 
 		return
 	}
