@@ -32,6 +32,8 @@ func main() {
 	conf, err := configer.GetConfig()
 	if err != nil {
 		logrus.Error("Cannot get the config: %w", err)
+
+		return
 	}
 
 	priceRegEx := `([0-9]).*([0-9])*,([0-9])*`
