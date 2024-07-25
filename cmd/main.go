@@ -31,7 +31,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(servCount)
 
-	configer := NewConfiger()
+	configer := config.NewConfiger(configPath)
 	conf, err := configer.GetConfig()
 	if err != nil {
 		logrus.Errorf("Cannot get the config: %v", err)
@@ -77,10 +77,6 @@ func main() {
 	}
 
 	logrus.Infoln("The application is done")
-}
-
-func NewConfiger() config.Configer {
-	return config.NewConfiger(configPath)
 }
 
 func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
