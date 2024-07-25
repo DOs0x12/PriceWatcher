@@ -61,13 +61,28 @@ func (s Service) servePriceWithTiming(
 	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) {
 	msg, _ := s.serveWithLogs()
+
+	var now time.Time
+
 	if msg != "" {
+		now = time.Now()
+		timeForMessage := priceTime.GetCallTime(now, s.conf.SendingHours)
+		durForMessage := timeForMessage.Sub(now)
+
+		select {
+		case <-ctx.Done():
+			logrus.Infoln("Interrupting waiting the time when to send a message")
+
+			return
+		case <-time.After(durForMessage):
+		}
+
 		for _, chatID := range subscribers.ChatIDs {
 			bot.SendMessage(msg, chatID)
 		}
 	}
 
-	now := time.Now()
+	now = time.Now()
 	dur := priceTime.PerStartDur(now)
 
 	select {
