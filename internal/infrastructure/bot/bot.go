@@ -66,7 +66,7 @@ func (t Telebot) Stop() {
 func (t Telebot) watchUpdates(ctx context.Context,
 	updCh tgbot.UpdatesChannel,
 	commands []telebot.Command) {
-	t.wg.Done()
+	defer t.wg.Done()
 
 	for {
 		select {

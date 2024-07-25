@@ -63,7 +63,6 @@ func main() {
 	bankService.WatchPrice(appCtx, wg, bot, subscribers)
 
 	wg.Wait()
-	appCancel()
 
 	err = subService.SaveSubscribers(subscribers)
 	if err != nil {
