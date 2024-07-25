@@ -109,6 +109,8 @@ func (t Telebot) SendMessage(msg string, chatID int64) error {
 
 			continue
 		}
+
+		return nil
 	}
 
 	return err
