@@ -1,7 +1,6 @@
 package main
 
 import (
-	internalApp "PriceWatcher/internal/app"
 	bankApp "PriceWatcher/internal/app/bank"
 	"PriceWatcher/internal/app/bank/interruption"
 	appBotComm "PriceWatcher/internal/app/bot/command"
@@ -73,7 +72,7 @@ func startWatching(ctx context.Context,
 	bankService bankApp.Service,
 	bot botInfra.Telebot,
 	subscribers *subEnt.Subscribers) {
-	internalApp.ServeMetalPrice(ctx, wg, bankService, bot, subscribers)
+	bankService.WatchPrice(ctx, wg, bot, subscribers)
 }
 
 func newContext() (ctx context.Context, cancel context.CancelFunc) {
