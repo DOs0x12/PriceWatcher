@@ -68,7 +68,7 @@ func (s Service) servePriceWithTiming(
 	}
 
 	now := time.Now()
-	dur := s.perStartWithLogs(now)
+	dur := priceTime.PerStartDur(now)
 
 	select {
 	case <-ctx.Done():
@@ -95,13 +95,6 @@ func (s Service) serveWithLogs() (string, string) {
 	logrus.Info("The price is processed")
 
 	return msg, sub
-}
-
-func (s Service) perStartWithLogs(now time.Time) time.Duration {
-	dur := perStartDur(now)
-	logrus.Infof("Waiting the start of the next period %v", dur)
-
-	return dur
 }
 
 func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
@@ -136,8 +129,4 @@ func (s Service) getWaitTime(now time.Time) time.Duration {
 	callTime := priceTime.GetCallTime(now, s.conf.SendingHours)
 
 	return getWaitDurWithRandomComp(now, callTime, randDur)
-}
-
-func perStartDur(now time.Time) time.Duration {
-	return priceTime.PerStartDur(now)
 }
