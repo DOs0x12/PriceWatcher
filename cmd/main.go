@@ -31,7 +31,7 @@ func main() {
 	configer := NewConfiger()
 	conf, err := configer.GetConfig()
 	if err != nil {
-		logrus.Error("%w", err)
+		logrus.Error("Cannot get the config: %w", err)
 	}
 
 	bankService := bankApp.NewService(bankInfra.BankRequester{},
@@ -40,7 +40,7 @@ func main() {
 	subService := bankInfra.SubscribingService{}
 	subscribers, err := subService.GetSubscribers()
 	if err != nil {
-		logrus.Errorf("cannot get subscribers: %v", err)
+		logrus.Errorf("Cannot get subscribers: %v", err)
 
 		return
 	}
@@ -48,40 +48,29 @@ func main() {
 	commands := createCommands(subscribers)
 	bot, err := botInfra.NewTelebot(wg, configer, commands)
 	if err != nil {
-		logrus.Errorf("bot: %v", err)
+		logrus.Errorf("A bot error occurs: %v", err)
 
 		return
 	}
 
-	startBot(appCtx, bot)
-	startWatching(appCtx, wg, bankService, bot, subscribers)
+	err = bot.Start(appCtx)
+	if err != nil {
+		logrus.Errorf("Cannot start a bot: %v", err)
+
+		return
+	}
+
+	bankService.WatchPrice(appCtx, wg, bot, subscribers)
 
 	wg.Wait()
 	appCancel()
 
 	err = subService.SaveSubscribers(subscribers)
 	if err != nil {
-		logrus.Errorf("cannot save the data of subscribers: %v", err)
+		logrus.Errorf("Cannot save the data of subscribers: %v", err)
 	}
 
 	logrus.Infoln("The application is done")
-}
-
-func startWatching(ctx context.Context,
-	wg *sync.WaitGroup,
-	bankService bankApp.Service,
-	bot botInfra.Telebot,
-	subscribers *subEnt.Subscribers) {
-	bankService.WatchPrice(ctx, wg, bot, subscribers)
-}
-
-func startBot(ctx context.Context, bot botInfra.Telebot) {
-	err := bot.Start(ctx)
-	if err != nil {
-		logrus.Errorf("bot: %v", err)
-
-		return
-	}
 }
 
 func NewConfiger() config.Configer {
