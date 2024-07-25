@@ -17,6 +17,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const configPath = "gold-price-watcher-data/config.yml"
+const subscribersFilePath = "gold-price-watcher-data/subscribers.yml"
+
 func main() {
 	appCtx, appCancel := context.WithCancel(context.Background())
 
@@ -42,7 +45,7 @@ func main() {
 	bankService := bankApp.NewService(bankInfra.BankRequester{}, priceExtractor, conf)
 
 	subService := bankInfra.SubscribingService{}
-	subscribers, err := subService.GetSubscribers()
+	subscribers, err := subService.GetSubscribers(subscribersFilePath)
 	if err != nil {
 		logrus.Errorf("Cannot get subscribers: %v", err)
 
@@ -68,7 +71,7 @@ func main() {
 
 	wg.Wait()
 
-	err = subService.SaveSubscribers(subscribers)
+	err = subService.SaveSubscribers(subscribers, subscribersFilePath)
 	if err != nil {
 		logrus.Errorf("Cannot save the data of subscribers: %v", err)
 	}
@@ -77,8 +80,6 @@ func main() {
 }
 
 func NewConfiger() config.Configer {
-	configPath := "gold-price-watcher-data/config.yml"
-
 	return config.NewConfiger(configPath)
 }
 

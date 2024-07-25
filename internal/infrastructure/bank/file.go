@@ -12,11 +12,9 @@ type subscribersDto struct {
 	Subscribers []int64 `yaml:"subscribers"`
 }
 
-const subscribersFilePath = "gold-price-watcher-data/subscribers.yml"
-
 type SubscribingService struct{}
 
-func (s SubscribingService) GetSubscribers() (*subscribing.Subscribers, error) {
+func (s SubscribingService) GetSubscribers(subscribersFilePath string) (*subscribing.Subscribers, error) {
 	subFile, err := os.ReadFile(subscribersFilePath)
 	if err != nil && errors.Is(err, os.ErrNotExist) {
 
@@ -30,7 +28,8 @@ func (s SubscribingService) GetSubscribers() (*subscribing.Subscribers, error) {
 	return unmarshalConf(subFile)
 }
 
-func (s SubscribingService) SaveSubscribers(subs *subscribing.Subscribers) error {
+func (s SubscribingService) SaveSubscribers(subs *subscribing.Subscribers,
+	subscribersFilePath string) error {
 	subsDto := castSubscribers(subs)
 	subsData, err := yaml.Marshal(&subsDto)
 	if err != nil {
