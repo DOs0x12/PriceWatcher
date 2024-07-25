@@ -83,7 +83,6 @@ func newContext() (ctx context.Context, cancel context.CancelFunc) {
 }
 
 func startBot(ctx context.Context, bot botInfra.Telebot) {
-
 	err := bot.Start(ctx)
 	if err != nil {
 		logrus.Errorf("bot: %v", err)
