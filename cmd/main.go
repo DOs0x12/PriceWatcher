@@ -18,12 +18,11 @@ import (
 )
 
 func main() {
-	watcherCtx, watcherCancel := newContext()
-	botCtx, botCancel := newContext()
+	appCtx, appCancel := context.WithCancel(context.Background())
 
 	logrus.Infoln("Start the application")
 
-	interruption.WatchForInterruption(watcherCancel, botCancel)
+	interruption.WatchForInterruption(appCancel)
 
 	servCount := 2
 	wg := &sync.WaitGroup{}
@@ -54,10 +53,11 @@ func main() {
 		return
 	}
 
-	startBot(botCtx, bot)
-	startWatching(watcherCtx, wg, bankService, bot, subscribers)
+	startBot(appCtx, bot)
+	startWatching(appCtx, wg, bankService, bot, subscribers)
 
 	wg.Wait()
+	appCancel()
 
 	err = subService.SaveSubscribers(subscribers)
 	if err != nil {
@@ -73,10 +73,6 @@ func startWatching(ctx context.Context,
 	bot botInfra.Telebot,
 	subscribers *subEnt.Subscribers) {
 	bankService.WatchPrice(ctx, wg, bot, subscribers)
-}
-
-func newContext() (ctx context.Context, cancel context.CancelFunc) {
-	return context.WithCancel(context.Background())
 }
 
 func startBot(ctx context.Context, bot botInfra.Telebot) {
