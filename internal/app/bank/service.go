@@ -66,8 +66,7 @@ func (s Service) servePriceWithTiming(
 
 	if msg != "" {
 		now = time.Now()
-		timeForMessage := priceTime.GetCallTime(now, s.conf.SendingHours)
-		durForMessage := timeForMessage.Sub(now)
+		durForMessage := priceTime.DurToSendMessage(now, s.conf.SendingHours)
 
 		select {
 		case <-ctx.Done():
