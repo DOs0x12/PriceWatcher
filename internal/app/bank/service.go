@@ -60,7 +60,14 @@ func (s Service) servePriceWithTiming(
 	timer *time.Timer,
 	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) {
-	msg, _ := s.serveWithLogs()
+	msg, _, err := s.getMessageWithPrice()
+	if err != nil {
+		logrus.Errorf("An error occurs while serving a price: %v", err)
+
+		return
+	}
+
+	logrus.Info("The price is processed")
 
 	var now time.Time
 
@@ -88,19 +95,6 @@ func (s Service) servePriceWithTiming(
 	timer.Reset(dur)
 }
 
-func (s Service) serveWithLogs() (string, string) {
-	msg, sub, err := s.servePrice()
-	if err != nil {
-		logrus.Errorf("An error occurs while serving a price: %v", err)
-
-		return "", ""
-	}
-
-	logrus.Info("The price is processed")
-
-	return msg, sub
-}
-
 func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
 	dur := s.getWaitTime(now)
 	logrus.Infof("Waiting %v", dur)
@@ -108,7 +102,7 @@ func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
 	return dur
 }
 
-func (s Service) servePrice() (message, subject string, err error) {
+func (s Service) getMessageWithPrice() (message, subject string, err error) {
 	logrus.Infof("Start processing a price")
 
 	response, err := s.req.RequestPage()
