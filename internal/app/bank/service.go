@@ -83,18 +83,7 @@ func (s Service) servePriceWithTiming(
 	}
 
 	now = time.Now()
-	dur := priceTime.PerStartDur(now)
-
-	select {
-	case <-ctx.Done():
-		logrus.Infoln("Interrupting waiting the next period")
-
-		return
-	case <-time.After(dur):
-	}
-
-	now = time.Now()
-	dur = s.getWaitTimeWithLogs(now)
+	dur := s.getWaitTimeWithLogs(now)
 
 	timer.Reset(dur)
 }
