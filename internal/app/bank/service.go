@@ -67,6 +67,7 @@ func (s Service) servePriceWithTiming(
 	if msg != "" {
 		now = time.Now()
 		durForMessage := priceTime.DurToSendMessage(now, s.conf.SendingHours)
+		logrus.Infof("Waiting the time to send a message: %v", durForMessage)
 
 		select {
 		case <-ctx.Done():
