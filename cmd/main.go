@@ -17,8 +17,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const configPath = "gold-price-watcher-data/config.yml"
-const subscribersFilePath = "gold-price-watcher-data/subscribers.yml"
+const configPath = "price-watcher-data/config.yml"
+const subscribersFilePath = "price-watcher-data/subscribers.yml"
 
 func main() {
 	appCtx, appCancel := context.WithCancel(context.Background())

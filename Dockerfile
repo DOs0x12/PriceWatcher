@@ -7,10 +7,10 @@ RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
 WORKDIR /app/cmd
-RUN CGO_ENABLED=0 GOOS=linux go build -o /gold-price-watcher
+RUN CGO_ENABLED=0 GOOS=linux go build -o /price-watcher
 
 FROM ubuntu:latest AS release-stage
-COPY --from=build-stage /gold-price-watcher /gold-price-watcher
+COPY --from=build-stage /price-watcher /price-watcher
 
 RUN apt -y update
 RUN apt install -y software-properties-common
@@ -27,5 +27,5 @@ RUN apt install -y tzdata
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt clean
-RUN mkdir /gold-price-watcher-data
-CMD ["/gold-price-watcher"]
+RUN mkdir /price-watcher-data
+CMD ["/price-watcher"]
