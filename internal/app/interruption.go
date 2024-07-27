@@ -1,4 +1,4 @@
-package interruption
+package app
 
 import (
 	"context"

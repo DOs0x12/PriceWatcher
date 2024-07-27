@@ -1,10 +1,9 @@
 package main
 
 import (
+	"PriceWatcher/internal/app"
 	bankApp "PriceWatcher/internal/app/bank"
-	"PriceWatcher/internal/app/bank/interruption"
 	appBotComm "PriceWatcher/internal/app/bot/command"
-	appPrice "PriceWatcher/internal/app/bot/command/price"
 	bankDom "PriceWatcher/internal/domain/bank"
 	subEnt "PriceWatcher/internal/entities/subscribing"
 	botEnt "PriceWatcher/internal/entities/telebot"
@@ -25,7 +24,7 @@ func main() {
 
 	logrus.Infoln("Start the application")
 
-	interruption.WatchForInterruption(appCancel)
+	app.WatchForInterruption(appCancel)
 
 	servCount := 2
 	wg := &sync.WaitGroup{}
@@ -80,7 +79,8 @@ func main() {
 }
 
 func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
-	subCom := appPrice.SubscribingComm{Subscribers: subscribers}
-
-	return appBotComm.CreateCommands(subCom)
+	return []botEnt.Command{
+		appBotComm.CreateHelloCommand(),
+		appBotComm.CreateSubCommand(subscribers),
+	}
 }
