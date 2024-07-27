@@ -96,7 +96,7 @@ func (s Service) servePriceWithTiming(
 }
 
 func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
-	dur := s.getWaitTime(now)
+	dur := priceTime.GetWaitTimeWithRandomComp(now, s.conf.SendingHours)
 	logrus.Infof("Waiting %v", dur)
 
 	return dur
@@ -119,12 +119,4 @@ func (s Service) getMessageWithPrice() (message, subject string, err error) {
 	sub := "Че по золоту?"
 
 	return msg, sub, nil
-}
-
-func (s Service) getWaitTime(now time.Time) time.Duration {
-	variation := 1800
-	randDur := priceTime.RandomSec(variation)
-	callTime := priceTime.GetCallTime(now, s.conf.SendingHours)
-
-	return getWaitDurWithRandomComp(now, callTime, randDur)
 }
