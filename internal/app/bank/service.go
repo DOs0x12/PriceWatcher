@@ -60,7 +60,7 @@ func (s Service) servePriceWithTiming(
 	timer *time.Timer,
 	bot interfaces.Bot,
 	subscribers *subscribing.Subscribers) {
-	msg, _, err := s.getMessageWithPrice()
+	msg, err := s.getMessageWithPrice()
 	if err != nil {
 		logrus.Errorf("An error occurs while serving a price: %v", err)
 
@@ -102,21 +102,20 @@ func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
 	return dur
 }
 
-func (s Service) getMessageWithPrice() (message, subject string, err error) {
+func (s Service) getMessageWithPrice() (message string, err error) {
 	logrus.Infof("Start processing a price")
 
 	response, err := s.req.RequestPage()
 	if err != nil {
-		return "", "", fmt.Errorf("cannot get a page with the current price: %w", err)
+		return "", fmt.Errorf("cannot get a page with the current price: %w", err)
 	}
 
 	price, err := s.ext.ExtractPrice(response.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("cannot extract the price from the body: %w", err)
+		return "", fmt.Errorf("cannot extract the price from the body: %w", err)
 	}
 
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
-	sub := "Че по золоту?"
 
-	return msg, sub, nil
+	return msg, nil
 }
