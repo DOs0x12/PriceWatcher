@@ -1,2 +1,2 @@
-# GoldPriceWatcher
-An app is for watching a gold price from a site.
+# PriceWatcher
+An app is for watching a price from a site.

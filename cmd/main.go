@@ -1,10 +1,9 @@
 package main
 
 import (
+	"PriceWatcher/internal/app"
 	bankApp "PriceWatcher/internal/app/bank"
-	"PriceWatcher/internal/app/bank/interruption"
 	appBotComm "PriceWatcher/internal/app/bot/command"
-	appPrice "PriceWatcher/internal/app/bot/command/price"
 	bankDom "PriceWatcher/internal/domain/bank"
 	subEnt "PriceWatcher/internal/entities/subscribing"
 	botEnt "PriceWatcher/internal/entities/telebot"
@@ -17,15 +16,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const configPath = "gold-price-watcher-data/config.yml"
-const subscribersFilePath = "gold-price-watcher-data/subscribers.yml"
+const configPath = "price-watcher-data/config.yml"
+const subscribersFilePath = "price-watcher-data/subscribers.yml"
 
 func main() {
 	appCtx, appCancel := context.WithCancel(context.Background())
 
 	logrus.Infoln("Start the application")
 
-	interruption.WatchForInterruption(appCancel)
+	app.WatchForInterruption(appCancel)
 
 	servCount := 2
 	wg := &sync.WaitGroup{}
@@ -80,7 +79,8 @@ func main() {
 }
 
 func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
-	subCom := appPrice.SubscribingComm{Subscribers: subscribers}
-
-	return appBotComm.CreateCommands(subCom)
+	return []botEnt.Command{
+		appBotComm.CreateHelloCommand(),
+		appBotComm.CreateSubCommand(subscribers),
+	}
 }

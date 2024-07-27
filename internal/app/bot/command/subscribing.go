@@ -1,4 +1,4 @@
-package price
+package command
 
 import (
 	"PriceWatcher/internal/entities/subscribing"
