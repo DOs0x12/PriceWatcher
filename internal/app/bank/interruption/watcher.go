@@ -8,7 +8,7 @@ import (
 )
 
 func WatchForInterruption(cancels ...context.CancelFunc) {
-	c := make(chan os.Signal, 2)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-c
