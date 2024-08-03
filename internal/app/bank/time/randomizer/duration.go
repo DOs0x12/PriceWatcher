@@ -1,4 +1,4 @@
-package time
+package randomizer
 
 import (
 	"math/rand"

@@ -1,13 +1,15 @@
-package time
+package waiting
 
 import (
+	"PriceWatcher/internal/app/bank/time/call"
+	"PriceWatcher/internal/app/bank/time/randomizer"
 	"time"
 )
 
 func GetWaitTimeWithRandomComp(now time.Time, callHours []int) time.Duration {
 	variation := 1800
-	randDur := RandomSec(variation)
-	callTime := GetCallTime(now, callHours)
+	randDur := randomizer.RandomSec(variation)
+	callTime := call.GetCallTime(now, callHours)
 
 	return getWaitDurWithProcessingTime(now, callTime, randDur)
 }
