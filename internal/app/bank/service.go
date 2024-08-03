@@ -7,7 +7,9 @@ import (
 	entConfig "PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/infrastructure/bank/request"
-	"PriceWatcher/internal/interfaces"
+	"PriceWatcher/internal/interfaces/bot"
+	"PriceWatcher/internal/interfaces/extractor"
+	"PriceWatcher/internal/interfaces/requester"
 	"context"
 	"sync"
 
@@ -18,8 +20,8 @@ import (
 )
 
 type Service struct {
-	req  interfaces.Requester
-	ext  interfaces.Extractor
+	req  requester.Requester
+	ext  extractor.Extractor
 	conf entConfig.Config
 }
 
@@ -36,7 +38,7 @@ func NewService(
 
 func (s Service) WatchPrice(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot interfaces.Bot,
+	bot bot.Bot,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
@@ -59,7 +61,7 @@ func (s Service) WatchPrice(ctx context.Context,
 func (s Service) servePriceWithTiming(
 	ctx context.Context,
 	timer *time.Timer,
-	bot interfaces.Bot,
+	bot bot.Bot,
 	subscribers *subscribing.Subscribers) {
 	msg, err := s.getMessageWithPrice()
 	if err != nil {

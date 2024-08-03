@@ -1,4 +1,4 @@
-package interfaces
+package configer
 
 import "PriceWatcher/internal/entities/config"
 

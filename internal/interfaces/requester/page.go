@@ -1,4 +1,4 @@
-package interfaces
+package requester
 
 import "PriceWatcher/internal/entities/bank"
 
