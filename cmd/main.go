@@ -7,7 +7,8 @@ import (
 	bankDom "PriceWatcher/internal/domain/bank"
 	subEnt "PriceWatcher/internal/entities/subscribing"
 	botEnt "PriceWatcher/internal/entities/telebot"
-	bankInfra "PriceWatcher/internal/infrastructure/bank"
+	infraReq "PriceWatcher/internal/infrastructure/bank/request"
+	infraSub "PriceWatcher/internal/infrastructure/bank/subscribing"
 	botInfra "PriceWatcher/internal/infrastructure/bot"
 	"PriceWatcher/internal/infrastructure/config"
 	"context"
@@ -41,9 +42,9 @@ func main() {
 	priceRegEx := `([0-9]).*([0-9])*,([0-9])*`
 	priceTag := "div"
 	priceExtractor := bankDom.NewPriceExtractor(priceRegEx, priceTag)
-	bankService := bankApp.NewService(bankInfra.BankRequester{}, priceExtractor, conf)
+	bankService := bankApp.NewService(infraReq.BankRequester{}, priceExtractor, conf)
 
-	subService := bankInfra.SubscribingService{}
+	subService := infraSub.SubscribingService{}
 	subscribers, err := subService.GetSubscribers(subscribersFilePath)
 	if err != nil {
 		logrus.Errorf("Cannot get subscribers: %v", err)

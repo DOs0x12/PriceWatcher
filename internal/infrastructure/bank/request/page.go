@@ -1,4 +1,4 @@
-package bank
+package request
 
 import (
 	"PriceWatcher/internal/entities/bank"

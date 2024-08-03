@@ -6,7 +6,7 @@ import (
 	domBank "PriceWatcher/internal/domain/bank"
 	entConfig "PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/entities/subscribing"
-	infraBank "PriceWatcher/internal/infrastructure/bank"
+	"PriceWatcher/internal/infrastructure/bank/request"
 	"PriceWatcher/internal/interfaces"
 	"context"
 	"sync"
@@ -24,7 +24,7 @@ type Service struct {
 }
 
 func NewService(
-	req infraBank.BankRequester,
+	req request.BankRequester,
 	ext domBank.PriceExtractor,
 	conf entConfig.Config) Service {
 	return Service{
