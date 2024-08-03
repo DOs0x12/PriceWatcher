@@ -83,5 +83,6 @@ func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
 	return []botEnt.Command{
 		appBotComm.CreateHelloCommand(),
 		appBotComm.CreateSubCommand(subscribers),
+		appBotComm.CreateUnsubCommand(subscribers),
 	}
 }
