@@ -71,26 +71,30 @@ func (t Telebot) watchUpdates(ctx context.Context,
 	for {
 		select {
 		case upd := <-updCh:
-			if upd.Message == nil {
-				continue
-			}
-
-			if !upd.Message.IsCommand() {
-				continue
-			}
-
-			for _, command := range commands {
-				if upd.Message.Text == command.Name {
-					chatID := upd.Message.Chat.ID
-					comResult := command.Action(upd)
-
-					if err := t.SendMessage(comResult, chatID); err != nil {
-						logrus.Errorf("cannot send a message: %v", err)
-					}
-				}
-			}
+			t.processUpdate(upd, commands)
 		case <-ctx.Done():
 			return
+		}
+	}
+}
+
+func (t Telebot) processUpdate(upd tgbot.Update, commands []telebot.Command) {
+	if upd.Message == nil {
+		return
+	}
+
+	if !upd.Message.IsCommand() {
+		return
+	}
+
+	for _, command := range commands {
+		if upd.Message.Text == command.Name {
+			chatID := upd.Message.Chat.ID
+			comResult := command.Action(upd)
+
+			if err := t.SendMessage(comResult, chatID); err != nil {
+				logrus.Errorf("cannot send a message: %v", err)
+			}
 		}
 	}
 }
