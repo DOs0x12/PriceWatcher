@@ -80,9 +80,10 @@ func main() {
 }
 
 func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
+	mu := &sync.Mutex{}
 	return []botEnt.Command{
 		appBotComm.CreateHelloCommand(),
-		appBotComm.CreateSubCommand(subscribers),
-		appBotComm.CreateUnsubCommand(subscribers),
+		appBotComm.CreateSubCommand(mu, subscribers),
+		appBotComm.CreateUnsubCommand(mu, subscribers),
 	}
 }

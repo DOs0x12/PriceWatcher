@@ -4,6 +4,7 @@ import (
 	subComms "PriceWatcher/internal/app/bot/command/subscribing"
 	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/entities/telebot"
+	"sync"
 )
 
 func CreateHelloCommand() telebot.Command {
@@ -16,8 +17,8 @@ func CreateHelloCommand() telebot.Command {
 	}
 }
 
-func CreateSubCommand(subs *subscribing.Subscribers) telebot.Command {
-	subCom := subComms.SubscribingComm{Subscribers: subs}
+func CreateSubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.Command {
+	subCom := subComms.NewSubCommand(mu, subs)
 	return telebot.Command{
 		Name:        "/subscribe",
 		Description: "Subscribe to messages of the current price ",
@@ -25,8 +26,8 @@ func CreateSubCommand(subs *subscribing.Subscribers) telebot.Command {
 	}
 }
 
-func CreateUnsubCommand(subs *subscribing.Subscribers) telebot.Command {
-	unsubCom := subComms.UnsubscribingComm{Subscribers: subs}
+func CreateUnsubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.Command {
+	unsubCom := subComms.NewUnsubCommand(mu, subs)
 	return telebot.Command{
 		Name:        "/subscribe",
 		Description: "Subscribe to messages of the current price ",
