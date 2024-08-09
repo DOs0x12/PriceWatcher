@@ -29,7 +29,7 @@ func CreateSubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.Com
 func CreateUnsubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.Command {
 	unsubCom := subComms.NewUnsubCommand(mu, subs)
 	return telebot.Command{
-		Name:        "/subscribe",
+		Name:        "/unsubscribe",
 		Description: "Subscribe to messages of the current price ",
 		Action:      unsubCom.UnsubscribeUser,
 	}
