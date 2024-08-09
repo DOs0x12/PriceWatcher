@@ -2,13 +2,19 @@ package subscribing
 
 import (
 	"PriceWatcher/internal/entities/subscribing"
+	"sync"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slices"
 )
 
 type UnsubscribingComm struct {
+	mu          *sync.Mutex
 	Subscribers *subscribing.Subscribers
+}
+
+func NewUnsubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) UnsubscribingComm {
+	return UnsubscribingComm{mu: mu, Subscribers: subscribers}
 }
 
 func (c UnsubscribingComm) UnsubscribeUser(input interface{}) string {
