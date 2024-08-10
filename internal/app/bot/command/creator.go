@@ -21,7 +21,7 @@ func CreateSubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.Com
 	subCom := subComms.NewSubCommand(mu, subs)
 	return telebot.Command{
 		Name:        "/subscribe",
-		Description: "Subscribe to messages of the current price ",
+		Description: "Subscribe to messages of the current gold price ",
 		Action:      subCom.SubscribeUser,
 	}
 }
@@ -30,7 +30,7 @@ func CreateUnsubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) telebot.C
 	unsubCom := subComms.NewUnsubCommand(mu, subs)
 	return telebot.Command{
 		Name:        "/unsubscribe",
-		Description: "Subscribe to messages of the current price ",
+		Description: "Subscribe from notifications about the current gold price ",
 		Action:      unsubCom.UnsubscribeUser,
 	}
 }

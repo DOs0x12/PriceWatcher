@@ -34,5 +34,5 @@ func (c UnsubscribingComm) UnsubscribeUser(input interface{}) string {
 
 	c.Subscribers.ChatIDs = slices.Delete(c.Subscribers.ChatIDs, idIndex, idIndex+1)
 
-	return "The user is subscribed for current metal price notifications!"
+	return "The user is unsubscribed from current gold price notifications!"
 }
