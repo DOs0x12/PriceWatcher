@@ -1,4 +1,4 @@
-package subscriber
+package bank
 
 import "PriceWatcher/internal/entities/subscribing"
 

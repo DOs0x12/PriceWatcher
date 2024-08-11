@@ -6,8 +6,7 @@ import (
 	entConfig "PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/entities/subscribing"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
-	"PriceWatcher/internal/interfaces/bank/page"
-	extract "PriceWatcher/internal/interfaces/bank/price"
+	interfBank "PriceWatcher/internal/interfaces/bank"
 	"PriceWatcher/internal/interfaces/bot"
 	"context"
 	"sync"
@@ -19,8 +18,8 @@ import (
 )
 
 type Service struct {
-	req  page.Requester
-	ext  extract.Extractor
+	req  interfBank.Requester
+	ext  interfBank.Extractor
 	conf entConfig.Config
 }
 
