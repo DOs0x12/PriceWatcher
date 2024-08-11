@@ -1,8 +1,7 @@
 package bank
 
 import (
-	"PriceWatcher/internal/app/bank/time/duration/sending"
-	"PriceWatcher/internal/app/bank/time/waiting"
+	bankTime "PriceWatcher/internal/app/bank/time"
 	domBank "PriceWatcher/internal/domain/bank"
 	"PriceWatcher/internal/entities/bank/subscribing"
 	entConfig "PriceWatcher/internal/entities/config"
@@ -76,7 +75,7 @@ func (s Service) servePriceWithTiming(
 
 	if msg != "" {
 		now = time.Now()
-		durForMessage := sending.DurToSendMessage(now, s.conf.SendingHours)
+		durForMessage := bankTime.DurToSendMessage(now, s.conf.SendingHours)
 		logrus.Infof("Waiting the time to send a message: %v", durForMessage)
 
 		select {
@@ -99,7 +98,7 @@ func (s Service) servePriceWithTiming(
 }
 
 func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
-	dur := waiting.GetWaitTimeWithRandomComp(now, s.conf.SendingHours)
+	dur := bankTime.GetWaitTimeWithRandomComp(now, s.conf.SendingHours)
 	logrus.Infof("Waiting %v", dur)
 
 	return dur

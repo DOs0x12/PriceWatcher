@@ -1,12 +1,11 @@
-package sending
+package time
 
 import (
-	"PriceWatcher/internal/app/bank/time/call"
 	"time"
 )
 
 func DurToSendMessage(now time.Time, callHours []int) time.Duration {
-	timeForMessage := call.GetCallTime(now, callHours)
+	timeForMessage := getCallTime(now, callHours)
 
 	return timeForMessage.Sub(now)
 }
