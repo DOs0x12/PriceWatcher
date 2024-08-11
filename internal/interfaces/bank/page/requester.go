@@ -1,7 +1,7 @@
 package page
 
-import "PriceWatcher/internal/entities/bank/page"
+import "PriceWatcher/internal/entities/bank"
 
 type Requester interface {
-	RequestPage() (page.Response, error)
+	RequestPage() (bank.Page, error)
 }

@@ -3,8 +3,8 @@ package bank
 import (
 	bankTime "PriceWatcher/internal/app/bank/time"
 	domBank "PriceWatcher/internal/domain/bank"
-	"PriceWatcher/internal/entities/bank/subscribing"
 	entConfig "PriceWatcher/internal/entities/config"
+	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/infrastructure/bank/request"
 	"PriceWatcher/internal/interfaces/bank/page"
 	extract "PriceWatcher/internal/interfaces/bank/price"

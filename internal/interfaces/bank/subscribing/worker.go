@@ -1,6 +1,6 @@
 package subscriber
 
-import "PriceWatcher/internal/entities/bank/subscribing"
+import "PriceWatcher/internal/entities/subscribing"
 
 type Worker interface {
 	GetSubscribers() (*subscribing.Subscribers, error)

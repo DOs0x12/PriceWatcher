@@ -1,7 +1,7 @@
 package subscribing
 
 import (
-	"PriceWatcher/internal/entities/bank/subscribing"
+	"PriceWatcher/internal/entities/subscribing"
 	"errors"
 	"os"
 

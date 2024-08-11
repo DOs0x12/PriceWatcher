@@ -1,8 +1,8 @@
 package command
 
 import (
-	"PriceWatcher/internal/entities/bank/subscribing"
 	"PriceWatcher/internal/entities/bot"
+	"PriceWatcher/internal/entities/subscribing"
 	"sync"
 )
 

@@ -1,7 +1,7 @@
 package telebot
 
 import (
-	"PriceWatcher/internal/entities/bank/subscribing"
+	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/interfaces/bot"
 	"context"
 	"fmt"
