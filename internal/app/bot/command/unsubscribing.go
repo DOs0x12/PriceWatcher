@@ -1,4 +1,4 @@
-package subscribing
+package command
 
 import (
 	"PriceWatcher/internal/entities/bank/subscribing"
@@ -8,16 +8,16 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type UnsubscribingComm struct {
+type unsubscribingComm struct {
 	mu          *sync.Mutex
 	Subscribers *subscribing.Subscribers
 }
 
-func NewUnsubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) UnsubscribingComm {
-	return UnsubscribingComm{mu: mu, Subscribers: subscribers}
+func newUnsubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) unsubscribingComm {
+	return unsubscribingComm{mu: mu, Subscribers: subscribers}
 }
 
-func (c UnsubscribingComm) UnsubscribeUser(input interface{}) string {
+func (c unsubscribingComm) unsubscribeUser(input interface{}) string {
 	errMessage := "The user is not subscribed!"
 
 	c.mu.Lock()

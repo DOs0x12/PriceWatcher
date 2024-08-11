@@ -1,4 +1,4 @@
-package subscribing
+package command
 
 import (
 	"PriceWatcher/internal/entities/bank/subscribing"
@@ -8,16 +8,16 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type SubscribingComm struct {
+type subscribingComm struct {
 	mu          *sync.Mutex
 	Subscribers *subscribing.Subscribers
 }
 
-func NewSubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) SubscribingComm {
-	return SubscribingComm{mu: mu, Subscribers: subscribers}
+func newSubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) subscribingComm {
+	return subscribingComm{mu: mu, Subscribers: subscribers}
 }
 
-func (c SubscribingComm) SubscribeUser(input interface{}) string {
+func (c subscribingComm) subscribeUser(input interface{}) string {
 	upd := input.(tgbotapi.Update)
 	c.mu.Lock()
 	defer c.mu.Unlock()
