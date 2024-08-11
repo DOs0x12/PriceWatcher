@@ -2,7 +2,7 @@ package waiting
 
 import (
 	"PriceWatcher/internal/app/bank/time/call"
-	"PriceWatcher/internal/app/bank/time/randomizer"
+	"PriceWatcher/internal/app/bank/time/duration/randomizer"
 	"time"
 )
 

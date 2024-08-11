@@ -1,8 +1,8 @@
-package subscribing
+package subscriber
 
-import "PriceWatcher/internal/entities/subscribing"
+import "PriceWatcher/internal/entities/bank/subscribing"
 
-type Subscribers interface {
+type Worker interface {
 	GetSubscribers() (*subscribing.Subscribers, error)
 	SaveSubscribers(subs *subscribing.Subscribers) error
 }

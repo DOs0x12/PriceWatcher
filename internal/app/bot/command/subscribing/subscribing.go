@@ -1,7 +1,7 @@
 package subscribing
 
 import (
-	"PriceWatcher/internal/entities/subscribing"
+	"PriceWatcher/internal/entities/bank/subscribing"
 	"sync"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"

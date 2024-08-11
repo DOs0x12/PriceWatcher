@@ -1,7 +1,8 @@
-package telebot
+package bot
 
 import (
-	"PriceWatcher/internal/entities/telebot"
+	telebot "PriceWatcher/internal/entities/bot"
+	infraComm "PriceWatcher/internal/infrastructure/bot/command"
 	"PriceWatcher/internal/infrastructure/config"
 	"context"
 	"fmt"
@@ -51,7 +52,9 @@ func (t Telebot) Start(ctx context.Context) error {
 }
 
 func (t Telebot) registerCommands(commands []telebot.Command) error {
-	if err := t.configureCommands(commands); err != nil {
+	conf := infraComm.ConfigureCommands(commands)
+
+	if _, err := t.bot.Request(conf); err != nil {
 		return fmt.Errorf("getting an error at registering commands: %v", err)
 	}
 

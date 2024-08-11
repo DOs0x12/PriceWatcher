@@ -1,4 +1,4 @@
-package telebot
+package bot
 
 type Command struct {
 	Name        string

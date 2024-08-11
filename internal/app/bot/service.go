@@ -1,7 +1,7 @@
 package telebot
 
 import (
-	"PriceWatcher/internal/entities/subscribing"
+	"PriceWatcher/internal/entities/bank/subscribing"
 	"PriceWatcher/internal/interfaces/bot"
 	"context"
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 func Start(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot bot.Bot,
+	bot bot.Worker,
 	subscribers *subscribing.Subscribers) error {
 	if err := bot.Start(ctx); err != nil {
 		return fmt.Errorf("can not start the bot: %v", err)

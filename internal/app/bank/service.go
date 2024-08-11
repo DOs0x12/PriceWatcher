@@ -1,15 +1,15 @@
 package bank
 
 import (
-	"PriceWatcher/internal/app/bank/time/sending"
+	"PriceWatcher/internal/app/bank/time/duration/sending"
 	"PriceWatcher/internal/app/bank/time/waiting"
 	domBank "PriceWatcher/internal/domain/bank"
+	"PriceWatcher/internal/entities/bank/subscribing"
 	entConfig "PriceWatcher/internal/entities/config"
-	"PriceWatcher/internal/entities/subscribing"
 	"PriceWatcher/internal/infrastructure/bank/request"
+	"PriceWatcher/internal/interfaces/bank/page"
+	extract "PriceWatcher/internal/interfaces/bank/price"
 	"PriceWatcher/internal/interfaces/bot"
-	"PriceWatcher/internal/interfaces/extractor"
-	"PriceWatcher/internal/interfaces/requester"
 	"context"
 	"sync"
 
@@ -20,8 +20,8 @@ import (
 )
 
 type Service struct {
-	req  requester.Requester
-	ext  extractor.Extractor
+	req  page.Requester
+	ext  extract.Extractor
 	conf entConfig.Config
 }
 
@@ -38,7 +38,7 @@ func NewService(
 
 func (s Service) WatchPrice(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot bot.Bot,
+	bot bot.Worker,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
@@ -61,7 +61,7 @@ func (s Service) WatchPrice(ctx context.Context,
 func (s Service) servePriceWithTiming(
 	ctx context.Context,
 	timer *time.Timer,
-	bot bot.Bot,
+	bot bot.Worker,
 	subscribers *subscribing.Subscribers) {
 	msg, err := s.getMessageWithPrice()
 	if err != nil {
