@@ -18,7 +18,7 @@ func NewUnsubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) Unsub
 }
 
 func (c UnsubscribingComm) UnsubscribeUser(input interface{}) string {
-	errMessage := "Error: the user is not subscribed!"
+	errMessage := "The user is not subscribed!"
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
