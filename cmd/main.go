@@ -7,10 +7,10 @@ import (
 	bankDom "PriceWatcher/internal/domain/bank"
 	botEnt "PriceWatcher/internal/entities/bot"
 	subEnt "PriceWatcher/internal/entities/subscribing"
-	infraReq "PriceWatcher/internal/infrastructure/bank/request"
-	infraSub "PriceWatcher/internal/infrastructure/bank/subscribing"
+	infraBank "PriceWatcher/internal/infrastructure/bank"
 	botInfra "PriceWatcher/internal/infrastructure/bot"
 	"PriceWatcher/internal/infrastructure/config"
+	infraSub "PriceWatcher/internal/infrastructure/subscribing"
 	"context"
 	"sync"
 
@@ -42,7 +42,7 @@ func main() {
 	priceRegEx := `([0-9]).*([0-9])*,([0-9])*`
 	priceTag := "div"
 	priceExtractor := bankDom.NewPriceExtractor(priceRegEx, priceTag)
-	bankService := bankApp.NewService(infraReq.BankRequester{}, priceExtractor, conf)
+	bankService := bankApp.NewService(infraBank.BankRequester{}, priceExtractor, conf)
 
 	subService := infraSub.SubscribingService{}
 	subscribers, err := subService.GetSubscribers(subscribersFilePath)
