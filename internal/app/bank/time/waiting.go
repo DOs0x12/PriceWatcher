@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-func GetWaitTimeWithRandomComp(now time.Time, callHours []int) time.Duration {
+func GetWaitDurWithRandomComp(now time.Time, callHours []int) time.Duration {
 	variation := 1800
-	randDur := randomSec(variation)
+	randDur := randomDurSec(variation)
 	callTime := getCallTime(now, callHours)
 	waitDur := callTime.Sub(now)
 	processingTime := 3 * time.Minute
@@ -20,7 +20,7 @@ func GetWaitTimeWithRandomComp(now time.Time, callHours []int) time.Duration {
 	return waitDur - randComp
 }
 
-func randomSec(variationInSec int) time.Duration {
+func randomDurSec(variationInSec int) time.Duration {
 	randComp := rand.Intn(variationInSec)
 	return time.Duration(randComp) * time.Second
 }

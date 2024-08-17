@@ -40,7 +40,7 @@ func (s Service) WatchPrice(ctx context.Context,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
-	dur := s.getWaitTimeWithLogs(time.Now())
+	dur := s.getWaitDurWithLogs(time.Now())
 
 	t := time.NewTimer(dur)
 	callChan := t.C
@@ -91,13 +91,13 @@ func (s Service) servePriceWithTiming(
 	}
 
 	now = time.Now()
-	dur := s.getWaitTimeWithLogs(now)
+	dur := s.getWaitDurWithLogs(now)
 
 	timer.Reset(dur)
 }
 
-func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
-	dur := bankTime.GetWaitTimeWithRandomComp(now, s.conf.SendingHours)
+func (s Service) getWaitDurWithLogs(now time.Time) time.Duration {
+	dur := bankTime.GetWaitDurWithRandomComp(now, s.conf.SendingHours)
 	logrus.Infof("Waiting %v", dur)
 
 	return dur
