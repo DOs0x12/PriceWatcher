@@ -70,30 +70,29 @@ func (s Service) servePriceWithTiming(
 
 	logrus.Info("The price is processed")
 
-	var now time.Time
+	if msg == "" {
+		s.resetTimer(timer)
 
-	if msg != "" {
-		now = time.Now()
-		durForMessage := bankTime.DurToSendMessage(now, s.conf.SendingHours)
-		logrus.Infof("Waiting the time to send a message: %v", durForMessage)
-
-		select {
-		case <-ctx.Done():
-			logrus.Infoln("Interrupting waiting the time when to send a message")
-
-			return
-		case <-time.After(durForMessage):
-		}
-
-		for _, chatID := range subscribers.ChatIDs {
-			bot.SendMessage(msg, chatID)
-		}
+		return
 	}
 
-	now = time.Now()
-	dur := s.getWaitDurWithLogs(now)
+	now := time.Now()
+	durForMessage := bankTime.DurToSendMessage(now, s.conf.SendingHours)
+	logrus.Infof("Waiting the time to send a message: %v", durForMessage)
 
-	timer.Reset(dur)
+	select {
+	case <-ctx.Done():
+		logrus.Infoln("Interrupting waiting the time when to send a message")
+
+		return
+	case <-time.After(durForMessage):
+	}
+
+	for _, chatID := range subscribers.ChatIDs {
+		bot.SendMessage(msg, chatID)
+	}
+
+	s.resetTimer(timer)
 }
 
 func (s Service) getWaitDurWithLogs(now time.Time) time.Duration {
@@ -119,4 +118,10 @@ func (s Service) getMessageWithPrice() (message string, err error) {
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
 
 	return msg, nil
+}
+
+func (s Service) resetTimer(timer *time.Timer) {
+	now := time.Now()
+	dur := s.getWaitDurWithLogs(now)
+	timer.Reset(dur)
 }
