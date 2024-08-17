@@ -72,6 +72,7 @@ func (s Service) servePriceWithTiming(
 
 	if msg == "" {
 		s.resetTimer(timer)
+		logrus.Infof("A message of the processed price is empty")
 
 		return
 	}
