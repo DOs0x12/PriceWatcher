@@ -9,22 +9,12 @@ func GetWaitTimeWithRandomComp(now time.Time, callHours []int) time.Duration {
 	variation := 1800
 	randDur := randomSec(variation)
 	callTime := getCallTime(now, callHours)
-
-	return getWaitDurWithProcessingTime(now, callTime, randDur)
-}
-
-func getWaitDurWithProcessingTime(now time.Time, callTime time.Time, randDur time.Duration) time.Duration {
 	waitDur := callTime.Sub(now)
-
-	if waitDur < 0 {
-		var zeroDur time.Duration
-		return zeroDur
-	}
 	processingTime := 3 * time.Minute
 	randComp := randDur + processingTime
 
 	if waitDur < randComp {
-		return waitDur
+		return 0 * time.Second
 	}
 
 	return waitDur - randComp
@@ -33,4 +23,36 @@ func getWaitDurWithProcessingTime(now time.Time, callTime time.Time, randDur tim
 func randomSec(variationInSec int) time.Duration {
 	randComp := rand.Intn(variationInSec)
 	return time.Duration(randComp) * time.Second
+}
+
+func getCallTime(now time.Time, callHours []int) time.Time {
+	curHour := now.Hour()
+	nextHour := -1
+
+	for _, hour := range callHours {
+		if curHour < hour {
+			nextHour = hour
+
+			break
+		}
+	}
+
+	nextDay := false
+
+	if nextHour == -1 {
+		nextHour = callHours[0]
+		nextDay = true
+	}
+
+	return getCallTimeFromHour(now, nextHour, nextDay)
+}
+
+func getCallTimeFromHour(now time.Time, hour int, nextDay bool) time.Time {
+	day := now.Day()
+
+	if nextDay {
+		day++
+	}
+
+	return time.Date(now.Year(), now.Month(), day, hour, 0, 0, 0, now.Location())
 }
