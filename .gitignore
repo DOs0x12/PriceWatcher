@@ -41,3 +41,6 @@ config.yml
 
 #Data file
 subscribers.yml
+
+#Environment file for Docker
+.env

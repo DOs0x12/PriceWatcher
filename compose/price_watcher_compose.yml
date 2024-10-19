@@ -1,0 +1,8 @@
+services:
+  price_watcher:
+    image: gold-price-watcher:v0.3
+    build: ../.
+    container_name: gold-price-watcher
+    volumes:
+      - ${DATA_FOLDER}:/price-watcher-data
+    restart: unless-stopped
