@@ -7,7 +7,7 @@ import (
 	"PriceWatcher/internal/entities/subscribing"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
 	interfBank "PriceWatcher/internal/interfaces/bank"
-	"PriceWatcher/internal/interfaces/bot"
+	"PriceWatcher/internal/interfaces/broker"
 	"context"
 	"sync"
 
@@ -36,7 +36,7 @@ func NewService(
 
 func (s Service) WatchPrice(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot bot.Worker,
+	broker broker.Worker,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
@@ -51,7 +51,7 @@ func (s Service) WatchPrice(ctx context.Context,
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go s.servePriceWithTiming(ctx, t, bot, subscribers)
+			go s.servePriceWithTiming(ctx, t, broker, subscribers)
 		}
 	}
 }
@@ -59,7 +59,7 @@ func (s Service) WatchPrice(ctx context.Context,
 func (s Service) servePriceWithTiming(
 	ctx context.Context,
 	timer *time.Timer,
-	bot bot.Worker,
+	broker broker.Worker,
 	subscribers *subscribing.Subscribers) {
 	msg, err := s.getMessageWithPrice()
 	if err != nil {
@@ -90,7 +90,7 @@ func (s Service) servePriceWithTiming(
 	}
 
 	for _, chatID := range subscribers.ChatIDs {
-		bot.SendMessage(msg, chatID)
+		broker.SendMessage(ctx, msg, chatID)
 	}
 
 	s.resetTimer(timer)
