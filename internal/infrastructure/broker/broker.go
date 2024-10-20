@@ -22,7 +22,7 @@ func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
 		commData := service.CommandData{Name: comm.Name, Description: comm.Description}
 
 		if err := service.RegisterCommand(ctx, b.w, commData); err != nil {
-			return nil, fmt.Errorf("cannot start the bot: %v", err)
+			return nil, fmt.Errorf("cannot start the broker: %v", err)
 		}
 
 		topicName := strings.Trim("/", comm.Name)
@@ -74,5 +74,5 @@ func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("an error occurs at sending a message to the broker: %v", err)
 }
