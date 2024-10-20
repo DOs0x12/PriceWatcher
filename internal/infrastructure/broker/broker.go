@@ -1,7 +1,7 @@
 package bot
 
 import (
-	telebot "PriceWatcher/internal/entities/bot"
+	"PriceWatcher/internal/entities/bot"
 	"context"
 	"fmt"
 	"strings"
@@ -12,12 +12,12 @@ import (
 )
 
 type Broker struct {
-	commands []telebot.Command
+	commands []bot.Command
 	w        *kafka.Writer
 }
 
-func (b Broker) Start(ctx context.Context) (chan<- telebot.Message, error) {
-	dataChan := make(chan telebot.Message)
+func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
+	dataChan := make(chan bot.Message)
 	for _, comm := range b.commands {
 		commData := service.CommandData{Name: comm.Name, Description: comm.Description}
 
@@ -36,13 +36,13 @@ func (b Broker) Start(ctx context.Context) (chan<- telebot.Message, error) {
 
 func pipelineData(ctx context.Context,
 	brokerDataChan <-chan service.BotData,
-	msgChan chan<- telebot.Message) {
+	msgChan chan<- bot.Message) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case brokerData := <-brokerDataChan:
-			msg := telebot.Message{ChatID: brokerData.ChatID, Value: brokerData.Value}
+			msg := bot.Message{ChatID: brokerData.ChatID, Value: brokerData.Value}
 			msgChan <- msg
 		}
 	}
