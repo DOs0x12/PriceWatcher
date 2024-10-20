@@ -1,6 +1,7 @@
 package bot
 
 type Message struct {
-	ChatID int64
-	Value  string
+	ChatID  int64
+	Command string
+	Value   string
 }

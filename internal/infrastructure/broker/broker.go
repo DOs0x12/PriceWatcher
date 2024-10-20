@@ -28,7 +28,7 @@ func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
 		topicName := strings.Trim("/", comm.Name)
 
 		brokerDataChan := service.StartGetData(ctx, topicName, b.w.Addr.String())
-		go pipelineData(ctx, brokerDataChan, dataChan)
+		go pipelineData(ctx, brokerDataChan, dataChan, comm.Name)
 	}
 
 	return dataChan, nil
@@ -36,13 +36,14 @@ func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
 
 func pipelineData(ctx context.Context,
 	brokerDataChan <-chan service.BotData,
-	msgChan chan<- bot.Message) {
+	msgChan chan<- bot.Message,
+	command string) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case brokerData := <-brokerDataChan:
-			msg := bot.Message{ChatID: brokerData.ChatID, Value: brokerData.Value}
+			msg := bot.Message{ChatID: brokerData.ChatID, Command: command, Value: brokerData.Value}
 			msgChan <- msg
 		}
 	}
