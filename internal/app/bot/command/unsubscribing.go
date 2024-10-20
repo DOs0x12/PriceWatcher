@@ -1,10 +1,10 @@
 package command
 
 import (
+	"PriceWatcher/internal/entities/bot"
 	"PriceWatcher/internal/entities/subscribing"
 	"sync"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slices"
 )
 
@@ -17,7 +17,7 @@ func newUnsubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) unsub
 	return unsubscribingComm{mu: mu, Subscribers: subscribers}
 }
 
-func (c unsubscribingComm) unsubscribeUser(input interface{}) string {
+func (c unsubscribingComm) unsubscribeUser(msg bot.Message) string {
 	errMessage := "The user is not subscribed!"
 
 	c.mu.Lock()
@@ -26,8 +26,7 @@ func (c unsubscribingComm) unsubscribeUser(input interface{}) string {
 		return errMessage
 	}
 
-	upd := input.(tgbotapi.Update)
-	idIndex := slices.Index(c.Subscribers.ChatIDs, upd.Message.Chat.ID)
+	idIndex := slices.Index(c.Subscribers.ChatIDs, msg.ChatID)
 	if idIndex == -1 {
 		return errMessage
 	}

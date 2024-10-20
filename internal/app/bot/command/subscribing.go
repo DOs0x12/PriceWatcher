@@ -1,10 +1,11 @@
 package command
 
 import (
+	"PriceWatcher/internal/entities/bot"
 	"PriceWatcher/internal/entities/subscribing"
+
 	"sync"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slices"
 )
 
@@ -17,17 +18,16 @@ func newSubCommand(mu *sync.Mutex, subscribers *subscribing.Subscribers) subscri
 	return subscribingComm{mu: mu, Subscribers: subscribers}
 }
 
-func (c subscribingComm) subscribeUser(input interface{}) string {
-	upd := input.(tgbotapi.Update)
+func (c subscribingComm) subscribeUser(msg bot.Message) string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	idIndex := slices.Index(c.Subscribers.ChatIDs, upd.Message.Chat.ID)
+	idIndex := slices.Index(c.Subscribers.ChatIDs, msg.ChatID)
 	if idIndex != -1 {
 		return "The user is already subscribed!"
 	}
 
-	c.Subscribers.ChatIDs = append(c.Subscribers.ChatIDs, upd.Message.Chat.ID)
+	c.Subscribers.ChatIDs = append(c.Subscribers.ChatIDs, msg.ChatID)
 
 	return "The user is subscribed for current gold price notifications!"
 }
