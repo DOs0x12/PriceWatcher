@@ -49,6 +49,14 @@ func pipelineData(ctx context.Context,
 
 }
 
+func (b Broker) Stop() error {
+	if err := b.w.Close(); err != nil {
+		return fmt.Errorf("an error occurs at stopping the broker worker: %v", err)
+	}
+
+	return nil
+}
+
 func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error {
 	botData := service.BotData{ChatID: chatID, Value: msg}
 	maxRetries := 10
