@@ -16,6 +16,10 @@ type Broker struct {
 	w        *kafka.Writer
 }
 
+func NewBroker(commands []bot.Command, w *kafka.Writer) Broker {
+	return Broker{commands: commands, w: w}
+}
+
 func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
 	dataChan := make(chan bot.Message)
 	for _, comm := range b.commands {
