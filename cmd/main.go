@@ -2,18 +2,20 @@ package main
 
 import (
 	bankApp "PriceWatcher/internal/app/bank"
+	botApp "PriceWatcher/internal/app/bot"
 	appBotComm "PriceWatcher/internal/app/bot/command"
 	"PriceWatcher/internal/app/interruption"
 	bankDom "PriceWatcher/internal/domain/bank"
 	botEnt "PriceWatcher/internal/entities/bot"
 	subEnt "PriceWatcher/internal/entities/subscribing"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
-	botInfra "PriceWatcher/internal/infrastructure/bot"
+	brokerInfra "PriceWatcher/internal/infrastructure/broker"
 	"PriceWatcher/internal/infrastructure/config"
 	infraSub "PriceWatcher/internal/infrastructure/subscribing"
 	"context"
 	"sync"
 
+	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -53,21 +55,20 @@ func main() {
 	}
 
 	commands := createCommands(subscribers)
-	bot, err := botInfra.NewTelebot(wg, configer, commands)
+	w := &kafka.Writer{
+		Addr:     kafka.TCP(conf.KafkaAddress),
+		Balancer: &kafka.LeastBytes{},
+	}
+	broker := brokerInfra.NewBroker(commands, w)
+
+	err = botApp.Start(appCtx, wg, broker, commands)
 	if err != nil {
-		logrus.Errorf("A bot error occurs: %v", err)
+		logrus.Errorf("Cannot start serving bot messages: %v", err)
 
 		return
 	}
 
-	err = bot.Start(appCtx)
-	if err != nil {
-		logrus.Errorf("Cannot start a bot: %v", err)
-
-		return
-	}
-
-	bankService.WatchPrice(appCtx, wg, bot, subscribers)
+	bankService.WatchPrice(appCtx, wg, broker, subscribers)
 
 	wg.Wait()
 
