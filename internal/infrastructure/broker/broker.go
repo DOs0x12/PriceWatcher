@@ -20,7 +20,7 @@ func NewBroker(commands []bot.Command, w *kafka.Writer) Broker {
 	return Broker{commands: commands, w: w}
 }
 
-func (b Broker) Start(ctx context.Context) (chan<- bot.Message, error) {
+func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
 	dataChan := make(chan bot.Message)
 	for _, comm := range b.commands {
 		commData := service.CommandData{Name: comm.Name, Description: comm.Description}
