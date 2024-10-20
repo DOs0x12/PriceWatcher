@@ -6,16 +6,6 @@ import (
 	"sync"
 )
 
-func CreateHelloCommand() bot.Command {
-	return bot.Command{
-		Name:        "/hello",
-		Description: "Say hello to the bot",
-		Action: func(interface{}) string {
-			return "Hello there!"
-		},
-	}
-}
-
 func CreateSubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) bot.Command {
 	subCom := newSubCommand(mu, subs)
 	return bot.Command{
