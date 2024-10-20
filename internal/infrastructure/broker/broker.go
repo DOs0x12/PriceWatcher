@@ -16,8 +16,8 @@ type Broker struct {
 	w        *kafka.Writer
 }
 
-func (b Broker) Start(ctx context.Context) (chan<- interface{}, error) {
-	dataChan := make(chan interface{})
+func (b Broker) Start(ctx context.Context) (chan<- telebot.Message, error) {
+	dataChan := make(chan telebot.Message)
 	for _, comm := range b.commands {
 		commData := service.CommandData{Name: comm.Name, Description: comm.Description}
 
@@ -27,21 +27,23 @@ func (b Broker) Start(ctx context.Context) (chan<- interface{}, error) {
 
 		topicName := strings.Trim("/", comm.Name)
 
-		botDataChan := service.StartGetData(ctx, topicName, b.w.Addr.String())
-		go pipelineData(ctx, botDataChan, dataChan)
+		brokerDataChan := service.StartGetData(ctx, topicName, b.w.Addr.String())
+		go pipelineData(ctx, brokerDataChan, dataChan)
 	}
 
 	return dataChan, nil
 }
 
-func pipelineData(ctx context.Context, botDataChan <-chan service.BotData, dataChan chan<- interface{}) {
+func pipelineData(ctx context.Context,
+	brokerDataChan <-chan service.BotData,
+	msgChan chan<- telebot.Message) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case botData := <-botDataChan:
-			//TODO: add casting from the botData to app data
-			dataChan <- botData
+		case brokerData := <-brokerDataChan:
+			msg := telebot.Message{ChatID: brokerData.ChatID, Value: brokerData.Value}
+			msgChan <- msg
 		}
 	}
 
