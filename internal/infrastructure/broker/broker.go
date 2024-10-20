@@ -29,7 +29,7 @@ func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
 			return nil, fmt.Errorf("cannot start the broker: %v", err)
 		}
 
-		topicName := strings.Trim("/", comm.Name)
+		topicName := strings.Trim(comm.Name, "/")
 
 		brokerDataChan := service.StartGetData(ctx, topicName, b.w.Addr.String())
 		go pipelineData(ctx, brokerDataChan, dataChan, comm.Name)
