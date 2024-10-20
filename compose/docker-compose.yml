@@ -6,3 +6,8 @@ services:
     volumes:
       - ${DATA_FOLDER}:/price-watcher-data
     restart: unless-stopped
+    networks:
+      - "kafka-network"
+networks:
+  kafka-network:
+    external: true
