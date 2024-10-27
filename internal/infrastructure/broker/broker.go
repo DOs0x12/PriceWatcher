@@ -7,31 +7,32 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Guise322/TeleBot/client/pkg/service"
-	"github.com/segmentio/kafka-go"
+	extBroker "github.com/Guise322/TeleBot/client/pkg/broker"
 )
 
 type Broker struct {
-	commands []bot.Command
-	w        *kafka.Writer
+	commands  []bot.Command
+	extBroker extBroker.Broker
+	address   string
 }
 
-func NewBroker(commands []bot.Command, w *kafka.Writer) Broker {
-	return Broker{commands: commands, w: w}
+func NewBroker(commands []bot.Command, address string) Broker {
+	extBroker := extBroker.NewBroker(address)
+	return Broker{commands: commands, extBroker: extBroker, address: address}
 }
 
 func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
 	dataChan := make(chan bot.Message)
 	for _, comm := range b.commands {
-		commData := service.CommandData{Name: comm.Name, Description: comm.Description}
+		commData := extBroker.CommandData{Name: comm.Name, Description: comm.Description}
 
-		if err := service.RegisterCommand(ctx, b.w, commData); err != nil {
+		if err := b.extBroker.RegisterCommand(ctx, commData); err != nil {
 			return nil, fmt.Errorf("cannot start the broker: %v", err)
 		}
 
 		topicName := strings.Trim(comm.Name, "/")
 
-		brokerDataChan := service.StartGetData(ctx, topicName, b.w.Addr.String())
+		brokerDataChan := b.extBroker.StartGetData(ctx, topicName, b.address)
 		go pipelineData(ctx, brokerDataChan, dataChan, comm.Name)
 	}
 
@@ -39,7 +40,7 @@ func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
 }
 
 func pipelineData(ctx context.Context,
-	brokerDataChan <-chan service.BotData,
+	brokerDataChan <-chan extBroker.BotData,
 	msgChan chan<- bot.Message,
 	command string) {
 	for {
@@ -55,7 +56,7 @@ func pipelineData(ctx context.Context,
 }
 
 func (b Broker) Stop() error {
-	if err := b.w.Close(); err != nil {
+	if err := b.extBroker.Stop(); err != nil {
 		return fmt.Errorf("an error occurs at stopping the broker worker: %v", err)
 	}
 
@@ -63,13 +64,13 @@ func (b Broker) Stop() error {
 }
 
 func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error {
-	botData := service.BotData{ChatID: chatID, Value: msg}
+	botData := extBroker.BotData{ChatID: chatID, Value: msg}
 	maxRetries := 10
 	cnt := 0
 	var err error
 
 	for cnt < maxRetries {
-		if err = service.SendData(ctx, b.w, botData); err != nil {
+		if err = b.extBroker.SendData(ctx, botData); err != nil {
 			time.Sleep(5 * time.Second)
 			cnt++
 

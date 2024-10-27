@@ -15,7 +15,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -55,11 +54,7 @@ func main() {
 	}
 
 	commands := createCommands(subscribers)
-	w := &kafka.Writer{
-		Addr:     kafka.TCP(conf.KafkaAddress),
-		Balancer: &kafka.LeastBytes{},
-	}
-	broker := brokerInfra.NewBroker(commands, w)
+	broker := brokerInfra.NewBroker(commands, conf.KafkaAddress)
 
 	err = botApp.Start(appCtx, wg, broker, commands)
 	if err != nil {
