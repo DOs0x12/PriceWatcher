@@ -1,6 +1,6 @@
 services:
   price_watcher:
-    image: gold-price-watcher:v0.3
+    image: gold-price-watcher:${TAG}
     build: ../.
     container_name: gold-price-watcher
     volumes:
