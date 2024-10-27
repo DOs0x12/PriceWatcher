@@ -18,7 +18,7 @@ func Start(ctx context.Context,
 		return err
 	}
 
-	go processeMessages(ctx, wg, broker, msgChan, commands)
+	go processeMessages(ctx, broker, msgChan, commands)
 
 	go func() {
 		<-ctx.Done()
@@ -32,14 +32,13 @@ func Start(ctx context.Context,
 }
 
 func processeMessages(ctx context.Context,
-	wg *sync.WaitGroup,
 	broker broker.Worker,
 	msgChan <-chan bot.Message,
 	commands []bot.Command) {
 	for {
 		select {
 		case <-ctx.Done():
-			wg.Done()
+			return
 		case msg := <-msgChan:
 			for _, cmd := range commands {
 				if cmd.Name == msg.Command {
