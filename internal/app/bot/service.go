@@ -43,8 +43,16 @@ func processeMessages(ctx context.Context,
 			for _, cmd := range commands {
 				if cmd.Name == msg.Command {
 					result := cmd.Action(msg)
-					broker.SendMessage(ctx, result, msg.ChatID)
+					err := broker.SendMessage(ctx, result, msg.ChatID)
+					if err != nil {
+						logrus.Error("Can not send a message:", err)
+					}
 				}
+			}
+
+			err := broker.CommitMessage(ctx, msg.ReceiverUuid, msg.MsgUuid)
+			if err != nil {
+				logrus.Error("Can not commit a message:", err)
 			}
 		}
 	}
