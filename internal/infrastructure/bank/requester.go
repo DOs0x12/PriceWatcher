@@ -1,4 +1,4 @@
-package bank
+package request
 
 import (
 	"PriceWatcher/internal/entities/bank"
@@ -13,7 +13,7 @@ import (
 
 type BankRequester struct{}
 
-func (r BankRequester) RequestPage() (bank.Response, error) {
+func (r BankRequester) RequestPage() (bank.Page, error) {
 	u := launcher.New().Bin("/usr/bin/chromium").MustLaunch()
 	browser := rod.New().ControlURL(u).Timeout(time.Minute).MustConnect()
 	browser.MustIgnoreCertErrors(true)
@@ -25,10 +25,10 @@ func (r BankRequester) RequestPage() (bank.Response, error) {
 
 	html, err := page.HTML()
 	if err != nil {
-		return bank.Response{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)
+		return bank.Page{Body: nil}, fmt.Errorf("cannot get the data from the address: %v", err)
 	}
 
 	respReader := strings.NewReader(html)
 
-	return bank.Response{Body: respReader}, nil
+	return bank.Page{Body: respReader}, nil
 }

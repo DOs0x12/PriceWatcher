@@ -1,7 +1,7 @@
-package interfaces
+package bank
 
 import "PriceWatcher/internal/entities/bank"
 
 type Requester interface {
-	RequestPage() (bank.Response, error)
+	RequestPage() (bank.Page, error)
 }

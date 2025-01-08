@@ -1,25 +1,25 @@
 package command
 
 import (
+	"PriceWatcher/internal/entities/bot"
 	"PriceWatcher/internal/entities/subscribing"
-	"PriceWatcher/internal/entities/telebot"
+	"sync"
 )
 
-func CreateHelloCommand() telebot.Command {
-	return telebot.Command{
-		Name:        "/hello",
-		Description: "Say hello to the bot",
-		Action: func(interface{}) string {
-			return "Hello there!"
-		},
+func CreateSubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) bot.Command {
+	subCom := newSubCommand(mu, subs)
+	return bot.Command{
+		Name:        "start",
+		Description: "Start getting messages of the current gold price ",
+		Action:      subCom.subscribeUser,
 	}
 }
 
-func CreateSubCommand(subs *subscribing.Subscribers) telebot.Command {
-	subCom := SubscribingComm{Subscribers: subs}
-	return telebot.Command{
-		Name:        "/subscribe",
-		Description: "Subscribe to messages of the current price ",
-		Action:      subCom.SubscribeUser,
+func CreateUnsubCommand(mu *sync.Mutex, subs *subscribing.Subscribers) bot.Command {
+	unsubCom := newUnsubCommand(mu, subs)
+	return bot.Command{
+		Name:        "stop",
+		Description: "Stop getting notifications about the current gold price ",
+		Action:      unsubCom.unsubscribeUser,
 	}
 }

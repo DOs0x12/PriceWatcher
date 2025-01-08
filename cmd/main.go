@@ -1,15 +1,17 @@
 package main
 
 import (
-	"PriceWatcher/internal/app"
 	bankApp "PriceWatcher/internal/app/bank"
+	botApp "PriceWatcher/internal/app/bot"
 	appBotComm "PriceWatcher/internal/app/bot/command"
+	"PriceWatcher/internal/app/interruption"
 	bankDom "PriceWatcher/internal/domain/bank"
+	botEnt "PriceWatcher/internal/entities/bot"
 	subEnt "PriceWatcher/internal/entities/subscribing"
-	botEnt "PriceWatcher/internal/entities/telebot"
-	bankInfra "PriceWatcher/internal/infrastructure/bank"
-	botInfra "PriceWatcher/internal/infrastructure/bot"
+	infraBank "PriceWatcher/internal/infrastructure/bank"
+	brokerInfra "PriceWatcher/internal/infrastructure/broker"
 	"PriceWatcher/internal/infrastructure/config"
+	infraSub "PriceWatcher/internal/infrastructure/subscribing"
 	"context"
 	"sync"
 
@@ -24,7 +26,7 @@ func main() {
 
 	logrus.Infoln("Start the application")
 
-	app.WatchForInterruption(appCancel)
+	interruption.WatchForInterruption(appCancel)
 
 	servCount := 2
 	wg := &sync.WaitGroup{}
@@ -41,9 +43,9 @@ func main() {
 	priceRegEx := `([0-9]).*([0-9])*,([0-9])*`
 	priceTag := "div"
 	priceExtractor := bankDom.NewPriceExtractor(priceRegEx, priceTag)
-	bankService := bankApp.NewService(bankInfra.BankRequester{}, priceExtractor, conf)
+	bankService := bankApp.NewService(infraBank.BankRequester{}, priceExtractor, conf)
 
-	subService := bankInfra.SubscribingService{}
+	subService := infraSub.SubscribingService{}
 	subscribers, err := subService.GetSubscribers(subscribersFilePath)
 	if err != nil {
 		logrus.Errorf("Cannot get subscribers: %v", err)
@@ -52,21 +54,16 @@ func main() {
 	}
 
 	commands := createCommands(subscribers)
-	bot, err := botInfra.NewTelebot(wg, configer, commands)
+	broker := brokerInfra.NewBroker(commands, conf.KafkaAddress)
+
+	err = botApp.Start(appCtx, wg, broker, commands)
 	if err != nil {
-		logrus.Errorf("A bot error occurs: %v", err)
+		logrus.Errorf("Cannot start serving bot messages: %v", err)
 
 		return
 	}
 
-	err = bot.Start(appCtx)
-	if err != nil {
-		logrus.Errorf("Cannot start a bot: %v", err)
-
-		return
-	}
-
-	bankService.WatchPrice(appCtx, wg, bot, subscribers)
+	bankService.WatchPrice(appCtx, wg, broker, subscribers)
 
 	wg.Wait()
 
@@ -79,8 +76,9 @@ func main() {
 }
 
 func createCommands(subscribers *subEnt.Subscribers) []botEnt.Command {
+	mu := &sync.Mutex{}
 	return []botEnt.Command{
-		appBotComm.CreateHelloCommand(),
-		appBotComm.CreateSubCommand(subscribers),
+		appBotComm.CreateSubCommand(mu, subscribers),
+		appBotComm.CreateUnsubCommand(mu, subscribers),
 	}
 }

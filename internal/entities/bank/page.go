@@ -2,6 +2,6 @@ package bank
 
 import "io"
 
-type Response struct {
+type Page struct {
 	Body io.Reader
 }

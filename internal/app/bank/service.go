@@ -1,12 +1,13 @@
 package bank
 
 import (
-	priceTime "PriceWatcher/internal/app/bank/time"
+	bankTime "PriceWatcher/internal/app/bank/time"
 	domBank "PriceWatcher/internal/domain/bank"
 	entConfig "PriceWatcher/internal/entities/config"
 	"PriceWatcher/internal/entities/subscribing"
 	infraBank "PriceWatcher/internal/infrastructure/bank"
-	"PriceWatcher/internal/interfaces"
+	interfBank "PriceWatcher/internal/interfaces/bank"
+	"PriceWatcher/internal/interfaces/broker"
 	"context"
 	"sync"
 
@@ -17,8 +18,8 @@ import (
 )
 
 type Service struct {
-	req  interfaces.Requester
-	ext  interfaces.Extractor
+	req  interfBank.Requester
+	ext  interfBank.Extractor
 	conf entConfig.Config
 }
 
@@ -35,11 +36,11 @@ func NewService(
 
 func (s Service) WatchPrice(ctx context.Context,
 	wg *sync.WaitGroup,
-	bot interfaces.Bot,
+	broker broker.Worker,
 	subscribers *subscribing.Subscribers) {
 	defer wg.Done()
 
-	dur := s.getWaitTimeWithLogs(time.Now())
+	dur := s.getWaitDurWithLogs(time.Now())
 
 	t := time.NewTimer(dur)
 	callChan := t.C
@@ -50,7 +51,7 @@ func (s Service) WatchPrice(ctx context.Context,
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go s.servePriceWithTiming(ctx, t, bot, subscribers)
+			go s.servePriceWithTiming(ctx, t, broker, subscribers)
 		}
 	}
 }
@@ -58,7 +59,7 @@ func (s Service) WatchPrice(ctx context.Context,
 func (s Service) servePriceWithTiming(
 	ctx context.Context,
 	timer *time.Timer,
-	bot interfaces.Bot,
+	broker broker.Worker,
 	subscribers *subscribing.Subscribers) {
 	msg, err := s.getMessageWithPrice()
 	if err != nil {
@@ -69,34 +70,34 @@ func (s Service) servePriceWithTiming(
 
 	logrus.Info("The price is processed")
 
-	var now time.Time
+	if msg == "" {
+		s.resetTimer(timer)
+		logrus.Infof("A message of the processed price is empty")
 
-	if msg != "" {
-		now = time.Now()
-		durForMessage := priceTime.DurToSendMessage(now, s.conf.SendingHours)
-		logrus.Infof("Waiting the time to send a message: %v", durForMessage)
-
-		select {
-		case <-ctx.Done():
-			logrus.Infoln("Interrupting waiting the time when to send a message")
-
-			return
-		case <-time.After(durForMessage):
-		}
-
-		for _, chatID := range subscribers.ChatIDs {
-			bot.SendMessage(msg, chatID)
-		}
+		return
 	}
 
-	now = time.Now()
-	dur := s.getWaitTimeWithLogs(now)
+	now := time.Now()
+	durForMessage := bankTime.DurToSendMessage(now, s.conf.SendingHours)
+	logrus.Infof("Waiting the time to send a message: %v", durForMessage)
 
-	timer.Reset(dur)
+	select {
+	case <-ctx.Done():
+		logrus.Infoln("Interrupting waiting the time when to send a message")
+
+		return
+	case <-time.After(durForMessage):
+	}
+
+	for _, chatID := range subscribers.ChatIDs {
+		broker.SendMessage(ctx, msg, chatID)
+	}
+
+	s.resetTimer(timer)
 }
 
-func (s Service) getWaitTimeWithLogs(now time.Time) time.Duration {
-	dur := priceTime.GetWaitTimeWithRandomComp(now, s.conf.SendingHours)
+func (s Service) getWaitDurWithLogs(now time.Time) time.Duration {
+	dur := bankTime.GetWaitDurWithRandomComp(now, s.conf.SendingHours)
 	logrus.Infof("Waiting %v", dur)
 
 	return dur
@@ -118,4 +119,10 @@ func (s Service) getMessageWithPrice() (message string, err error) {
 	msg := fmt.Sprintf("Курс золота. Продажа: %.2fр", price)
 
 	return msg, nil
+}
+
+func (s Service) resetTimer(timer *time.Timer) {
+	now := time.Now()
+	dur := s.getWaitDurWithLogs(now)
+	timer.Reset(dur)
 }

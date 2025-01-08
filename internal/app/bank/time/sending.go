@@ -5,7 +5,7 @@ import (
 )
 
 func DurToSendMessage(now time.Time, callHours []int) time.Duration {
-	timeForMessage := GetCallTime(now, callHours)
+	timeForMessage := getCallTime(now, callHours)
 
 	return timeForMessage.Sub(now)
 }

@@ -1,0 +1,13 @@
+services:
+  price_watcher:
+    image: gold-price-watcher:v1.0.0
+    build: ../.
+    volumes:
+      - ${DATA_FOLDER}:/price-watcher-data
+      - ${CLIENT_DATA_FOLDER}:/var/lib/telebot
+    restart: unless-stopped
+    networks:
+      - "kafka-network"
+networks:
+  kafka-network:
+    external: true

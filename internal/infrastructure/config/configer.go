@@ -8,7 +8,7 @@ import (
 )
 
 type ConfigDto struct {
-	BotKey       string `yaml:"botKey"`
+	KafkaAddress string `yaml:"kafkaAddress"`
 	SendingHours []int  `yaml:"sending_hours"`
 }
 
@@ -40,5 +40,5 @@ func unmarshalConf(data []byte) (config.Config, error) {
 }
 
 func cast(confDto ConfigDto) config.Config {
-	return config.Config{BotKey: confDto.BotKey, SendingHours: confDto.SendingHours}
+	return config.Config{KafkaAddress: confDto.KafkaAddress, SendingHours: confDto.SendingHours}
 }
