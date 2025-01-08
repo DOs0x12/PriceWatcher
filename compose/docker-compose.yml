@@ -4,6 +4,7 @@ services:
     build: ../.
     volumes:
       - ${DATA_FOLDER}:/price-watcher-data
+      - ${CLIENT_DATA_FOLDER}:/var/lib/telebot
     restart: unless-stopped
     networks:
       - "kafka-network"
