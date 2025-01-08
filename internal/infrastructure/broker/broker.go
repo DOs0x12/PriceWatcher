@@ -39,7 +39,16 @@ func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
 			return nil, fmt.Errorf("cannot start the broker: %v", err)
 		}
 
-		r := extBroker.NewReceiver(b.address, comm.Name)
+		r, err := extBroker.NewReceiver(b.address, comm.Name)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create a broker receiver for the command %v on the address %v: %w",
+				comm.Name,
+				b.address,
+				err,
+			)
+		}
+
 		recUuid := uuid.New()
 		b.mu.Lock()
 		b.receivers[recUuid] = *r
