@@ -43,7 +43,7 @@ func (b Broker) Start(ctx context.Context, serviceName string) (<-chan bot.Messa
 	kafkaBrChan := b.kafkaBroker.StartGetData(ctx)
 	msgChan := make(chan bot.Message)
 
-	pipelineData(ctx, kafkaBrChan, msgChan)
+	go pipelineData(ctx, kafkaBrChan, msgChan)
 
 	return msgChan, nil
 }
