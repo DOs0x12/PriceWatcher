@@ -8,8 +8,8 @@ import (
 )
 
 type Worker interface {
-	Start(ctx context.Context) (<-chan bot.Message, error)
-	Stop() error
+	Start(ctx context.Context, serviceName string) (<-chan bot.Message, error)
+	Stop()
 	SendMessage(ctx context.Context, msg string, chatID int64) error
-	CommitMessage(ctx context.Context, recUuid uuid.UUID, msgUuid uuid.UUID) error
+	CommitMessage(ctx context.Context, msgUuid uuid.UUID) error
 }
