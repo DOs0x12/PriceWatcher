@@ -18,7 +18,7 @@ type Broker struct {
 	kafkaBroker broker.KafkaBroker
 }
 
-func NewBroker(ctx context.Context, address, serviceName string) (Broker, error) {
+func NewBroker(ctx context.Context, address, serviceName string, commands []bot.Command) (Broker, error) {
 	kafkaBroker, err := broker.NewKafkaBroker(ctx, address, serviceName)
 	if err != nil {
 		return Broker{}, fmt.Errorf("failed to create a broker: %w", err)
@@ -28,6 +28,7 @@ func NewBroker(ctx context.Context, address, serviceName string) (Broker, error)
 		mu:          &sync.RWMutex{},
 		kafkaBroker: *kafkaBroker,
 		address:     address,
+		commands:    commands,
 	}, nil
 }
 

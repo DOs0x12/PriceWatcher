@@ -55,7 +55,7 @@ func main() {
 
 	commands := createCommands(subscribers)
 	serviceName := "price-watcher"
-	broker, err := brokerInfra.NewBroker(appCtx, conf.KafkaAddress, serviceName)
+	broker, err := brokerInfra.NewBroker(appCtx, conf.KafkaAddress, serviceName, commands)
 	if err != nil {
 		logrus.Errorf("Failed to create a broker: %v", err)
 
