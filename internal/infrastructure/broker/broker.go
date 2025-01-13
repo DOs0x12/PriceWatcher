@@ -7,76 +7,61 @@ import (
 	"sync"
 	"time"
 
-	extBroker "github.com/DOs0x12/TeleBot/client/broker"
+	"github.com/DOs0x12/TeleBot/client/v2/broker"
 	"github.com/google/uuid"
 )
 
 type Broker struct {
-	mu        *sync.RWMutex
-	commands  []bot.Command
-	sender    extBroker.Sender
-	receivers map[uuid.UUID]extBroker.Receiver
-	address   string
+	mu          *sync.RWMutex
+	commands    []bot.Command
+	address     string
+	kafkaBroker broker.KafkaBroker
 }
 
-func NewBroker(commands []bot.Command, address string) Broker {
-	sender := extBroker.NewSender(address)
+func NewBroker(ctx context.Context, address, serviceName string, commands []bot.Command) (Broker, error) {
+	kafkaBroker, err := broker.NewKafkaBroker(ctx, address, serviceName)
+	if err != nil {
+		return Broker{}, fmt.Errorf("failed to create a broker: %w", err)
+	}
+
 	return Broker{
-		mu:        &sync.RWMutex{},
-		commands:  commands,
-		sender:    sender,
-		address:   address,
-		receivers: make(map[uuid.UUID]extBroker.Receiver),
-	}
+		mu:          &sync.RWMutex{},
+		kafkaBroker: *kafkaBroker,
+		address:     address,
+		commands:    commands,
+	}, nil
 }
 
-func (b Broker) Start(ctx context.Context) (<-chan bot.Message, error) {
-	dataChan := make(chan bot.Message)
+func (b Broker) Start(ctx context.Context, serviceName string) (<-chan bot.Message, error) {
 	for _, comm := range b.commands {
-		commData := extBroker.CommandData{Name: comm.Name, Description: comm.Description}
-
-		if err := b.sender.RegisterCommand(ctx, commData); err != nil {
-			return nil, fmt.Errorf("cannot start the broker: %v", err)
-		}
-
-		r, err := extBroker.NewReceiver(b.address, comm.Name)
+		commData := broker.BrokerCommandData{Name: comm.Name, Description: comm.Description}
+		err := b.kafkaBroker.RegisterCommand(ctx, commData, serviceName)
 		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to create a broker receiver for the command %v on the address %v: %w",
-				comm.Name,
-				b.address,
-				err,
-			)
+			return nil, fmt.Errorf("failed to register the command %v: %w", comm.Name, err)
 		}
-
-		recUuid := uuid.New()
-		b.mu.Lock()
-		b.receivers[recUuid] = *r
-		b.mu.Unlock()
-		brokerDataChan := r.StartGetData(ctx)
-
-		go pipelineData(ctx, brokerDataChan, dataChan, comm.Name, recUuid)
 	}
 
-	return dataChan, nil
+	kafkaBrChan := b.kafkaBroker.StartGetData(ctx)
+	msgChan := make(chan bot.Message)
+
+	go pipelineData(ctx, kafkaBrChan, msgChan)
+
+	return msgChan, nil
 }
 
 func pipelineData(ctx context.Context,
-	brokerDataChan <-chan extBroker.BotData,
-	msgChan chan<- bot.Message,
-	command string,
-	recUuid uuid.UUID) {
+	brokerDataChan <-chan broker.BrokerData,
+	msgChan chan<- bot.Message) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case brokerData := <-brokerDataChan:
 			msg := bot.Message{
-				ChatID:       brokerData.ChatID,
-				Command:      command,
-				Value:        brokerData.Value,
-				MsgUuid:      brokerData.MessageUuid,
-				ReceiverUuid: recUuid,
+				Command: brokerData.CommName,
+				ChatID:  brokerData.ChatID,
+				Value:   brokerData.Value,
+				MsgUuid: brokerData.MessageUuid,
 			}
 
 			msgChan <- msg
@@ -85,22 +70,18 @@ func pipelineData(ctx context.Context,
 
 }
 
-func (b Broker) Stop() error {
-	if err := b.sender.Stop(); err != nil {
-		return fmt.Errorf("an error occurs at stopping the broker worker: %v", err)
-	}
-
-	return nil
+func (b Broker) Stop() {
+	b.kafkaBroker.Stop()
 }
 
 func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error {
-	botData := extBroker.BotData{ChatID: chatID, Value: msg}
+	botData := broker.BrokerData{ChatID: chatID, Value: msg}
 	maxRetries := 10
 	cnt := 0
 	var err error
 
 	for cnt < maxRetries {
-		if err = b.sender.SendData(ctx, botData); err != nil {
+		if err = b.kafkaBroker.SendData(ctx, botData); err != nil {
 			time.Sleep(5 * time.Second)
 			cnt++
 
@@ -113,11 +94,8 @@ func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error
 	return fmt.Errorf("an error occurs at sending a message to the broker: %v", err)
 }
 
-func (b Broker) CommitMessage(ctx context.Context, recUuid uuid.UUID, msgUuid uuid.UUID) error {
-	b.mu.RLock()
-	r := b.receivers[recUuid]
-	b.mu.RUnlock()
-	err := r.Commit(ctx, msgUuid)
+func (b Broker) CommitMessage(ctx context.Context, msgUuid uuid.UUID) error {
+	err := b.kafkaBroker.Commit(ctx, msgUuid)
 	if err != nil {
 		return fmt.Errorf("an error occurs at commiting a message in the broker: %v", err)
 	}

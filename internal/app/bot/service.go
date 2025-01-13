@@ -12,8 +12,9 @@ import (
 func Start(ctx context.Context,
 	wg *sync.WaitGroup,
 	broker broker.Worker,
+	serviceName string,
 	commands []bot.Command) error {
-	msgChan, err := broker.Start(ctx)
+	msgChan, err := broker.Start(ctx, serviceName)
 	if err != nil {
 		return err
 	}
@@ -22,9 +23,7 @@ func Start(ctx context.Context,
 
 	go func() {
 		<-ctx.Done()
-		if err := broker.Stop(); err != nil {
-			logrus.Errorln("An error occurs at stopping the message worker: ", err)
-		}
+		broker.Stop()
 		wg.Done()
 	}()
 
@@ -50,7 +49,7 @@ func processeMessages(ctx context.Context,
 				}
 			}
 
-			err := broker.CommitMessage(ctx, msg.ReceiverUuid, msg.MsgUuid)
+			err := broker.CommitMessage(ctx, msg.MsgUuid)
 			if err != nil {
 				logrus.Error("Can not commit a message:", err)
 			}

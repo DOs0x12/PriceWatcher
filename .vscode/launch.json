@@ -10,7 +10,8 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/cmd",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "asRoot": true
         }
     ]
 }
