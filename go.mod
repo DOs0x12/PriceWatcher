@@ -5,7 +5,7 @@ go 1.23.3
 require golang.org/x/net v0.19.0
 
 require (
-	github.com/DOs0x12/TeleBot/client/v2 v2.0.3
+	github.com/DOs0x12/TeleBot/client/v2 v2.0.5
 	github.com/go-rod/rod v0.116.0
 	github.com/go-rod/stealth v0.4.9
 	github.com/google/uuid v1.6.0
