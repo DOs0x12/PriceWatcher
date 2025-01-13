@@ -58,6 +58,7 @@ func pipelineData(ctx context.Context,
 			return
 		case brokerData := <-brokerDataChan:
 			msg := bot.Message{
+				Command: brokerData.CommName,
 				ChatID:  brokerData.ChatID,
 				Value:   brokerData.Value,
 				MsgUuid: brokerData.MessageUuid,
