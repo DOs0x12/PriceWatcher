@@ -5,7 +5,7 @@ go 1.23.3
 require golang.org/x/net v0.19.0
 
 require (
-	github.com/DOs0x12/TeleBot/client/v2 v2.0.5
+	github.com/DOs0x12/TeleBot/client/v2 v2.0.6
 	github.com/go-rod/rod v0.116.0
 	github.com/go-rod/stealth v0.4.9
 	github.com/google/uuid v1.6.0
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/DOs0x12/TeleBot/server/v2 v2.0.3 // indirect
+	github.com/DOs0x12/TeleBot/server/v2 v2.0.5-0.20250202145706-ee084cf75f66 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
