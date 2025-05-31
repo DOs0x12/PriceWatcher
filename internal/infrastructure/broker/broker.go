@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/DOs0x12/TeleBot/client/v2/broker"
+	"github.com/DOs0x12/TeleBot/client/v3/broker"
 	"github.com/google/uuid"
 )
 
@@ -60,7 +60,7 @@ func pipelineData(ctx context.Context,
 			msg := bot.Message{
 				Command: brokerData.CommName,
 				ChatID:  brokerData.ChatID,
-				Value:   brokerData.Value,
+				Value:   string(brokerData.Value),
 				MsgUuid: brokerData.MessageUuid,
 			}
 
@@ -75,7 +75,7 @@ func (b Broker) Stop() {
 }
 
 func (b Broker) SendMessage(ctx context.Context, msg string, chatID int64) error {
-	botData := broker.BrokerData{ChatID: chatID, Value: msg}
+	botData := broker.BrokerData{ChatID: chatID, Value: []byte(msg)}
 	maxRetries := 10
 	cnt := 0
 	var err error
