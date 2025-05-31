@@ -43,4 +43,5 @@ config.yml
 subscribers.yml
 
 #Environment file for Docker
-.env
+.env.*
+!.env.example
