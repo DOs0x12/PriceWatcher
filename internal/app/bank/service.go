@@ -51,14 +51,14 @@ func (s Service) WatchPrice(ctx context.Context,
 		case <-ctx.Done():
 			return
 		case <-callChan:
-			go s.servePriceWithTiming(ctx, t, broker, subscribers)
+			s.servePriceWithTiming(ctx, broker, subscribers)
+			s.resetTimer(t)
 		}
 	}
 }
 
 func (s Service) servePriceWithTiming(
 	ctx context.Context,
-	timer *time.Timer,
 	broker broker.Worker,
 	subscribers *subscribing.Subscribers) {
 	msg, err := s.getMessageWithPrice()
@@ -71,7 +71,6 @@ func (s Service) servePriceWithTiming(
 	logrus.Info("The price is processed")
 
 	if msg == "" {
-		s.resetTimer(timer)
 		logrus.Infof("A message of the processed price is empty")
 
 		return
@@ -92,8 +91,6 @@ func (s Service) servePriceWithTiming(
 	for _, chatID := range subscribers.ChatIDs {
 		broker.SendMessage(ctx, msg, chatID)
 	}
-
-	s.resetTimer(timer)
 }
 
 func (s Service) getWaitDurWithLogs(now time.Time) time.Duration {
