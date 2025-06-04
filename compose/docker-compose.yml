@@ -1,6 +1,6 @@
 services:
   price_watcher:
-    image: gold-price-watcher:v1.0.1
+    image: gold-price-watcher:v1.0.2
     build: ../.
     volumes:
       - ${DATA_FOLDER}:/price-watcher-data
